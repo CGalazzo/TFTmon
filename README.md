@@ -1,4 +1,4 @@
-# Kanto Tactics v0.4
+# Kanto Tactics v0.5
 
 Protótipo fan-made de auto-battler com Pokémon de Kanto e Johto. Site estático: `index.html` na raiz, sem build obrigatório para o Vercel.
 
@@ -11,9 +11,24 @@ Protótipo fan-made de auto-battler com Pokémon de Kanto e Johto. Site estátic
 - Juros na vitória e na derrota: +1 ouro por cada 10 guardados antes da recompensa, até +5 com 50 ou mais. Somam à recompensa base e ao bônus de sequência; gastar ouro reduz os juros da próxima rodada.
 - XP visível abaixo do nível, com experiência atual/necessária e barra de progresso. Atualiza ao comprar XP, concluir rodada, subir de nível e reiniciar; nível 7 mostra nível máximo.
 - Sequências de vitórias ou derrotas: 3 dão +1 ouro; 4 dão +2; 5 ou mais dão +3 por rodada. Resultado diferente reinicia a sequência em 1; nova partida zera.
-- Mana, habilidades automáticas, movimentação e combate automático; 15 rodadas e rival final fortalecido.
+- Mana, habilidades automáticas, movimentação e combate automático; jornada ampliada para 25 etapas, com quatro encontros de boss.
 - Selecione um Pokémon no campo e clique em um espaço vazio do banco para retirá-lo.
 - Correções da v0.2 mantidas: sem ação contra alvo inexistente e sem ação após morte por dano periódico.
+
+
+## Progressão e bosses — v0.5
+
+- A jornada agora possui 25 etapas.
+- As etapas 1, 2 e 3 são propositalmente leves, com poucos inimigos, sem evoluções e atributos reduzidos.
+- A dificuldade sobe gradualmente em quantidade, atributos e chance de formas evoluídas.
+- A partir da parte intermediária da partida, as composições da IA passam a ser montadas para ativar conjuntos de 3 linhas; nos trechos avançados, passam a buscar conjuntos de 5 linhas.
+- Boss da etapa 6: **Onix**.
+- Boss da etapa 12: **3 Tauros**.
+- Boss da etapa 18: **Raikou, Entei ou Suicune**, sorteado uma vez por partida.
+- Boss da etapa 25: **Mewtwo**.
+- Os lendários de boss não entram na loja, no banco nem no elenco permanente.
+- Em batalhas de boss, sobreviver ao limite de tempo sem derrotar o boss conta como derrota.
+- Recompensa de boss: vitória = 2 componentes; derrota com pelo menos 50% do HP total removido = 1 componente; derrota abaixo de 50% = 0.
 
 ## Elenco: 33 linhas
 
@@ -81,12 +96,12 @@ Execute com Node.js:
 node --test tests/game.test.cjs
 ```
 
-Os testes executam o JavaScript real do jogo em um DOM simulado, cobrindo conjuntos, efeitos, invocação, evoluções, economia, ações de posicionamento e combates completos das oito composições nas 15 rodadas. Não substituem a avaliação visual em navegador nem os testes de balanceamento com jogadores.
+Os testes executam o JavaScript real do jogo em um DOM simulado, cobrindo conjuntos, efeitos, invocação, evoluções, economia, ações de posicionamento, curva de dificuldade, bosses e combates completos das oito composições nas 25 etapas. Não substituem a avaliação visual em navegador nem os testes de balanceamento com jogadores.
 
 Protótipo não comercial criado para testes de mecânica e balanceamento.
 
 
-## Itens — v0.4
+## Itens — v0.5
 
 - 5 componentes (Garra, Pena, Cristal, Casco, Semente) e 15 receitas, consultáveis na mochila.
 - Selecione um Pokémon, clique em um item da mochila e em Equipar. Até 3 itens por Pokémon, incluindo componentes.
@@ -96,8 +111,10 @@ Protótipo não comercial criado para testes de mecânica e balanceamento.
 - Remoção gratuita durante a preparação. Nenhuma alteração de equipamento é permitida em combate ou após o fim da partida.
 - A evolução preserva os itens: prioriza equipamentos completos, começando pelos da unidade que estava no campo. Excedentes e equipamentos completos duplicados voltam à mochila. Componentes não são combinados automaticamente na evolução.
 - Venda devolve todos os itens à mochila, sem alterar o valor de venda do Pokémon. A mochila não tem limite de capacidade.
-- Duas peças aleatórias na rodada 1. Antes das rodadas 4, 7, 10 e 13, escolha 1 entre 3 pacotes distintos de 2 componentes, independentemente do resultado anterior. Total: 10 componentes por partida.
-- A escolha de recompensa deve ser concluída antes do combate e só pode ser resgatada uma vez. Reiniciar limpa todos os itens e gera o par inicial novamente.
+- A partida começa com 2 componentes aleatórios.
+- Não existem mais pacotes automáticos nas etapas 4, 7, 10 e 13.
+- Os novos componentes são conquistados nos bosses das etapas 6, 12, 18 e 25: derrotar o boss concede 2 componentes; perder após remover pelo menos 50% do HP total do encontro concede 1; abaixo de 50% não concede componente.
+- No encontro de 3 Tauros, o percentual usa a soma do HP inicial dos três. Reiniciar limpa recompensas anteriores e sorteia novamente os 2 componentes iniciais.
 - Bônus percentuais dos itens no mesmo atributo se somam; esse total é multiplicado pelo bônus do conjunto. O equipamento substitui os bônus dos componentes consumidos. Escudos e regeneração de itens somam aos dos conjuntos.
 - Cura por dano considera apenas HP efetivamente retirado por dano direto, sem escudos, excesso além do HP restante, veneno ou queimadura. A redução de cura por veneno também afeta essa cura.
 - Itens não concedem tipos nem modificam a eficácia elemental. Zapdos não recebe equipamentos. A IA mantém o comportamento anterior, sem receber equipamentos extras nesta versão.
