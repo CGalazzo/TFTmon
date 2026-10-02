@@ -121,7 +121,7 @@
   <div class="modal-section"><h3>🛒 Loja e economia</h3><p>Compre Pokémon, use reroll por 2 ouro e compre 4 XP por 4 ouro. Guardar ouro gera juros de +1 por cada 10, até +5. Sequências de vitória ou derrota dão bônus a partir de 3 resultados iguais.</p></div>
   <div class="modal-section"><h3>✨ Evolução e campo</h3><p>3 cópias iguais do mesmo estágio evoluem automaticamente. Formas finais não fundem. O limite de Pokémon no campo é igual ao nível do treinador, que vai até 9.</p></div>
   <div class="modal-section"><h3>🧩 Sinergias</h3><p>3 ou 5 linhas evolutivas diferentes da mesma tipagem ativam bônus. Repetidos da mesma linha contam uma vez. Toque em qualquer tipagem durante a partida para ver os Pokémon válidos e seus efeitos.</p></div>
-  <div class="modal-section"><h3>★★★★ Pokémon especiais</h3><p>Dratini, Larvitar, Gastly, Lapras e Beldum são 4★. Eles começam a aparecer no nível 6, podem vir evoluídos e possuem habilidades/passivas exclusivas.</p></div>
+  <div class="modal-section"><h3>★★★★ Pokémon especiais</h3><p>Dratini, Larvitar, Gastly, Gible e Beldum são 4★. Eles começam a aparecer no nível 6, podem vir evoluídos e possuem habilidades/passivas exclusivas.</p></div>
   <div class="modal-section"><h3>🎒 Itens</h3><p>Você começa com 2 componentes. Combine 2 componentes para formar equipamentos. Cada Pokémon pode carregar até 3 itens. Bosses podem conceder novos componentes.</p></div>
   <div class="modal-section"><h3>👑 Bosses</h3><p>Etapa 6: Onix • 12: 3 Tauros • 18: Raikou, Entei ou Suicune • 25: Mewtwo. Vitória rende 2 componentes; ao perder removendo pelo menos 50% do HP total do boss, você recebe 1.</p></div>
   <div class="modal-section"><h3>🏆 Objetivo</h3><p>Sobreviva às 25 etapas. Não existem fraquezas, resistências ou imunidades elementais de dano: as tipagens servem para formar sinergias.</p></div>
@@ -199,33 +199,33 @@
     caterpie:{cost:1,role:'Suporte',types:[['Bug'],['Bug'],['Bug','Flying']],base:[78,11,5,1,82],ability:{name:'Teia',kind:'stun',power:1.0},stages:[['Caterpie',10],['Metapod',11],['Butterfree',12]]},
     weedle:{cost:1,role:'Atacante',types:[['Bug','Poison'],['Bug','Poison'],['Bug','Poison']],base:[70,13,4,1,94],ability:{name:'Ferrão',kind:'multi',power:1.12},stages:[['Weedle',13],['Kakuna',14],['Beedrill',15]]},
     pidgey:{cost:1,role:'Atacante',types:[['Normal','Flying'],['Normal','Flying'],['Normal','Flying']],base:[76,15,5,2,105],ability:{name:'Rajada',kind:'multi',power:1.05},stages:[['Pidgey',16],['Pidgeotto',17],['Pidgeot',18]]},
-    pikachu:{cost:2,role:'Atacante',types:[['Electric'],['Electric']],base:[74,23,4,2,118],ability:{name:'Thunderbolt',kind:'multi',power:1.35},stages:[['Pikachu',25],['Raichu',26]]},
-    sandshrew:{cost:2,role:'Tanque',types:[['Ground'],['Ground']],base:[110,17,12,1,82],ability:{name:'Magnitude',kind:'blast',power:1.25},stages:[['Sandshrew',27],['Sandslash',28]]},
+    pichu:{cost:2,role:'Atacante',types:[['Electric'],['Electric'],['Electric']],base:[74,23,4,2,118],ability:{name:'Thunderbolt',kind:'multi',power:1.35},stages:[['Pichu',172],['Pikachu',25],['Raichu',26]]},
+    rhyhorn:{cost:2,role:'Tanque',types:[['Ground','Rock'],['Ground','Rock'],['Ground','Rock']],base:[110,17,12,1,82],ability:{name:'Magnitude',kind:'blast',power:1.25},stages:[['Rhyhorn',111],['Rhydon',112],['Rhyperior',464]]},
     nidoranf:{cost:2,role:'Tanque',types:[['Poison'],['Poison'],['Poison','Ground']],base:[108,16,10,1,84],ability:{name:'Golpe Tóxico',kind:'blast',power:1.28},stages:[['Nidoran♀',29],['Nidorina',30],['Nidoqueen',31]]},
-    vulpix:{cost:2,role:'Mago',types:[['Fire'],['Fire']],base:[72,20,5,2,110],ability:{name:'Fire Spin',kind:'blast',power:1.65},stages:[['Vulpix',37],['Ninetales',38]]},
-    zubat:{cost:1,role:'Atacante',types:[['Poison','Flying'],['Poison','Flying']],base:[68,14,4,1,120],ability:{name:'Supersônico',kind:'stun',power:1.0},stages:[['Zubat',41],['Golbat',42]]},
+    magby:{cost:2,role:'Mago',types:[['Fire'],['Fire'],['Fire']],base:[72,20,5,2,110],ability:{name:'Fire Spin',kind:'blast',power:1.65},stages:[['Magby',240],['Magmar',126],['Magmortar',467]]},
+    zubat:{cost:1,role:'Atacante',types:[['Poison','Flying'],['Poison','Flying'],['Poison','Flying']],base:[68,14,4,1,120],ability:{name:'Supersônico',kind:'stun',power:1.0},stages:[['Zubat',41],['Golbat',42],['Crobat',169]]},
     oddish:{cost:1,role:'Suporte',types:[['Grass','Poison'],['Grass','Poison'],['Grass','Poison']],base:[84,14,6,2,82],ability:{name:'Absorver',kind:'heal',power:.5},stages:[['Oddish',43],['Gloom',44],['Vileplume',45]]},
-    paras:{cost:2,role:'Lutador',types:[['Bug','Grass'],['Bug','Grass']],base:[92,19,8,1,72],ability:{name:'Esporos',kind:'stun',power:1.15},stages:[['Paras',46],['Parasect',47]]},
-    venonat:{cost:2,role:'Mago',types:[['Bug','Poison'],['Bug','Poison']],base:[86,17,7,2,88],ability:{name:'Psybeam',kind:'blast',power:1.48},stages:[['Venonat',48],['Venomoth',49]]},
-    diglett:{cost:1,role:'Assassino',types:[['Ground'],['Ground']],base:[60,22,3,1,128],ability:{name:'Escavar',kind:'blast',power:1.55},stages:[['Diglett',50],['Dugtrio',51]]},
-    psyduck:{cost:2,role:'Mago',types:[['Water'],['Water']],base:[92,18,6,2,94],ability:{name:'Confusão',kind:'blast',power:1.5},stages:[['Psyduck',54],['Golduck',55]]},
+    bellsprout:{cost:2,role:'Lutador',types:[['Grass','Poison'],['Grass','Poison'],['Grass','Poison']],base:[92,19,8,1,72],ability:{name:'Pó do Sono',kind:'stun',power:1.15},stages:[['Bellsprout',69],['Weepinbell',70],['Victreebel',71]]},
+    wurmple:{cost:2,role:'Mago',types:[['Bug'],['Bug'],['Bug','Poison']],base:[86,17,7,2,88],ability:{name:'Rajada Tóxica',kind:'blast',power:1.48},stages:[['Wurmple',265],['Cascoon',268],['Dustox',269]]},
+    trapinch:{cost:1,role:'Assassino',types:[['Ground'],['Ground','Dragon'],['Ground','Dragon']],base:[60,22,3,1,128],ability:{name:'Escavar',kind:'blast',power:1.55},stages:[['Trapinch',328],['Vibrava',329],['Flygon',330]]},
+    horsea:{cost:2,role:'Mago',types:[['Water'],['Water'],['Water','Dragon']],base:[92,18,6,2,94],ability:{name:'Pulso d’Água',kind:'blast',power:1.5},stages:[['Horsea',116],['Seadra',117],['Kingdra',230]]},
     abra:{cost:3,role:'Mago',types:[['Psychic'],['Psychic'],['Psychic']],base:[58,28,3,3,96],ability:{name:'Psíquico',kind:'blast',power:1.75},stages:[['Abra',63],['Kadabra',64],['Alakazam',65]]},
-    ponyta:{cost:3,role:'Atacante',types:[['Fire'],['Fire']],base:[92,24,6,1,116],ability:{name:'Investida Flamejante',kind:'blast',power:1.55},stages:[['Ponyta',77],['Rapidash',78]]},
-    magnemite:{cost:3,role:'Tanque',types:[['Electric','Steel'],['Electric','Steel']],base:[100,21,13,2,72],ability:{name:'Onda de Choque',kind:'multi',power:1.22},stages:[['Magnemite',81],['Magneton',82]]},
-    exeggcute:{cost:3,role:'Suporte',types:[['Grass','Psychic'],['Grass','Psychic']],base:[104,18,10,2,70],ability:{name:'Hipnose',kind:'stun',power:1.18},stages:[['Exeggcute',102],['Exeggutor',103]]},
-    growlithe:{cost:2,role:'Atacante',types:[['Fire'],['Fire']],base:[96,22,7,1,104],ability:{name:'Presa de Fogo',kind:'blast',power:1.5},stages:[['Growlithe',58],['Arcanine',59]]},
+    torchic:{cost:3,role:'Atacante',types:[['Fire'],['Fire','Fighting'],['Fire','Fighting']],base:[92,24,6,1,116],ability:{name:'Investida Flamejante',kind:'blast',power:1.55},stages:[['Torchic',255],['Combusken',256],['Blaziken',257]]},
+    magnemite:{cost:3,role:'Tanque',types:[['Electric','Steel'],['Electric','Steel'],['Electric','Steel']],base:[100,21,13,2,72],ability:{name:'Onda de Choque',kind:'multi',power:1.22},stages:[['Magnemite',81],['Magneton',82],['Magnezone',462]]},
+    ralts:{cost:3,role:'Suporte',types:[['Psychic','Fairy'],['Psychic','Fairy'],['Psychic','Fairy']],base:[104,18,10,2,70],ability:{name:'Confusão',kind:'stun',power:1.18},stages:[['Ralts',280],['Kirlia',281],['Gardevoir',282]]},
+    litwick:{cost:2,role:'Atacante',types:[['Ghost','Fire'],['Ghost','Fire'],['Ghost','Fire']],base:[96,22,7,1,104],ability:{name:'Chama Sombria',kind:'blast',power:1.5},stages:[['Litwick',607],['Lampent',608],['Chandelure',609]]},
     cyndaquil:{cost:2,role:'Mago',types:[['Fire'],['Fire'],['Fire']],base:[78,21,5,2,102],ability:{name:'Erupção',kind:'blast',power:1.55},stages:[['Cyndaquil',155],['Quilava',156],['Typhlosion',157]]},
-    voltorb:{cost:1,role:'Atacante',types:[['Electric'],['Electric']],base:[68,16,5,1,124],ability:{name:'Descarga',kind:'blast',power:1.4},stages:[['Voltorb',100],['Electrode',101]]},
+    shinx:{cost:1,role:'Atacante',types:[['Electric'],['Electric'],['Electric']],base:[68,16,5,1,124],ability:{name:'Descarga',kind:'blast',power:1.4},stages:[['Shinx',403],['Luxio',404],['Luxray',405]]},
     mareep:{cost:2,role:'Mago',types:[['Electric'],['Electric'],['Electric']],base:[86,22,6,2,82],ability:{name:'Raio',kind:'blast',power:1.6},stages:[['Mareep',179],['Flaaffy',180],['Ampharos',181]]},
-    chinchou:{cost:2,role:'Suporte',types:[['Water','Electric'],['Water','Electric']],base:[102,16,7,2,84],ability:{name:'Aqua Ring',kind:'heal',power:.4},stages:[['Chinchou',170],['Lanturn',171]]},
-    slowpoke:{cost:2,role:'Tanque',types:[['Water','Psychic'],['Water','Psychic']],base:[125,15,11,1,60],ability:{name:'Amnésia',kind:'shield',power:.5},stages:[['Slowpoke',79],['Slowbro',80]]},
-    wooper:{cost:1,role:'Tanque',types:[['Water','Ground'],['Water','Ground']],base:[102,12,8,1,65],ability:{name:'Recuperação',kind:'heal',power:.35},stages:[['Wooper',194],['Quagsire',195]]},
-    drowzee:{cost:2,role:'Suporte',types:[['Psychic'],['Psychic']],base:[92,17,7,2,80],ability:{name:'Hipnose',kind:'stun',power:1.2},stages:[['Drowzee',96],['Hypno',97]]},
-    natu:{cost:1,role:'Suporte',types:[['Psychic','Flying'],['Psychic','Flying']],base:[66,15,4,3,98],ability:{name:'Vento Psíquico',kind:'multi',power:1.05},stages:[['Natu',177],['Xatu',178]]},
+    tynamo:{cost:2,role:'Suporte',types:[['Electric'],['Electric'],['Electric']],base:[102,16,7,2,84],ability:{name:'Carga Restauradora',kind:'heal',power:.4},stages:[['Tynamo',602],['Eelektrik',603],['Eelektross',604]]},
+    spheal:{cost:2,role:'Tanque',types:[['Ice','Water'],['Ice','Water'],['Ice','Water']],base:[125,15,11,1,60],ability:{name:'Defesa de Gelo',kind:'shield',power:.5},stages:[['Spheal',363],['Sealeo',364],['Walrein',365]]},
+    mudkip:{cost:1,role:'Tanque',types:[['Water'],['Water','Ground'],['Water','Ground']],base:[102,12,8,1,65],ability:{name:'Recuperação',kind:'heal',power:.35},stages:[['Mudkip',258],['Marshtomp',259],['Swampert',260]]},
+    solosis:{cost:2,role:'Suporte',types:[['Psychic'],['Psychic'],['Psychic']],base:[92,17,7,2,80],ability:{name:'Hipnose',kind:'stun',power:1.2},stages:[['Solosis',577],['Duosion',578],['Reuniclus',579]]},
+    hatenna:{cost:1,role:'Suporte',types:[['Psychic'],['Psychic'],['Psychic','Fairy']],base:[66,15,4,3,98],ability:{name:'Vento Psíquico',kind:'multi',power:1.05},stages:[['Hatenna',856],['Hattrem',857],['Hatterene',858]]},
     hoppip:{cost:1,role:'Suporte',types:[['Grass','Flying'],['Grass','Flying'],['Grass','Flying']],base:[72,11,5,2,92],ability:{name:'Síntese',kind:'heal',power:.4},stages:[['Hoppip',187],['Skiploom',188],['Jumpluff',189]]},
-    spearow:{cost:1,role:'Atacante',types:[['Normal','Flying'],['Normal','Flying']],base:[70,17,4,1,116],ability:{name:'Bico Broca',kind:'blast',power:1.4},stages:[['Spearow',21],['Fearow',22]]},
+    gothita:{cost:1,role:'Atacante',types:[['Psychic'],['Psychic'],['Psychic']],base:[70,17,4,1,116],ability:{name:'Psicocorte',kind:'blast',power:1.4},stages:[['Gothita',574],['Gothorita',575],['Gothitelle',576]]},
     geodude:{cost:1,role:'Tanque',types:[['Rock','Ground'],['Rock','Ground'],['Rock','Ground']],base:[112,13,12,1,58],ability:{name:'Defesa de Pedra',kind:'shield',power:.45},stages:[['Geodude',74],['Graveler',75],['Golem',76]]},
-    phanpy:{cost:2,role:'Lutador',types:[['Ground'],['Ground']],base:[110,20,9,1,82],ability:{name:'Rolagem',kind:'blast',power:1.4},stages:[['Phanpy',231],['Donphan',232]]},
+    lotad:{cost:2,role:'Lutador',types:[['Water','Grass'],['Water','Grass'],['Water','Grass']],base:[110,20,9,1,82],ability:{name:'Jato de Bolhas',kind:'blast',power:1.4},stages:[['Lotad',270],['Lombre',271],['Ludicolo',272]]},
     dratini:{cost:4,special:true,role:'Carry',types:[['Dragon','Water'],['Dragon','Water'],['Dragon','Flying']],base:[88,25,7,2,104],
       abilities:[{name:'Fúria do Dragão',kind:'dragonRush',power:1.25,speedBoost:.15,duration:2200},{name:'Fúria do Dragão+',kind:'dragonRush',power:1.45,speedBoost:.22,duration:2600},{name:'Fúria do Dragão Suprema',kind:'dragonRush',power:1.72,speedBoost:.30,duration:3200}],
       passive:{kind:'multiscale',values:[.15,.25,.35]},stages:[['Dratini',147],['Dragonair',148],['Dragonite',149]]},
@@ -235,8 +235,9 @@
     gastly:{cost:4,special:true,role:'Mago/Assassino',types:[['Ghost','Poison'],['Ghost','Poison'],['Ghost','Poison']],base:[68,29,4,3,112],
       abilities:[{name:'Bola Sombria',kind:'shadowBall',power:1.45,manaRefund:20},{name:'Bola Sombria+',kind:'shadowBall',power:1.68,manaRefund:35},{name:'Bola Sombria Suprema',kind:'shadowBall',power:1.95,manaRefund:50}],
       passive:{kind:'shadow',intangibility:[400,700,1000]},stages:[['Gastly',92],['Haunter',93],['Gengar',94]]},
-    lapras:{cost:4,special:true,role:'Tanque/Suporte',types:[['Water','Ice']],base:[150,22,13,3,78],
-      abilities:[{name:'Blizzard',kind:'blizzard',power:1.28,chill:.18,duration:3000}],passive:{kind:'songShield',shield:[.12]},stages:[['Lapras',131]]},
+    gible:{cost:4,special:true,role:'Bruiser/Carry',types:[['Dragon','Ground'],['Dragon','Ground'],['Dragon','Ground']],base:[112,26,11,1,96],
+      abilities:[{name:'Investida do Dragão',kind:'dragonRush',power:1.20,speedBoost:.10,duration:1800},{name:'Investida do Dragão+',kind:'dragonRush',power:1.42,speedBoost:.15,duration:2200},{name:'Investida do Dragão Suprema',kind:'dragonRush',power:1.70,speedBoost:.22,duration:2600}],
+      passive:{kind:'roughSkin',reflect:[.08,.12,.18]},stages:[['Gible',443],['Gabite',444],['Garchomp',445]]},
     beldum:{cost:4,special:true,role:'Tanque/Carry',types:[['Steel','Psychic'],['Steel','Psychic'],['Steel','Psychic']],base:[116,25,15,1,72],
       abilities:[{name:'Meteor Mash',kind:'meteorMash',power:1.28,shieldPerHit:.05},{name:'Meteor Mash+',kind:'meteorMash',power:1.48,shieldPerHit:.07},{name:'Meteor Mash Supremo',kind:'meteorMash',power:1.75,shieldPerHit:.10}],
       passive:{kind:'metalBody',guard:[.50,.75,1]},stages:[['Beldum',374],['Metang',375],['Metagross',376]]}
@@ -255,14 +256,14 @@
     mewtwo:{name:'Mewtwo',dex:150,types:['Psychic'],role:'Boss Final',hp:1650,atk:66,def:25,range:3,speed:128,ability:{name:'Psíquico Supremo',kind:'multi',power:1.82},count:1}
   };
   const ENEMY_TRAIT_POOLS={
-    Fire:['charmander','vulpix','ponyta','growlithe','cyndaquil'],
-    Water:['squirtle','psyduck','chinchou','slowpoke','wooper'],
-    Electric:['pikachu','magnemite','voltorb','mareep','chinchou'],
-    Grass:['bulbasaur','oddish','paras','exeggcute','hoppip'],
-    Psychic:['abra','exeggcute','slowpoke','drowzee','natu'],
-    Flying:['pidgey','zubat','spearow','natu','hoppip'],
+    Fire:['charmander','magby','torchic','litwick','cyndaquil'],
+    Water:['squirtle','horsea','spheal','mudkip','lotad'],
+    Electric:['pichu','magnemite','shinx','mareep','tynamo'],
+    Grass:['bulbasaur','oddish','bellsprout','hoppip','lotad'],
+    Psychic:['abra','ralts','solosis','hatenna','gothita'],
+    Flying:['pidgey','zubat','hoppip','caterpie','charmander'],
     Poison:['bulbasaur','weedle','nidoranf','zubat','oddish'],
-    Ground:['sandshrew','diglett','wooper','geodude','phanpy']
+    Ground:['rhyhorn','trapinch','geodude','mudkip','nidoranf']
   };
   function randomLegendaryBoss(){return ['raikou','entei','suicune'][Math.floor(Math.random()*3)]}
   function bossKeyForRound(round,legendary){
@@ -649,7 +650,7 @@
     if(x.kind==='multiscale')return 'Multiescala: '+Math.round((x.values||0)*100)+'% menos dano enquanto estiver acima de 70% do HP.';
     if(x.kind==='sandstorm')return 'Tempestade de Areia: inimigos ficam '+Math.round((x.slow||0)*100)+'% mais lentos e esta unidade recebe +'+Math.round((x.defBoost||0)*100)+'% DEF.';
     if(x.kind==='shadow')return 'Sombra: fica intangível por '+((x.intangibility||0)/1000).toFixed(1).replace('.',',')+'s no início do combate.';
-    if(x.kind==='songShield')return 'Canção Protetora: concede escudo de '+Math.round((x.shield||0)*100)+'% do HP máximo aos aliados no início.';
+    if(x.kind==='roughSkin')return 'Pele Áspera: devolve '+Math.round((x.reflect||0)*100)+'% do dano efetivo recebido de ataques básicos.';
     if(x.kind==='metalBody')return 'Corpo Metálico: reduz o primeiro controle recebido em '+Math.round((x.guard||0)*100)+'%.';
     return x.kind;
   }
@@ -714,18 +715,25 @@
     if(max>=1&&r<profile.stage2+profile.stage1)return 1;
     return 0;
   }
+  function traitStageForLine(line,type){
+    const stages=LINES[line].types;for(let i=0;i<stages.length;i++)if(stages[i].includes(type))return i;return 0;
+  }
   function generateEnemy(){
     const profile=difficultyProfile(state.round),arr=[],positions=[];
     while(positions.length<profile.count){const p=Math.floor(Math.random()*21);if(!positions.includes(p))positions.push(p)}
-    let picks=[];
+    let picks=[],traitType=null,traitPicks=new Set();
     if(profile.synergy){
-      const types=Object.keys(ENEMY_TRAIT_POOLS),type=types[Math.floor(Math.random()*types.length)];
-      picks.push(...ENEMY_TRAIT_POOLS[type].slice().sort(()=>Math.random()-.5).slice(0,Math.min(profile.synergy,profile.count)));
+      const types=Object.keys(ENEMY_TRAIT_POOLS);traitType=types[Math.floor(Math.random()*types.length)];
+      const pool=ENEMY_TRAIT_POOLS[traitType],baseReady=pool.filter(k=>LINES[k].types[0].includes(traitType)),later=pool.filter(k=>!LINES[k].types[0].includes(traitType));
+      const wanted=Math.min(profile.synergy,profile.count),chosen=[...baseReady.sort(()=>Math.random()-.5),...later.sort(()=>Math.random()-.5)].slice(0,wanted);
+      picks.push(...chosen);chosen.forEach(k=>traitPicks.add(k));
     }
     const remainder=ENEMY_KEYS.filter(k=>!picks.includes(k)).sort(()=>Math.random()-.5);
     while(picks.length<profile.count)picks.push(remainder.shift()||ENEMY_KEYS[Math.floor(Math.random()*ENEMY_KEYS.length)]);
     picks.forEach((key,n)=>{
-      const stage=chooseEnemyStage(key,profile),pos=positions[n],combatant=makeCombatant({id:8000+n,line:key,stage},'enemy',pos%7,Math.floor(pos/7));
+      let stage=chooseEnemyStage(key,profile);
+      if(traitType&&traitPicks.has(key))stage=Math.max(stage,traitStageForLine(key,traitType));
+      const pos=positions[n],combatant=makeCombatant({id:8000+n,line:key,stage},'enemy',pos%7,Math.floor(pos/7));
       scaleEnemy(combatant,profile.scale);arr.push(combatant);
     });
     return arr;
@@ -772,7 +780,7 @@
       if(p.kind==='multiscale')c.damageReductionAbove70=p.values??p.value??0;
       else if(p.kind==='shadow')c.intangibleUntil=Math.max(c.intangibleUntil,p.intangibility||0);
       else if(p.kind==='metalBody')c.controlGuard=p.guard||0;
-      else if(p.kind==='songShield'){for(const a of allies)if(!a.summoned)a.shield+=Math.round(a.maxHp*(p.shield||0));}
+      else if(p.kind==='roughSkin')c.roughSkin=p.reflect||0;
       else if(p.kind==='sandstorm')c.def=Math.round(c.def*(1+(p.defBoost||0)));
     }
     const sand=allies.filter(c=>c.passive?.kind==='sandstorm').reduce((m,c)=>Math.max(m,c.passive.slow||0),0);
@@ -849,6 +857,7 @@
     if(t.dead)return;
     if(kind==='basic'&&Math.random()<(t.bonus?.dodge||0))return;
     const dealt=takeDamage(t,Math.max(1,Math.round(amount-t.def*.32)));t.mana=Math.min(100,t.mana+12);
+    if(kind==='basic'&&dealt>0&&t.roughSkin&&!att.dead)takeDamage(att,Math.max(1,Math.round(dealt*t.roughSkin)));
     const leech=kind==='basic'?att.bonus?.basicLeech:att.bonus?.abilityLeech;if(leech&&dealt>0)heal(att,dealt*leech);
     if(kind==='basic'&&att.bonus?.poison)applyDot(t,'poison',att.bonus.poison,att.bonus.antiHeal);
     if(kind==='ability'&&att.bonus?.burn)applyDot(t,'burn',att.bonus.burn);
