@@ -636,7 +636,7 @@
       if(p.kind==='multiscale')c.damageReductionAbove70=p.values??p.value??0;
       else if(p.kind==='shadow')c.intangibleUntil=Math.max(c.intangibleUntil,p.intangibility||0);
       else if(p.kind==='metalBody')c.controlGuard=p.guard||0;
-      else if(p.kind==='songShield')for(const a of allies)if(!a.summoned)a.shield+=Math.round(a.maxHp*(p.shield||0));
+      else if(p.kind==='songShield'){for(const a of allies)if(!a.summoned)a.shield+=Math.round(a.maxHp*(p.shield||0));}
       else if(p.kind==='sandstorm')c.def=Math.round(c.def*(1+(p.defBoost||0)));
     }
     const sand=allies.filter(c=>c.passive?.kind==='sandstorm').reduce((m,c)=>Math.max(m,c.passive.slow||0),0);
