@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kanto Tactics v0.1</title>
+  <title>Kanto Tactics v0.2</title>
   <style>
     :root{
       --bg:#07111f;--panel:#0e1b2d;--panel2:#13243b;--line:#28415f;--text:#f7fbff;
@@ -42,7 +42,7 @@
 <body>
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="pokeball"></div><div><h1>KANTO TACTICS <span style="color:#f5c542">v0.1</span></h1><div class="subtitle">Auto-battler fan-made • apenas Pokémon da 1ª geração • sem itens</div></div></div>
+    <div class="brand"><div class="pokeball"></div><div><h1>KANTO TACTICS <span style="color:#f5c542">v0.2</span></h1><div class="subtitle">Auto-battler fan-made • apenas Pokémon da 1ª geração • sem itens</div></div></div>
     <div class="stats">
       <div class="stat"><span>Rodada</span><b id="roundStat">1/15</b></div>
       <div class="stat"><span>HP</span><b id="hpStat">100</b></div>
@@ -54,7 +54,7 @@
 
   <div class="layout">
     <aside class="panel side-left">
-      <h2>Sinergias v0.1</h2>
+      <h2>Sinergias v0.2</h2>
       <div id="synergies"></div>
     </aside>
 
@@ -69,7 +69,7 @@
         <button class="btn" id="xpBtn">Comprar 4 XP • 4 ouro</button>
         <button class="btn danger" id="sellBtn" disabled>Vender selecionado</button>
       </div>
-      <div style="margin-top:8px;text-align:center;font-size:11px;color:#9fb3c8">Clique em um Pokémon do banco/campo e depois em uma casa azul para posicionar. Máximo no campo = seu nível.</div>
+      <div style="margin-top:8px;text-align:center;font-size:11px;color:#9fb3c8">Clique em um Pokémon do banco/campo e depois em uma casa azul para posicionar. Para retirar, selecione no campo e clique em um espaço vazio do banco. Máximo no campo = seu nível.</div>
     </main>
 
     <aside class="panel side-right">
@@ -78,7 +78,7 @@
       <h2>Registro</h2>
       <div id="log" class="log"></div>
       <h2 style="margin-top:10px">Regras rápidas</h2>
-      <div class="help">3 cópias iguais evoluem automaticamente. Evoluções finais não fundem. A batalha é automática e o dano sofrido depende dos inimigos sobreviventes. Você recebe ouro por rodada + juros. Sobreviva às 15 rodadas.</div>
+      <div class="help">3 cópias iguais evoluem automaticamente. Evoluções finais não fundem. A batalha é automática e o dano sofrido depende dos inimigos sobreviventes. Você recebe ouro por rodada + juros. Sequências de vitórias ou derrotas: 3 = +1 ouro, 4 = +2, 5 ou mais = +3 por rodada. Mudar o resultado reinicia a sequência. Sobreviva às 15 rodadas.</div>
     </aside>
   </div>
 
@@ -132,7 +132,7 @@
   const KEYS = Object.keys(LINES);
 
   const state = {
-    round:1,maxRounds:15,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,
+    round:1,maxRounds:15,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,
     bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null
   };
 
@@ -186,7 +186,7 @@
   }
   function renderBench(){
     els.bench.innerHTML='';
-    for(let i=0;i<9;i++){const slot=document.createElement('div');slot.className='bench-slot'+(state.bench[i]?'':' empty');if(state.bench[i])slot.appendChild(createToken(state.bench[i],'bench',i));els.bench.appendChild(slot)}
+    for(let i=0;i<9;i++){const slot=document.createElement('div');slot.className='bench-slot'+(state.bench[i]?'':' empty');if(state.bench[i])slot.appendChild(createToken(state.bench[i],'bench',i));else slot.onclick=()=>returnToBench(i);els.bench.appendChild(slot)}
   }
   function shopOdds(){
     const l=state.level;
@@ -258,6 +258,12 @@
       if(target){state.board[f.index]=target;state.board[i]=f.u}else{state.board[f.index]=null;state.board[i]=f.u}state.selected={id:f.u.id,location:'board',index:i}
     }
     render();
+  }
+  function returnToBench(i){
+    if(state.battle||state.gameOver||!state.selected||i<0||i>=state.bench.length||state.bench[i])return;
+    const f=findUnit(state.selected.id);if(!f||f.location!=='board')return;
+    state.board[f.index]=null;state.bench[i]=f.u;
+    state.selected={id:f.u.id,location:'bench',index:i};render();
   }
   function sellSelected(){
     if(state.battle||!state.selected)return;const f=findUnit(state.selected.id);if(!f)return;const val=LINES[f.u.line].cost*Math.pow(3,f.u.stage);removeById(f.u.id);state.gold+=val;log('Vendido por '+val+' ouro.');state.selected=null;render();
@@ -352,12 +358,12 @@
     if(!aliveP.length||!aliveE.length||state.combat.ticks>420){finishBattle(aliveP.length>aliveE.length);return}
     for(const c of state.combat.units){
       if(c.dead)continue;
-      if(c.poisonTicks>0&&state.combat.ticks%4===0){c.hp-=c.poison;c.poisonTicks--;if(c.hp<=0){c.hp=0;c.dead=true}}
+      if(c.poisonTicks>0&&state.combat.ticks%4===0){c.hp-=c.poison;c.poisonTicks--;if(c.hp<=0){c.hp=0;c.dead=true;continue}}
       if(c.bonus?.regen)c.hp=Math.min(c.maxHp,c.hp+Math.max(1,Math.round(c.maxHp*c.bonus.regen)));
       if(c.stun>0){c.stun--;continue}
       c.meter+=c.speed/3.2;if(c.meter<100)continue;c.meter-=100;
       const foes=c.side==='player'?aliveE:aliveP,allies=c.side==='player'?aliveP:aliveE;if(!foes.length)continue;
-      const t=nearest(c,foes);if(c.mana>=100)cast(c,foes,allies);else if(dist(c,t)<=c.range)normalAttack(c,t);else moveToward(c,t);
+      const t=nearest(c,foes);if(!t)continue;if(c.mana>=100)cast(c,foes,allies);else if(dist(c,t)<=c.range)normalAttack(c,t);else moveToward(c,t);
     }
     renderCombat();
   }
@@ -372,23 +378,30 @@
       const hp=Math.max(0,Math.round(c.hp/c.maxHp*100));d.innerHTML='<div class="hp"><i style="width:'+hp+'%"></i></div><div class="mana"><i style="width:'+Math.min(100,c.mana)+'%"></i></div><img src="'+SPRITE(c.dex)+'"><div class="label">'+c.name+'</div>';layer.appendChild(d)
     });
   }
+  function updateStreak(win){
+    const result=win?'win':'loss';
+    state.streak=state.streakResult===result?state.streak+1:1;
+    state.streakResult=result;
+    return Math.min(3,Math.max(0,state.streak-2));
+  }
   function finishBattle(win){
     clearInterval(state.combat.timer);const survivors=state.combat.units.filter(c=>c.side==='enemy'&&!c.dead).length;
-    state.battle=false;state.combat=null;const interest=Math.min(5,Math.floor(state.gold/10));
-    if(win){const gain=6+interest;state.gold+=gain;log('✅ Vitória! +'+gain+' ouro ('+interest+' de juros).','win');banner('VITÓRIA');}
-    else{const dmg=4+survivors*3;state.hp-=dmg;const gain=5+interest;state.gold+=gain;log('❌ Derrota. -'+dmg+' HP • +'+gain+' ouro.','loss');banner('-'+dmg+' HP');}
+    state.battle=false;state.combat=null;const interest=Math.min(5,Math.floor(state.gold/10)),streakBonus=updateStreak(win);
+    const incomeDetails=interest+' de juros + '+streakBonus+' de sequência • '+state.streak+' '+(win?'vitória(s)':'derrota(s)')+' consecutiva(s)';
+    if(win){const gain=6+interest+streakBonus;state.gold+=gain;log('✅ Vitória! +'+gain+' ouro ('+incomeDetails+').','win');banner('VITÓRIA');}
+    else{const dmg=4+survivors*3;state.hp-=dmg;const gain=5+interest+streakBonus;state.gold+=gain;log('❌ Derrota. -'+dmg+' HP • +'+gain+' ouro ('+incomeDetails+').','loss');banner('-'+dmg+' HP');}
     state.xp+=2;levelCheck();
     if(state.hp<=0){state.hp=0;state.gameOver=true;toast('Fim de jogo na rodada '+state.round+'.');log('☠️ Sua jornada terminou.','loss');render();return}
-    if(state.round>=state.maxRounds){state.gameOver=true;toast(win?'🏆 Você venceu o protótipo v0.1!':'Fim do teste v0.1.');log(win?'🏆 Kanto Tactics v0.1 concluído!':'Teste concluído.');render();return}
+    if(state.round>=state.maxRounds){state.gameOver=true;toast(win?'🏆 Você venceu o protótipo v0.2!':'Fim do teste v0.2.');log(win?'🏆 Kanto Tactics v0.2 concluído!':'Teste concluído.');render();return}
     state.round++;rollShop(true);render();
   }
   function reset(){
-    clearInterval(state.combat?.timer);Object.assign(state,{round:1,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null});
-    els.log.innerHTML='';rollShop(true);log('Bem-vindo ao Kanto Tactics v0.1. Monte seu primeiro time!');render();
+    clearInterval(state.combat?.timer);Object.assign(state,{round:1,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null});
+    els.log.innerHTML='';rollShop(true);log('Bem-vindo ao Kanto Tactics v0.2. Monte seu primeiro time!');render();
   }
   $('#rerollBtn').onclick=()=>rollShop(false);$('#xpBtn').onclick=buyXP;$('#sellBtn').onclick=sellSelected;$('#battleBtn').onclick=()=>{if(state.gameOver)reset();else startBattle()};
   document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r')rollShop(false);if(e.key===' '){e.preventDefault();if(!state.battle)startBattle()}});
-  rollShop(true);log('Bem-vindo ao Kanto Tactics v0.1. Monte seu primeiro time!');render();
+  rollShop(true);log('Bem-vindo ao Kanto Tactics v0.2. Monte seu primeiro time!');render();
 })();
 </script>
 </body>
