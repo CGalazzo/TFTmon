@@ -184,7 +184,7 @@
       passive:{kind:'multiscale',values:[.15,.25,.35]},stages:[['Dratini',147],['Dragonair',148],['Dragonite',149]]},
     larvitar:{cost:4,special:true,role:'Bruiser',types:[['Rock','Ground'],['Rock','Ground'],['Rock','Dark']],base:[108,23,13,1,76],
       abilities:[{name:'Terremoto',kind:'quake',power:1.18,stun:1,radius:1},{name:'Terremoto+',kind:'quake',power:1.38,stun:1,radius:2},{name:'Terremoto Supremo',kind:'quake',power:1.65,stun:2,radius:2}],
-      passive:{kind:'sandstorm',slow:[.08,.12,.18],def:[.10,.20,.30]},stages:[['Larvitar',246],['Pupitar',247],['Tyranitar',248]]},
+      passive:{kind:'sandstorm',slow:[.08,.12,.18],defBoost:[.10,.20,.30]},stages:[['Larvitar',246],['Pupitar',247],['Tyranitar',248]]},
     gastly:{cost:4,special:true,role:'Mago/Assassino',types:[['Ghost','Poison'],['Ghost','Poison'],['Ghost','Poison']],base:[68,29,4,3,112],
       abilities:[{name:'Bola Sombria',kind:'shadowBall',power:1.45,manaRefund:20},{name:'Bola Sombria+',kind:'shadowBall',power:1.68,manaRefund:35},{name:'Bola Sombria Suprema',kind:'shadowBall',power:1.95,manaRefund:50}],
       passive:{kind:'shadow',intangibility:[400,700,1000]},stages:[['Gastly',92],['Haunter',93],['Gengar',94]]},
@@ -637,7 +637,7 @@
       else if(p.kind==='shadow')c.intangibleUntil=Math.max(c.intangibleUntil,p.intangibility||0);
       else if(p.kind==='metalBody')c.controlGuard=p.guard||0;
       else if(p.kind==='songShield')for(const a of allies)if(!a.summoned)a.shield+=Math.round(a.maxHp*(p.shield||0));
-      else if(p.kind==='sandstorm')c.def=Math.round(c.def*(1+(p.def||0)));
+      else if(p.kind==='sandstorm')c.def=Math.round(c.def*(1+(p.defBoost||0)));
     }
     const sand=allies.filter(c=>c.passive?.kind==='sandstorm').reduce((m,c)=>Math.max(m,c.passive.slow||0),0);
     if(sand)for(const f of foes)f.sandSlow=Math.max(f.sandSlow||0,sand);
