@@ -1,4 +1,4 @@
-# Kanto Tactics v0.3
+# Kanto Tactics v0.4
 
 Protótipo fan-made de auto-battler com Pokémon de Kanto e Johto. Site estático: `index.html` na raiz, sem build obrigatório para o Vercel.
 
@@ -6,7 +6,7 @@ Protótipo fan-made de auto-battler com Pokémon de Kanto e Johto. Site estátic
 
 - Tabuleiro 7×6, banco com 9 espaços e loja com 5 opções.
 - Loja vende formas iniciais; três cópias da mesma forma evoluem automaticamente. Formas finais não fundem.
-- Sem equipamentos ou itens de evolução.
+- Equipamentos combináveis; evoluções continuam sem itens de evolução.
 - Ouro, juros, reroll, compra/venda, XP e nível do treinador; limite de campo igual ao nível (máximo 7).
 - Sequências de vitórias ou derrotas: 3 dão +1 ouro; 4 dão +2; 5 ou mais dão +3 por rodada. Resultado diferente reinicia a sequência em 1; nova partida zera.
 - Mana, habilidades automáticas, movimentação e combate automático; 15 rodadas e rival final fortalecido.
@@ -82,3 +82,40 @@ node --test tests/game.test.cjs
 Os testes executam o JavaScript real do jogo em um DOM simulado, cobrindo conjuntos, efeitos, invocação, evoluções, economia, ações de posicionamento e combates completos das oito composições nas 15 rodadas. Não substituem a avaliação visual em navegador nem os testes de balanceamento com jogadores.
 
 Protótipo não comercial criado para testes de mecânica e balanceamento.
+
+
+## Itens — v0.4
+
+- 5 componentes (Garra, Pena, Cristal, Casco, Semente) e 15 receitas, consultáveis na mochila.
+- Selecione um Pokémon, clique em um item da mochila e em Equipar. Até 3 itens por Pokémon, incluindo componentes.
+- Para combinar, selecione dois componentes, na mochila ou equipados, e confirme a prévia. Os componentes são consumidos e o equipamento ocupa uma vaga. Não há desmontagem.
+- A combinação prioriza o Pokémon que carregava o primeiro componente equipado; se ele já possui o equipamento resultante, o resultado vai para a mochila.
+- Um equipamento completo de cada tipo por Pokémon. Componentes repetidos são permitidos.
+- Remoção gratuita durante a preparação. Nenhuma alteração de equipamento é permitida em combate ou após o fim da partida.
+- A evolução preserva os itens: prioriza equipamentos completos, começando pelos da unidade que estava no campo. Excedentes e equipamentos completos duplicados voltam à mochila. Componentes não são combinados automaticamente na evolução.
+- Venda devolve todos os itens à mochila, sem alterar o valor de venda do Pokémon. A mochila não tem limite de capacidade.
+- Duas peças aleatórias na rodada 1. Antes das rodadas 4, 7, 10 e 13, escolha 1 entre 3 pacotes distintos de 2 componentes, independentemente do resultado anterior. Total: 10 componentes por partida.
+- A escolha de recompensa deve ser concluída antes do combate e só pode ser resgatada uma vez. Reiniciar limpa todos os itens e gera o par inicial novamente.
+- Bônus percentuais dos itens no mesmo atributo se somam; esse total é multiplicado pelo bônus do conjunto. O equipamento substitui os bônus dos componentes consumidos. Escudos e regeneração de itens somam aos dos conjuntos.
+- Cura por dano considera apenas HP efetivamente retirado por dano direto, sem escudos, excesso além do HP restante, veneno ou queimadura. A redução de cura por veneno também afeta essa cura.
+- Itens não concedem tipos nem modificam a eficácia elemental. Zapdos não recebe equipamentos. A IA mantém o comportamento anterior, sem receber equipamentos extras nesta versão.
+
+| Componentes | Equipamento | Efeito total |
+|---|---|---|
+| Garra + Garra | Faixa Muscular | +25% ATK |
+| Pena + Pena | Lenço Veloz | +25% velocidade |
+| Cristal + Cristal | Óculos Sábios | +25% potência |
+| Casco + Casco | Revestimento Metálico | +35% DEF |
+| Semente + Semente | Restos | +20% HP; regenera 2% HP/3s |
+| Garra + Pena | Garra Rápida | +15% ATK e velocidade |
+| Garra + Cristal | Orbe de Poder | +20% ATK e potência |
+| Garra + Casco | Faixa de Combate | +15% ATK; +25% DEF |
+| Garra + Semente | Presa Vital | +15% ATK; cura 15% do dano direto dos ataques básicos |
+| Pena + Cristal | Amuleto Energético | +15% velocidade; +10 mana por ataque básico |
+| Pena + Casco | Manto Ágil | +15% velocidade; +20% DEF |
+| Pena + Semente | Faixa de Vigor | +15% velocidade; +20% HP |
+| Cristal + Casco | Barreira Mística | +15% potência; escudo inicial de 20% HP |
+| Cristal + Semente | Sino Restaurador | +15% potência; cura 15% do dano direto das habilidades |
+| Casco + Semente | Colete Protetor | +25% DEF e HP |
+
+Componentes isolados: Garra +10% ATK; Pena +10% velocidade; Cristal +10% potência; Casco +15% DEF; Semente +10% HP. Potência se aplica a dano, cura e escudo das habilidades.

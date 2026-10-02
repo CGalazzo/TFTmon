@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kanto Tactics v0.3</title>
+  <title>Kanto Tactics v0.4</title>
   <style>
     :root{
       --bg:#07111f;--panel:#0e1b2d;--panel2:#13243b;--line:#28415f;--text:#f7fbff;
@@ -35,6 +35,7 @@
     .progress{height:7px;border-radius:7px;background:#07111f;overflow:hidden;margin-top:5px}.progress i{display:block;height:100%;background:#5bb7ff}.round-banner{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.9);background:#081421ee;border:2px solid #f5c542;border-radius:18px;padding:18px 28px;font-size:24px;font-weight:900;z-index:99;opacity:0;pointer-events:none;transition:.25s}.round-banner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
     .toast{position:fixed;right:18px;bottom:18px;background:#0e1b2df4;border:1px solid #56708b;border-radius:12px;padding:12px 15px;z-index:100;transform:translateY(20px);opacity:0;transition:.25s;max-width:330px}.toast.show{transform:none;opacity:1}.evo{color:#ffe06a;font-weight:800}
     .tag{display:inline-block;padding:2px 6px;border-radius:8px;background:#19314b;border:1px solid #31506e;font-size:9px;margin:2px}.phase{font-weight:800;color:#ffe06a;text-align:center;margin-bottom:8px}
+    .items-panel{margin-top:14px}.item-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.item-button{text-align:left;white-space:normal;max-width:250px}.item-button small{display:block;font-weight:400;color:var(--muted);margin-top:4px}.item-button.chosen{outline:2px solid var(--accent)}.item-complete{border-color:#caa53c}.item-preview,.reward-box{background:#142943;border:1px solid #d1ae3b;border-radius:12px;padding:12px;margin:12px 0}.item-slots{display:flex;flex-wrap:wrap;gap:10px}.item-slot{border:1px solid var(--line);border-radius:10px;padding:8px;flex:1;min-width:155px}.item-icons{position:absolute;top:2px;right:2px;font-size:10px;background:#081421dd;border-radius:5px;padding:1px 3px}.recipe-scroll{overflow-x:auto}.recipe-table{border-collapse:collapse;width:100%;font-size:12px}.recipe-table td,.recipe-table th{padding:8px;border-bottom:1px solid var(--line);text-align:left}.item-note{color:var(--muted);font-size:12px;line-height:1.5}.reward-options{display:flex;flex-wrap:wrap;gap:8px}.reward-options .btn{flex:1;min-width:200px}
     @media(max-width:1050px){.layout{grid-template-columns:1fr}.side-left,.side-right{display:grid;grid-template-columns:1fr 1fr;gap:10px}.side-left h2,.side-right h2{grid-column:1/-1}.log{height:150px}.shop-grid{grid-template-columns:repeat(5,minmax(120px,1fr));overflow-x:auto}.panel{padding:10px}}
     @media(max-width:700px){:root{--cell:12vw}.app{padding:7px}.topbar{border-radius:12px;padding:9px}.stats{width:100%}.stat{flex:1;min-width:64px;padding:6px}.layout{gap:8px;margin-top:8px}.board{gap:2px;padding:5px}.battle-layer{inset:5px}.bench{grid-template-columns:repeat(9,70px);overflow-x:auto}.shop-grid{grid-template-columns:repeat(5,130px)}.side-left,.side-right{display:block}.card{min-height:160px}.card img{width:78px;height:78px}}
   </style>
@@ -42,7 +43,7 @@
 <body>
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="pokeball"></div><div><h1>KANTO TACTICS <span style="color:#f5c542">v0.3</span></h1><div class="subtitle">Auto-battler fan-made • Pokémon de Kanto e Johto • sem itens</div></div></div>
+    <div class="brand"><div class="pokeball"></div><div><h1>KANTO TACTICS <span style="color:#f5c542">v0.4</span></h1><div class="subtitle">Auto-battler fan-made • Pokémon de Kanto e Johto • equipamentos e conjuntos</div></div></div>
     <div class="stats">
       <div class="stat"><span>Rodada</span><b id="roundStat">1/15</b></div>
       <div class="stat"><span>HP</span><b id="hpStat">100</b></div>
@@ -54,7 +55,7 @@
 
   <div class="layout">
     <aside class="panel side-left">
-      <h2>Sinergias v0.3</h2>
+      <h2>Sinergias v0.4</h2>
       <div id="synergies"></div>
     </aside>
 
@@ -89,6 +90,17 @@
     </div>
     <div id="shop" class="shop-grid"></div>
   </section>
+  <section class="panel items-panel" aria-label="Mochila e equipamentos">
+    <h2>Mochila e equipamentos</h2>
+    <p class="item-note">Selecione um Pokémon e um item da mochila para equipar. Para combinar, clique em dois componentes e confira a receita. Máximo de 3 itens por Pokémon; remover é grátis na preparação.</p>
+    <div id="itemRewards" aria-live="polite"></div>
+    <div id="itemInventory" class="item-grid"></div>
+    <button class="btn primary" id="equipItemBtn" disabled>Equipar no Pokémon selecionado</button>
+    <div id="itemPreview" aria-live="polite"></div>
+    <h3 id="equipmentTitle" style="font-size:14px">Selecione um Pokémon para ver seus equipamentos</h3>
+    <div id="equipmentSlots" class="item-slots"></div>
+    <details style="margin-top:12px"><summary style="cursor:pointer">Ver as 15 receitas</summary><div id="itemRecipes" class="recipe-scroll"></div></details>
+  </section>
 </div>
 <div id="banner" class="round-banner"></div>
 <div id="toast" class="toast"></div>
@@ -108,6 +120,31 @@
     Ground:{icon:'⛰️',levels:[3,5],desc:['+20% DEF','+40% DEF; escudo inicial de 15% HP']}
   };
 
+  const ITEM_DEFS = {
+    claw:{name:'Garra',icon:'🦷',component:true,stats:{atk:.10},desc:'+10% de ataque'},
+    feather:{name:'Pena',icon:'🪶',component:true,stats:{speed:.10},desc:'+10% de velocidade de ação'},
+    crystal:{name:'Cristal',icon:'🔮',component:true,stats:{power:.10},desc:'+10% de potência das habilidades'},
+    shell:{name:'Casco',icon:'🛡️',component:true,stats:{def:.15},desc:'+15% de defesa'},
+    seed:{name:'Semente',icon:'🌱',component:true,stats:{hp:.10},desc:'+10% de vida máxima'},
+    muscle:{name:'Faixa Muscular',icon:'💪',recipe:['claw','claw'],stats:{atk:.25},desc:'+25% de ataque'},
+    scarf:{name:'Lenço Veloz',icon:'🧣',recipe:['feather','feather'],stats:{speed:.25},desc:'+25% de velocidade de ação'},
+    glasses:{name:'Óculos Sábios',icon:'👓',recipe:['crystal','crystal'],stats:{power:.25},desc:'+25% de potência das habilidades'},
+    metal:{name:'Revestimento Metálico',icon:'🛡️',recipe:['shell','shell'],stats:{def:.35},desc:'+35% de defesa'},
+    leftovers:{name:'Restos',icon:'🍎',recipe:['seed','seed'],stats:{hp:.20,regen:.02},desc:'+20% de vida; recupera 2% da vida máxima a cada 3s'},
+    quickClaw:{name:'Garra Rápida',icon:'🦅',recipe:['claw','feather'],stats:{atk:.15,speed:.15},desc:'+15% de ataque e +15% de velocidade'},
+    orb:{name:'Orbe de Poder',icon:'🔴',recipe:['claw','crystal'],stats:{atk:.20,power:.20},desc:'+20% de ataque e +20% de potência das habilidades'},
+    combatBand:{name:'Faixa de Combate',icon:'🥋',recipe:['claw','shell'],stats:{atk:.15,def:.25},desc:'+15% de ataque e +25% de defesa'},
+    fang:{name:'Presa Vital',icon:'🦷',recipe:['claw','seed'],stats:{atk:.15,basicLeech:.15},desc:'+15% de ataque; cura 15% do dano direto à vida causado por ataques básicos'},
+    amulet:{name:'Amuleto Energético',icon:'🔋',recipe:['feather','crystal'],stats:{speed:.15,manaOnAttack:10},desc:'+15% de velocidade; +10 de mana por ataque básico'},
+    cloak:{name:'Manto Ágil',icon:'🧥',recipe:['feather','shell'],stats:{speed:.15,def:.20},desc:'+15% de velocidade e +20% de defesa'},
+    vigor:{name:'Faixa de Vigor',icon:'🎗️',recipe:['feather','seed'],stats:{speed:.15,hp:.20},desc:'+15% de velocidade e +20% de vida'},
+    barrier:{name:'Barreira Mística',icon:'🔰',recipe:['crystal','shell'],stats:{power:.15,shield:.20},desc:'+15% de potência; escudo inicial de 20% da vida máxima'},
+    bell:{name:'Sino Restaurador',icon:'🔔',recipe:['crystal','seed'],stats:{power:.15,abilityLeech:.15},desc:'+15% de potência; cura 15% do dano direto à vida causado por habilidades'},
+    vest:{name:'Colete Protetor',icon:'🦺',recipe:['shell','seed'],stats:{def:.25,hp:.25},desc:'+25% de defesa e +25% de vida'}
+  };
+  const COMPONENTS=Object.keys(ITEM_DEFS).filter(k=>ITEM_DEFS[k].component);
+  const recipeKey=(a,b)=>[a,b].sort().join('+');
+  const ITEM_RECIPES=Object.fromEntries(Object.entries(ITEM_DEFS).filter(([,d])=>d.recipe).map(([k,d])=>[recipeKey(...d.recipe),k]));
   const LINES = {
     bulbasaur:{cost:2,role:'Suporte',types:[['Grass','Poison'],['Grass','Poison'],['Grass','Poison']],base:[105,16,8,1,86],ability:{name:'Chicote de Vinha',kind:'heal',power:.42},stages:[['Bulbasaur',1],['Ivysaur',2],['Venusaur',3]]},
     charmander:{cost:2,role:'Atacante',types:[['Fire'],['Fire'],['Fire','Flying']],base:[82,22,5,1,100],ability:{name:'Lança-Chamas',kind:'blast',power:1.55},stages:[['Charmander',4],['Charmeleon',5],['Charizard',6]]},
@@ -147,7 +184,7 @@
 
   const state = {
     round:1,maxRounds:15,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,
-    bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null
+    bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[]
   };
 
   const $ = s => document.querySelector(s);
@@ -159,7 +196,118 @@
       hp:Math.round(l.base[0]*mult),atk:Math.round(l.base[1]*(1+st*.56)),def:Math.round(l.base[2]*(1+st*.52)),
       range:l.base[3],speed:Math.round(l.base[4]*(1+st*.08)),ability:l.ability,final:st===l.stages.length-1};
   }
-  function unit(line,stage=0){return {id:state.uid++,line,stage};}
+  function unit(line,stage=0){return {id:state.uid++,line,stage,items:[]};}
+  function newItem(key){return {id:state.itemUid++,key}}
+  function canManageItems(){return !state.battle&&!state.gameOver}
+  function itemBonuses(u){
+    const b={atk:0,hp:0,def:0,speed:0,power:0,regen:0,shield:0,basicLeech:0,abilityLeech:0,manaOnAttack:0};
+    if(!u.summoned)for(const item of u.items||[])for(const [k,v] of Object.entries(ITEM_DEFS[item.key].stats))b[k]+=v;
+    return b;
+  }
+  function locateItem(id){
+    let index=state.inventory.findIndex(i=>i.id===id);
+    if(index>=0)return {item:state.inventory[index],list:state.inventory,index,u:null};
+    for(const u of allPlayerUnits()){index=(u.items||[]).findIndex(i=>i.id===id);if(index>=0)return {item:u.items[index],list:u.items,index,u}}
+    return null;
+  }
+  function clearItemSelection(){state.selectedItem=null;state.pendingCombine=null}
+  function selectItem(id){
+    if(!canManageItems())return;const next=locateItem(id);if(!next)return;
+    const current=locateItem(state.selectedItem);
+    if(current&&current.item.id!==id&&ITEM_DEFS[current.item.key].component&&ITEM_DEFS[next.item.key].component){
+      state.pendingCombine=[current.item.id,id];
+    }else{state.pendingCombine=null;state.selectedItem=state.selectedItem===id?null:id}
+    renderItems();
+  }
+  function combinationPlan(){
+    if(!state.pendingCombine)return null;
+    const [a,b]=state.pendingCombine.map(locateItem);if(!a||!b||a.item.id===b.item.id)return null;
+    const key=ITEM_RECIPES[recipeKey(a.item.key,b.item.key)];if(!key)return null;
+    let target=a.u||b.u;
+    if(target){const remaining=(target.items||[]).filter(i=>i.id!==a.item.id&&i.id!==b.item.id);if(remaining.length>=3||remaining.some(i=>i.key===key))target=null}
+    return {a,b,key,target};
+  }
+  function confirmCombine(){
+    if(!canManageItems())return;const plan=combinationPlan();if(!plan)return;
+    for(const id of [plan.a.item.id,plan.b.item.id]){const f=locateItem(id);f.list.splice(f.index,1)}
+    const item=newItem(plan.key);(plan.target?plan.target.items:state.inventory).push(item);
+    clearItemSelection();log('🧩 Criado: '+ITEM_DEFS[item.key].name+'.');render();
+  }
+  function cancelCombine(){clearItemSelection();renderItems()}
+  function equipSelectedItem(){
+    if(!canManageItems()||state.pendingCombine)return;
+    const f=locateItem(state.selectedItem),target=state.selected?findUnit(state.selected.id)?.u:null;
+    if(!f||f.u||!target||target.summoned)return;
+    target.items=target.items||[];
+    if(target.items.length>=3){toast('Este Pokémon já possui 3 itens.');return}
+    if(!ITEM_DEFS[f.item.key].component&&target.items.some(i=>i.key===f.item.key)){toast('Este equipamento já está equipado neste Pokémon.');return}
+    target.items.push(f.item);state.inventory.splice(f.index,1);clearItemSelection();render();
+  }
+  function removeItem(id){
+    if(!canManageItems())return;const f=locateItem(id);if(!f||!f.u)return;
+    state.inventory.push(f.item);f.list.splice(f.index,1);clearItemSelection();render();
+  }
+  function inheritItems(evolved,picked,boardDest){
+    // Preserve equipped field unit first; keep complete equipment before components.
+    const ordered=boardDest?[boardDest,...picked.filter(p=>p!==boardDest)]:picked;
+    const items=ordered.flatMap(p=>p.u.items||[]);
+    for(const item of [...items.filter(i=>!ITEM_DEFS[i.key].component),...items.filter(i=>ITEM_DEFS[i.key].component)]){
+      if(evolved.items.length<3&&(ITEM_DEFS[item.key].component||!evolved.items.some(i=>i.key===item.key)))evolved.items.push(item);
+      else state.inventory.push(item);
+    }
+    clearItemSelection();
+  }
+  function prepareItemRewards(){
+    if(state.rewardRounds.includes(state.round)||state.rewardChoices)return;
+    if(state.round===1){
+      for(let i=0;i<2;i++)state.inventory.push(newItem(COMPONENTS[Math.floor(Math.random()*COMPONENTS.length)]));
+      state.rewardRounds.push(1);log('🎒 Você recebeu 2 componentes iniciais.');
+    }else if([4,7,10,13].includes(state.round)){
+      const pairs=Object.values(ITEM_DEFS).filter(d=>d.recipe).map(d=>d.recipe.slice());
+      for(let i=pairs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pairs[i],pairs[j]]=[pairs[j],pairs[i]]}
+      state.rewardChoices={round:state.round,options:pairs.slice(0,3)};
+    }
+  }
+  function chooseItemReward(index){
+    const reward=state.rewardChoices;
+    if(!canManageItems()||!reward||reward.round!==state.round||!Number.isInteger(index)||!reward.options[index])return;
+    reward.options[index].forEach(k=>state.inventory.push(newItem(k)));state.rewardRounds.push(reward.round);state.rewardChoices=null;
+    log('🎒 Rodada '+state.round+': pacote de 2 componentes recebido.');render();
+  }
+  function itemButton(item){
+    const d=ITEM_DEFS[item.key],button=document.createElement('button');
+    button.className='btn item-button'+(!d.component?' item-complete':'')+(state.selectedItem===item.id||state.pendingCombine?.includes(item.id)?' chosen':'');
+    button.innerHTML=d.icon+' '+d.name+'<small>'+d.desc+'</small>';button.disabled=!canManageItems();button.onclick=()=>selectItem(item.id);return button;
+  }
+  function renderItems(){
+    const inventory=$('#itemInventory');inventory.innerHTML='';
+    state.inventory.forEach(item=>inventory.appendChild(itemButton(item)));
+    if(!state.inventory.length)inventory.textContent='Sua mochila está vazia.';
+    const target=state.selected?findUnit(state.selected.id)?.u:null,selected=locateItem(state.selectedItem);
+    const equip=$('#equipItemBtn');equip.disabled=!canManageItems()||!selected||!!selected.u||!target||!!state.pendingCombine;
+    equip.onclick=equipSelectedItem;equip.textContent=target?'Equipar em '+stageData(target).name:'Selecione um Pokémon para equipar';
+    $('#equipmentTitle').textContent=target?'Equipamentos de '+stageData(target).name+' ('+(target.items||[]).length+'/3)':'Selecione um Pokémon para ver seus equipamentos';
+    const slots=$('#equipmentSlots');slots.innerHTML='';
+    if(target)for(let i=0;i<3;i++){
+      const slot=document.createElement('div');slot.className='item-slot';const item=(target.items||[])[i];
+      if(item){slot.appendChild(itemButton(item));const remove=document.createElement('button');remove.className='btn';remove.textContent='Remover grátis';remove.disabled=!canManageItems();remove.onclick=()=>removeItem(item.id);slot.appendChild(remove)}else slot.textContent='Espaço livre';
+      slots.appendChild(slot);
+    }
+    const preview=$('#itemPreview');preview.innerHTML='';const plan=combinationPlan();
+    if(plan){
+      const box=document.createElement('div');box.className='item-preview';const d=ITEM_DEFS[plan.key];
+      box.innerHTML='<b>'+ITEM_DEFS[plan.a.item.key].name+' + '+ITEM_DEFS[plan.b.item.key].name+' → '+d.icon+' '+d.name+'</b><p>'+d.desc+'</p><p>Destino: '+(plan.target?stageData(plan.target).name:'mochila')+'. Os componentes serão consumidos; o equipamento não pode ser desfeito.</p>';
+      const yes=document.createElement('button');yes.className='btn primary';yes.textContent='Confirmar combinação';yes.disabled=!canManageItems();yes.onclick=confirmCombine;
+      const no=document.createElement('button');no.className='btn';no.textContent='Cancelar';no.onclick=cancelCombine;box.appendChild(yes);box.appendChild(no);preview.appendChild(box);
+    }else if(selected){preview.textContent='Selecionado: '+ITEM_DEFS[selected.item.key].name+(ITEM_DEFS[selected.item.key].component?'. Clique em outro componente para ver a combinação.':'');}
+    const rewards=$('#itemRewards');rewards.innerHTML='';
+    if(state.rewardChoices){
+      const box=document.createElement('div');box.className='reward-box';box.innerHTML='<b>Rodada '+state.rewardChoices.round+' — escolha 1 pacote antes de batalhar</b>';
+      const options=document.createElement('div');options.className='reward-options';
+      state.rewardChoices.options.forEach((pair,i)=>{const button=document.createElement('button');button.className='btn';button.textContent=pair.map(k=>ITEM_DEFS[k].icon+' '+ITEM_DEFS[k].name).join(' + ');button.disabled=!canManageItems();button.onclick=()=>chooseItemReward(i);options.appendChild(button)});box.appendChild(options);rewards.appendChild(box);
+    }
+    $('#itemRecipes').innerHTML='<table class="recipe-table"><thead><tr><th>Componentes</th><th>Equipamento</th><th>Efeito total</th></tr></thead><tbody>'+Object.values(ITEM_DEFS).filter(d=>d.recipe).map(d=>'<tr><td>'+d.recipe.map(k=>ITEM_DEFS[k].name).join(' + ')+'</td><td>'+d.icon+' '+d.name+'</td><td>'+d.desc+'</td></tr>').join('')+'</tbody></table>';
+  }
   function xpNeed(){return state.level>=7?999:state.level*4;}
   function fieldCount(){return state.board.filter(Boolean).length}
   function log(msg,cls=''){const d=document.createElement('div');d.className=cls;d.textContent=msg;els.log.prepend(d)}
@@ -190,6 +338,7 @@
   function createToken(u,location,index){
     const p=stageData(u),d=document.createElement('div');d.className='token'+(state.selected&&state.selected.id===u.id?' selected':'');
     d.innerHTML='<img src="'+SPRITE(p.dex)+'" alt="'+p.name+'"><div class="mini">'+p.name+(u.stage?' • E'+(u.stage+1):'')+'</div>';
+    if((u.items||[]).length){const icons=document.createElement('span');icons.className='item-icons';icons.textContent=u.items.map(i=>ITEM_DEFS[i.key].icon).join('');d.appendChild(icons)}
     d.onclick=e=>{e.stopPropagation();if(state.battle)return;state.selected={id:u.id,location,index};render()};
     return d;
   }
@@ -260,7 +409,7 @@
     if(copies.length<3)return;
     const picked=copies.slice(0,3).map(u=>removeById(u.id));
     const boardDest=picked.find(x=>x&&x.location==='board');
-    const evolved=unit(line,stage+1);
+    const evolved=unit(line,stage+1);inheritItems(evolved,picked,boardDest);
     if(boardDest)state.board[boardDest.index]=evolved;
     else{const open=state.bench.findIndex(x=>!x);if(open>=0)state.bench[open]=evolved;else state.bench[0]=evolved}
     const p=stageData(evolved);toast('<span class="evo">EVOLUÇÃO!</span> '+p.name+' entrou no time.');log('✨ Evolução: '+p.name,'win');
@@ -286,7 +435,7 @@
     state.selected={id:f.u.id,location:'bench',index:i};render();
   }
   function sellSelected(){
-    if(state.battle||!state.selected)return;const f=findUnit(state.selected.id);if(!f)return;const val=LINES[f.u.line].cost*Math.pow(3,f.u.stage);removeById(f.u.id);state.gold+=val;log('Vendido por '+val+' ouro.');state.selected=null;render();
+    if(state.battle||state.gameOver||!state.selected)return;const f=findUnit(state.selected.id);if(!f)return;const val=LINES[f.u.line].cost*Math.pow(3,f.u.stage);state.inventory.push(...(f.u.items||[]));clearItemSelection();removeById(f.u.id);state.gold+=val;log('Vendido por '+val+' ouro.');state.selected=null;render();
   }
   function buyXP(){
     if(state.battle||state.level>=7)return;if(state.gold<4){toast('Ouro insuficiente.');return}state.gold-=4;state.xp+=4;levelCheck();render();
@@ -297,16 +446,17 @@
   function selectedBox(){
     const f=state.selected?findUnit(state.selected.id):null;$('#sellBtn').disabled=!f||state.battle;
     if(!f){els.selected.innerHTML='<small>Nenhum Pokémon selecionado.</small>';return}
-    const p=stageData(f.u),val=LINES[f.u.line].cost*Math.pow(3,f.u.stage);
-    els.selected.innerHTML='<div class="row"><img src="'+SPRITE(p.dex)+'"><div><b>'+p.name+'</b><small>'+p.types.join(' / ')+' • '+p.role+'</small><br><span class="tag">HP '+p.hp+'</span><span class="tag">ATK '+p.atk+'</span><span class="tag">DEF '+p.def+'</span></div></div><small>Habilidade: '+p.ability.name+' • Venda: '+val+' ouro'+(p.final?' • Evolução final':'')+'</small>';
+    const p=stageData(f.u),val=LINES[f.u.line].cost*Math.pow(3,f.u.stage),ib=itemBonuses(f.u);
+    p.hp=Math.round(p.hp*(1+ib.hp));p.atk=Math.round(p.atk*(1+ib.atk));p.def=Math.round(p.def*(1+ib.def));
+    els.selected.innerHTML='<div class="row"><img src="'+SPRITE(p.dex)+'"><div><b>'+p.name+'</b><small>'+p.types.join(' / ')+' • '+p.role+'</small><br><span class="tag">HP '+p.hp+'</span><span class="tag">ATK '+p.atk+'</span><span class="tag">DEF '+p.def+'</span></div></div><small>Habilidade: '+p.ability.name+' • Venda: '+val+' ouro'+(p.final?' • Evolução final':'')+'</small><br><small>Atributos com itens; conjuntos aplicados no combate.</small>';
   }
   function renderStats(){
     $('#roundStat').textContent=state.round+'/'+state.maxRounds;$('#hpStat').textContent=Math.max(0,state.hp);$('#goldStat').textContent=state.gold;$('#levelStat').textContent=state.level;$('#fieldStat').textContent=fieldCount()+'/'+state.level;
     const need=xpNeed();$('#levelStat').title=state.level>=7?'Nível máximo':state.xp+'/'+need+' XP';
     $('#battleBtn').textContent=state.gameOver?'Reiniciar partida':'Iniciar batalha';$('#battleBtn').disabled=state.battle||(!state.gameOver&&fieldCount()===0);$('#xpBtn').disabled=state.battle||state.gameOver||state.level>=7;$('#rerollBtn').disabled=state.battle||state.gameOver;
-    $('#phaseText').textContent=state.gameOver?'FIM DE JOGO':state.battle?'BATALHA AUTOMÁTICA':'PREPARAÇÃO';
+    $('#phaseText').textContent=state.gameOver?'FIM DE JOGO':state.battle?'BATALHA AUTOMÁTICA':state.rewardChoices?'RECOMPENSA DISPONÍVEL — escolha seu pacote na mochila':'PREPARAÇÃO';
   }
-  function render(){renderStats();renderSynergies();renderBoard();renderBench();renderShop();selectedBox()}
+  function render(){renderStats();renderSynergies();renderBoard();renderBench();renderShop();selectedBox();renderItems()}
 
   function synergyBonuses(sideUnits){
     const counts=countTypes(sideUnits);
@@ -315,7 +465,7 @@
   function makeCombatant(u,side,x,y){
     const p=stageData(u);return {cid:side+'-'+u.id+'-'+Math.random(),side,line:u.line,stage:u.stage,name:p.name,dex:p.dex,types:p.types,role:p.role,
       maxHp:p.hp,hp:p.hp,atk:p.atk,def:p.def,range:p.range,speed:p.speed,ability:p.ability,mana:0,shield:0,x,y,meter:Math.random()*35,stun:0,
-      effects:{},rootUntil:0,hasCast:false,nextRegenAt:3000,summoned:false,dead:false};
+      effects:{},rootUntil:0,hasCast:false,nextRegenAt:3000,summoned:false,dead:false,itemBonus:itemBonuses(u)};
   }
   function generateEnemy(){
     const count=Math.min(7,2+Math.floor((state.round-1)/2)),arr=[],used=new Set();
@@ -334,7 +484,10 @@
     return arr;
   }
   function startBattle(){
-    if(state.battle||state.gameOver||fieldCount()===0)return;state.selected=null;state.battle=true;
+    if(state.battle||state.gameOver||fieldCount()===0)return;
+    if(state.rewardChoices){$('#itemRewards').scrollIntoView?.({behavior:'smooth',block:'center'});toast('Escolha seu pacote de componentes antes da batalha.');return}
+    if(state.pendingCombine){$('#itemPreview').scrollIntoView?.({behavior:'smooth',block:'center'});toast('Confirme ou cancele a combinação antes da batalha.');return}
+    clearItemSelection();state.selected=null;state.battle=true;
     const player=[];state.board.forEach((u,i)=>{if(u)player.push(makeCombatant(u,'player',i%7,Math.floor(i/7)))});
     const enemy=generateEnemy(),pb=synergyBonuses(player),eb=synergyBonuses(enemy);
     for(const c of player)applyBonus(c,pb);for(const c of enemy)applyBonus(c,eb);
@@ -344,15 +497,16 @@
     banner('RODADA '+state.round);log('⚔️ Rodada '+state.round+' começou.');render();state.combat.timer=setInterval(combatTick,COMBAT_TICK_MS);
   }
   function applyBonus(c,tiers){
-    const tier=t=>c.summoned||!c.types.includes(t)?0:(tiers[t]||0);
+    const tier=t=>c.summoned||!c.types.includes(t)?0:(tiers[t]||0),ib=c.summoned?itemBonuses(c):(c.itemBonus||itemBonuses(c));
     const b={atk:[1,1.15,1.30][tier('Fire')],hp:[1,1.20,1.35][tier('Water')],def:[1,1.20,1.40][tier('Ground')],
       speed:(tier('Electric')?1.20:1)*(tier('Flying')===2?1.15:1),mana:[0,25,40][tier('Psychic')],
       power:tier('Psychic')===2?1.20:1,dodge:[0,.10,.20][tier('Flying')],
       regen:(tier('Water')===2?.02:0)+[0,.02,.04][tier('Grass')],root:tier('Grass')===2,
       poison:[0,.01,.02][tier('Poison')],antiHeal:tier('Poison')===2?.30:0,burn:tier('Fire')===2?.02:0,
       shield:tier('Ground')===2?.15:0};
-    c.maxHp=Math.round(c.maxHp*b.hp);c.hp=c.maxHp;c.atk=Math.round(c.atk*b.atk);c.def=Math.round(c.def*b.def);
-    c.speed=c.speed*b.speed;c.mana=b.mana;c.shield=Math.round(c.maxHp*b.shield);c.bonus=b;
+    c.maxHp=Math.round(c.maxHp*(1+ib.hp)*b.hp);c.hp=c.maxHp;c.atk=Math.round(c.atk*(1+ib.atk)*b.atk);c.def=Math.round(c.def*(1+ib.def)*b.def);
+    c.speed=c.speed*(1+ib.speed)*b.speed;c.mana=b.mana;c.shield=Math.round(c.maxHp*(b.shield+ib.shield));
+    b.power*=1+ib.power;b.regen+=ib.regen;b.basicLeech=ib.basicLeech;b.abilityLeech=ib.abilityLeech;b.manaOnAttack=ib.manaOnAttack;c.bonus=b;
   }
   function summonZapdos(side){
     if(!state.combat||state.combat.units.some(c=>c.side===side&&c.summoned))return;
@@ -378,9 +532,9 @@
     for(const [x,y] of opts){if(x>=0&&x<7&&y>=0&&y<6&&!occupied(x,y,c)){c.x=x;c.y=y;return}}
   }
   function takeDamage(t,amount){
-    let raw=Math.max(0,amount);
+    const before=t.hp;let raw=Math.max(0,amount);
     if(t.shield>0){const absorbed=Math.min(t.shield,raw);t.shield-=absorbed;raw-=absorbed}
-    t.hp=Math.max(0,t.hp-raw);if(t.hp===0)t.dead=true;
+    t.hp=Math.max(0,t.hp-raw);if(t.hp===0)t.dead=true;return before-t.hp;
   }
   function applyDot(t,kind,rate,antiHeal=0){
     if(t.dead)return;
@@ -412,13 +566,14 @@
   function damage(att,t,amount,kind='ability'){
     if(t.dead)return;
     if(kind==='basic'&&Math.random()<(t.bonus?.dodge||0))return;
-    takeDamage(t,Math.max(1,Math.round(amount-t.def*.32)));t.mana=Math.min(100,t.mana+12);
+    const dealt=takeDamage(t,Math.max(1,Math.round(amount-t.def*.32)));t.mana=Math.min(100,t.mana+12);
+    const leech=kind==='basic'?att.bonus?.basicLeech:att.bonus?.abilityLeech;if(leech&&dealt>0)heal(att,dealt*leech);
     if(kind==='basic'&&att.bonus?.poison)applyDot(t,'poison',att.bonus.poison,att.bonus.antiHeal);
     if(kind==='ability'&&att.bonus?.burn)applyDot(t,'burn',att.bonus.burn);
     flash(t.cid,'hit');
   }
   function normalAttack(c,t){
-    damage(c,t,c.atk*(.90+Math.random()*.2),'basic');c.mana=Math.min(100,c.mana+34);
+    damage(c,t,c.atk*(.90+Math.random()*.2),'basic');c.mana=Math.min(100,c.mana+34+(c.bonus?.manaOnAttack||0));
   }
   function cast(c,foes,allies){
     const t=nearest(c,foes);if(!t)return;
@@ -472,16 +627,16 @@
     else{const dmg=4+survivors*3;state.hp-=dmg;const gain=5+interest+streakBonus;state.gold+=gain;log('❌ Derrota. -'+dmg+' HP • +'+gain+' ouro ('+incomeDetails+').','loss');banner('-'+dmg+' HP');}
     state.xp+=2;levelCheck();
     if(state.hp<=0){state.hp=0;state.gameOver=true;toast('Fim de jogo na rodada '+state.round+'.');log('☠️ Sua jornada terminou.','loss');render();return}
-    if(state.round>=state.maxRounds){state.gameOver=true;toast(win?'🏆 Você venceu o protótipo v0.3!':'Fim do teste v0.3.');log(win?'🏆 Kanto Tactics v0.3 concluído!':'Teste concluído.');render();return}
-    state.round++;rollShop(true);render();
+    if(state.round>=state.maxRounds){state.gameOver=true;toast(win?'🏆 Você venceu o protótipo v0.4!':'Fim do teste v0.4.');log(win?'🏆 Kanto Tactics v0.4 concluído!':'Teste concluído.');render();return}
+    state.round++;prepareItemRewards();rollShop(true);render();
   }
   function reset(){
-    clearInterval(state.combat?.timer);Object.assign(state,{round:1,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null});
-    els.log.innerHTML='';rollShop(true);log('Bem-vindo ao Kanto Tactics v0.3. Monte seu primeiro time!');render();
+    clearInterval(state.combat?.timer);Object.assign(state,{round:1,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[]});
+    els.log.innerHTML='';prepareItemRewards();rollShop(true);log('Bem-vindo ao Kanto Tactics v0.4. Monte seu primeiro time!');render();
   }
   $('#rerollBtn').onclick=()=>rollShop(false);$('#xpBtn').onclick=buyXP;$('#sellBtn').onclick=sellSelected;$('#battleBtn').onclick=()=>{if(state.gameOver)reset();else startBattle()};
-  document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r')rollShop(false);if(e.key===' '){e.preventDefault();if(!state.battle)startBattle()}});
-  rollShop(true);log('Bem-vindo ao Kanto Tactics v0.3. Monte seu primeiro time!');render();
+  document.addEventListener('keydown',e=>{if(e.target&&['BUTTON','INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;if(e.key.toLowerCase()==='r')rollShop(false);if(e.key===' '){e.preventDefault();if(!state.battle)startBattle()}});
+  prepareItemRewards();rollShop(true);log('Bem-vindo ao Kanto Tactics v0.4. Monte seu primeiro time!');render();
 })();
 </script>
 </body>
