@@ -1,22 +1,22 @@
-# Kanto Tactics v0.5
+# Kanto Tactics v0.6
 
-Protótipo fan-made de auto-battler com Pokémon de Kanto e Johto. Site estático: `index.html` na raiz, sem build obrigatório para o Vercel.
+Protótipo fan-made de auto-battler com base em Pokémon de Kanto e unidades especiais selecionadas de Johto e Hoenn. Site estático: `index.html` na raiz, sem build obrigatório para o Vercel.
 
 ## Base preservada
 
 - Tabuleiro 7×6, banco com 9 espaços e loja com 5 opções.
-- Loja vende formas iniciais; três cópias da mesma forma evoluem automaticamente. Formas finais não fundem.
+- A loja pode oferecer formas base e evoluídas; três cópias do mesmo estágio continuam evoluindo automaticamente. Formas finais não fundem.
 - Equipamentos combináveis; evoluções continuam sem itens de evolução.
-- Ouro, juros, reroll, compra/venda, XP e nível do treinador; limite de campo igual ao nível (máximo 7).
+- Ouro, juros, reroll, compra/venda, XP e nível do treinador; limite de campo igual ao nível (máximo 9).
 - Juros na vitória e na derrota: +1 ouro por cada 10 guardados antes da recompensa, até +5 com 50 ou mais. Somam à recompensa base e ao bônus de sequência; gastar ouro reduz os juros da próxima rodada.
-- XP visível abaixo do nível, com experiência atual/necessária e barra de progresso. Atualiza ao comprar XP, concluir rodada, subir de nível e reiniciar; nível 7 mostra nível máximo.
+- XP visível abaixo do nível, com experiência atual/necessária e barra de progresso. Atualiza ao comprar XP, concluir rodada, subir de nível e reiniciar; nível 9 mostra nível máximo.
 - Sequências de vitórias ou derrotas: 3 dão +1 ouro; 4 dão +2; 5 ou mais dão +3 por rodada. Resultado diferente reinicia a sequência em 1; nova partida zera.
 - Mana, habilidades automáticas, movimentação e combate automático; jornada ampliada para 25 etapas, com quatro encontros de boss.
 - Selecione um Pokémon no campo e clique em um espaço vazio do banco para retirá-lo.
 - Correções da v0.2 mantidas: sem ação contra alvo inexistente e sem ação após morte por dano periódico.
 
 
-## Progressão e bosses — v0.5
+## Progressão e bosses — preservados da v0.5
 
 - A jornada agora possui 25 etapas.
 - As etapas 1, 2 e 3 são propositalmente leves, com poucos inimigos, sem evoluções e atributos reduzidos.
@@ -30,7 +30,50 @@ Protótipo fan-made de auto-battler com Pokémon de Kanto e Johto. Site estátic
 - Em batalhas de boss, sobreviver ao limite de tempo sem derrotar o boss conta como derrota.
 - Recompensa de boss: vitória = 2 componentes; derrota com pelo menos 50% do HP total removido = 1 componente; derrota abaixo de 50% = 0.
 
-## Elenco: 33 linhas
+
+## Loja e raridades — v0.6
+
+Cada espaço da loja sorteia primeiro a raridade, depois a linha e por fim o estágio evolutivo. Pokémon especiais 4★ só entram no pool a partir do nível 6.
+
+| Nível | 1$ | 2$ | 3$ | 4★ especial |
+|---:|---:|---:|---:|---:|
+| 2 | 70% | 30% | 0% | 0% |
+| 3 | 55% | 35% | 10% | 0% |
+| 4 | 40% | 35% | 25% | 0% |
+| 5 | 28% | 37% | 35% | 0% |
+| 6 | 18% | 32% | 47% | 3% |
+| 7 | 10% | 25% | 57% | 8% |
+| 8 | 5% | 18% | 65% | 12% |
+| 9 | 3% | 12% | 67% | 18% |
+
+Formas normais também podem aparecer evoluídas:
+
+| Nível | Base | 2ª forma | Final |
+|---:|---:|---:|---:|
+| 2 | 100% | 0% | 0% |
+| 3 | 98% | 2% | 0% |
+| 4 | 92% | 8% | 0% |
+| 5 | 82% | 16% | 2% |
+| 6 | 70% | 25% | 5% |
+| 7 | 58% | 32% | 10% |
+| 8 | 48% | 35% | 17% |
+| 9 | 40% | 37% | 23% |
+
+Para os especiais 4★: nível 6 = 94/5/1; nível 7 = 82/15/3; nível 8 = 72/21/7; nível 9 = 62/26/12 para forma base/2ª/final. Lapras sempre aparece como Lapras.
+
+Preços normais seguem o valor equivalente do estágio: custo base × 3 por evolução. Nos 4★, os preços são 4 ouro na forma base, 9 na segunda forma e 16 na forma final. A própria interface mostra as probabilidades do nível atual.
+
+## Pokémon especiais 4★ — v0.6
+
+- **Dratini → Dragonair → Dragonite**: Multiescala reduz dano acima de 70% do HP em 15% / 25% / 35%. Fúria do Dragão fica mais forte e concede velocidade temporária crescente.
+- **Larvitar → Pupitar → Tyranitar**: Tempestade de Areia reduz a velocidade inimiga em 8% / 12% / 18% e aumenta a própria defesa em 10% / 20% / 30%. Terremoto ganha alcance, dano e controle.
+- **Gastly → Haunter → Gengar**: Sombra concede intangibilidade inicial por 0,4s / 0,7s / 1,0s. Bola Sombria aumenta o dano e devolve 20 / 35 / 50 de mana ao finalizar um alvo.
+- **Lapras**: Canção Protetora concede escudo inicial de 12% do HP máximo aos aliados. Blizzard causa dano em área e reduz velocidade.
+- **Beldum → Metang → Metagross**: Corpo Metálico reduz o primeiro controle recebido em 50% / 75% / 100%. Meteor Mash aumenta dano e escudo por inimigo atingido.
+
+Os especiais mantêm seus tipos normais e só contribuem para conjuntos já existentes. Dragon e Dark, por exemplo, ainda não possuem conjunto próprio. Os 4★ não foram adicionados ao gerador de composições normais da IA da v0.5 e não substituem os lendários de boss.
+
+## Elenco: 33 linhas padrão + 5 linhas especiais 4★
 
 As 20 linhas existentes foram mantidas. Novas linhas disponíveis na loja:
 
@@ -96,12 +139,12 @@ Execute com Node.js:
 node --test tests/game.test.cjs
 ```
 
-Os testes executam o JavaScript real do jogo em um DOM simulado, cobrindo conjuntos, efeitos, invocação, evoluções, economia, ações de posicionamento, curva de dificuldade, bosses e combates completos das oito composições nas 25 etapas. Não substituem a avaliação visual em navegador nem os testes de balanceamento com jogadores.
+Os testes executam o JavaScript real do jogo em um DOM simulado, cobrindo conjuntos, efeitos, invocação, evoluções, economia, loja por raridade, formas evoluídas, nível 9, habilidades especiais 4★, ações de posicionamento, curva de dificuldade, bosses e combates completos das oito composições nas 25 etapas. Não substituem a avaliação visual em navegador nem os testes de balanceamento com jogadores.
 
 Protótipo não comercial criado para testes de mecânica e balanceamento.
 
 
-## Itens — v0.5
+## Itens — preservados na v0.6
 
 - 5 componentes (Garra, Pena, Cristal, Casco, Semente) e 15 receitas, consultáveis na mochila.
 - Selecione um Pokémon, clique em um item da mochila e em Equipar. Até 3 itens por Pokémon, incluindo componentes.
