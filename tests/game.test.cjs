@@ -84,6 +84,17 @@ test('v0.6 Gastly line starts intangible for stage-scaled duration',()=>{const {
 test('v0.6 Lapras shields allies at battle start',()=>{const {g,s}=setup();const lap=g.makeCombatant(g.unit('lapras'),'player',0,3),ally=g.makeCombatant(g.unit('pikachu'),'player',1,3),foe=g.makeCombatant(g.unit('squirtle'),'enemy',0,2);for(const c of [lap,ally,foe])g.applyBonus(c,{});s.combat={units:[lap,ally,foe],elapsedMs:0};g.applySpecialBattleStart('player');assert.equal(lap.shield,Math.round(lap.maxHp*.12));assert.equal(ally.shield,Math.round(ally.maxHp*.12))});
 test('v0.6 Metal Body progressively reduces the first control and Metagross ignores it',()=>{const {g,s}=setup();for(const [stage,expected] of [[0,1],[1,1],[2,0]]){const m=g.makeCombatant(g.unit('beldum',stage),'player',0,3),foe=g.makeCombatant(g.unit('zubat'),'enemy',0,2);g.applyBonus(m,{});g.applyBonus(foe,{});s.combat={units:[m,foe],elapsedMs:0};g.applySpecialBattleStart('player');g.applyStun(m,2);assert.equal(m.stun,expected);assert.equal(m.controlGuardUsed,true);g.applyStun(m,2);assert.equal(m.stun,2)}});
 
+test('v0.6 special active abilities exist from the first form and scale through evolution',()=>{const {g}=setup();for(const line of ['dratini','larvitar','gastly','beldum']){const first=g.stageData(g.unit(line,0)),final=g.stageData(g.unit(line,2));assert(first.ability);assert(final.ability);assert(final.ability.power>first.ability.power)}assert.equal(g.stageData(g.unit('lapras')).ability.kind,'blizzard')});
+test('v0.6 Dragon Rush, Earthquake, Shadow Ball, Blizzard and Meteor Mash execute their unique effects',()=>{const {g,s}=setup();
+  const foe=line=>{const c=g.makeCombatant(g.unit(line),'enemy',3,1);g.applyBonus(c,{});c.def=0;c.hp=c.maxHp=1000;return c};
+  {const c=g.makeCombatant(g.unit('dratini'),'player',0,3),e=foe('squirtle');g.applyBonus(c,{});s.combat={units:[c,e],elapsedMs:0};g.cast(c,[e],[c]);assert.equal(c.speedBoost,.15);assert.equal(c.speedBoostUntil,2200)}
+  {const c=g.makeCombatant(g.unit('larvitar'),'player',3,3),e=foe('squirtle');e.x=3;e.y=2;g.applyBonus(c,{});s.combat={units:[c,e],elapsedMs:0};g.cast(c,[e],[c]);assert.equal(e.stun,1);assert(e.hp<1000)}
+  {const c=g.makeCombatant(g.unit('gastly'),'player',0,3),e=foe('squirtle');g.applyBonus(c,{});e.hp=1;s.combat={units:[c,e],elapsedMs:0};g.cast(c,[e],[c]);assert.equal(e.dead,true);assert.equal(c.mana,20)}
+  {const c=g.makeCombatant(g.unit('lapras'),'player',0,3),e=foe('squirtle');g.applyBonus(c,{});s.combat={units:[c,e],elapsedMs:0};g.cast(c,[e],[c]);assert.equal(e.chill,.18);assert.equal(e.chillUntil,3000)}
+  {const c=g.makeCombatant(g.unit('beldum'),'player',0,3),e=foe('squirtle');g.applyBonus(c,{});s.combat={units:[c,e],elapsedMs:0};g.cast(c,[e],[c]);assert.equal(c.shield,Math.round(c.maxHp*.05))}
+});
+test('v0.6 shop displays the current rarity and evolution percentages',()=>{const {g,s,nodes}=setup();s.level=6;g.render();const t=nodes.get('#shopOddsText').textContent;assert(t.includes('4★ 3%'));assert(t.includes('base 70%'));s.level=9;g.render();const t9=nodes.get('#shopOddsText').textContent;assert(t9.includes('4★ 18%'));assert(t9.includes('final 23%'))});
+
 test('interest: balance brackets before payout, both results, cap and streak resets',()=>{
   for(const win of [true,false])for(const gold of [0,9,10,19,20,29,30,35,39,40,49,50,59,100]){
     const {g,s}=setup();s.gold=gold;s.streak=2;s.streakResult=win?'win':'loss';s.combat={units:[]};
