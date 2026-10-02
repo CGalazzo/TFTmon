@@ -8,6 +8,8 @@ Protótipo fan-made de auto-battler com Pokémon de Kanto e Johto. Site estátic
 - Loja vende formas iniciais; três cópias da mesma forma evoluem automaticamente. Formas finais não fundem.
 - Equipamentos combináveis; evoluções continuam sem itens de evolução.
 - Ouro, juros, reroll, compra/venda, XP e nível do treinador; limite de campo igual ao nível (máximo 7).
+- Juros na vitória e na derrota: +1 ouro por cada 10 guardados antes da recompensa, até +5 com 50 ou mais. Somam à recompensa base e ao bônus de sequência; gastar ouro reduz os juros da próxima rodada.
+- XP visível abaixo do nível, com experiência atual/necessária e barra de progresso. Atualiza ao comprar XP, concluir rodada, subir de nível e reiniciar; nível 7 mostra nível máximo.
 - Sequências de vitórias ou derrotas: 3 dão +1 ouro; 4 dão +2; 5 ou mais dão +3 por rodada. Resultado diferente reinicia a sequência em 1; nova partida zera.
 - Mana, habilidades automáticas, movimentação e combate automático; 15 rodadas e rival final fortalecido.
 - Selecione um Pokémon no campo e clique em um espaço vazio do banco para retirá-lo.

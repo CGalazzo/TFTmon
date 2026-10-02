@@ -10,7 +10,7 @@ function setup(){
   const nodes=new Map(),listeners={};
   function element(){
     const e={children:[],style:{},dataset:{},className:'',textContent:'',classList:{add(){},remove(){}},
-      appendChild(c){this.children.push(c);if(c.id)nodes.set('#'+c.id,c)},prepend(c){this.children.unshift(c)},
+      setAttribute(k,v){this[k]=String(v)},appendChild(c){this.children.push(c);if(c.id)nodes.set('#'+c.id,c)},prepend(c){this.children.unshift(c)},
       querySelector(){return element()},querySelectorAll(selector){return this.children.filter(c=>c.className.split(' ').includes(selector.slice(1)))}};
     let content='';Object.defineProperty(e,'innerHTML',{get:()=>content,set:v=>{content=v;e.children=[]}});return e;
   }
@@ -67,3 +67,22 @@ test('items: leech excludes shields, overkill, periodic damage and the other att
 test('items: ability power applies to damage, cure and shield, not just attacks',()=>{const ctx=setup(),{g,fighter}=ctx;for(const kind of ['blast','heal','shield']){const c=equipped(ctx,'squirtle',['glasses']),t=fighter('pikachu','enemy'),ally=fighter('pikachu');t.def=0;t.hp=t.maxHp=1000;ally.hp=1;ally.maxHp=1000;c.ability={kind,power:.5};g.cast(c,[t],[c,ally]);if(kind==='blast')assert.equal(1000-t.hp,Math.round(c.atk*.5*1.25));if(kind==='heal')assert.equal(ally.hp,1+Math.round(c.maxHp*.5*1.25));if(kind==='shield')assert.equal(c.shield,Math.round(c.maxHp*.5*1.25))}});
 test('items: battle copies do not mutate original stats or inventory; Zapdos cannot receive items',()=>{const {g,s,field}=setup();field(sets.Electric);s.board[21].items=[g.newItem('vest'),g.newItem('muscle')];const owned=JSON.stringify(s.board);g.startBattle();const first=s.combat.units.find(c=>c.side==='player'&&!c.summoned),hp=first.maxHp;const z=s.combat.units.find(c=>c.summoned&&c.side==='player');assert.equal(z.maxHp,180);const item=g.newItem('vest');s.inventory.push(item);s.selected={id:z.cid};s.selectedItem=item.id;g.equipSelectedItem();assert(s.inventory.includes(item));g.finishBattle(true);assert.equal(JSON.stringify(s.board),owned);g.startBattle();assert.equal(s.combat.units.find(c=>c.side==='player'&&!c.summoned).maxHp,hp)});
 test('items: entire 15-round journey with rewards and equipped combat terminates without losing equipment',()=>{const {g,s,field}=setup();field(sets.Water);s.hp=10000;s.board[21].items=['leftovers','vest','barrier'].map(g.newItem);s.board[22].items=['orb','bell','amulet'].map(g.newItem);const before=JSON.stringify(s.board);for(let round=1;round<=15;round++){if(s.rewardChoices)g.chooseItemReward(0);assert.equal(s.round,round);g.startBattle();let ticks=0;while(s.battle&&ticks++<430)g.combatTick();assert.equal(s.battle,false);assert.equal(JSON.stringify(s.board),before)}assert(s.gameOver);assert.equal(s.inventory.length,10);assert.equal(s.rewardRounds.length,5)});
+
+test('interest: balance brackets before payout, both results, cap and streak resets',()=>{
+  for(const win of [true,false])for(const gold of [0,9,10,19,20,29,30,35,39,40,49,50,59,100]){
+    const {g,s}=setup();s.gold=gold;s.streak=2;s.streakResult=win?'win':'loss';s.combat={units:[]};
+    g.finishBattle(win);assert.equal(s.gold,gold+(win?6:5)+Math.min(5,Math.floor(gold/10))+1);
+  }
+  const {g,s}=setup();s.gold=40;s.gold-=5;s.streak=5;s.streakResult='win';s.combat={units:[]};
+  g.finishBattle(false);assert.equal(s.gold,43);assert.equal(s.streak,1);assert.equal(s.streakResult,'loss');
+  s.gold=40;s.streak=5;s.streakResult='loss';s.combat={units:[]};
+  g.finishBattle(true);assert.equal(s.gold,50);assert.equal(s.streak,1);assert.equal(s.streakResult,'win');
+});
+test('visible XP: initial, purchase, round reward, level rollover, maximum and reset',()=>{
+  const {g,s,nodes}=setup();const text=()=>nodes.get('#xpStat').textContent;
+  assert.equal(text(),'0/8 XP');s.gold=100;g.buyXP();assert.equal(text(),'4/8 XP');assert.equal(nodes.get('#xpFill').style.width,'50%');
+  s.combat={units:[]};g.finishBattle(false);assert.equal(text(),'6/8 XP');
+  g.buyXP();assert.equal(s.level,3);assert.equal(text(),'2/12 XP');assert.equal(nodes.get('#xpProgress')['aria-valuenow'],'2');
+  s.level=7;g.render();assert.equal(text(),'XP • Nível máximo');assert.equal(nodes.get('#xpFill').style.width,'100%');
+  g.reset();assert.equal(text(),'0/8 XP');assert.equal(nodes.get('#xpFill').style.width,'0%');
+});

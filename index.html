@@ -48,7 +48,7 @@
       <div class="stat"><span>Rodada</span><b id="roundStat">1/15</b></div>
       <div class="stat"><span>HP</span><b id="hpStat">100</b></div>
       <div class="stat"><span>Ouro</span><b id="goldStat">10</b></div>
-      <div class="stat"><span>Nível</span><b id="levelStat">2</b></div>
+      <div class="stat"><span>Nível</span><b id="levelStat">2</b><small id="xpStat">0/8 XP</small><div class="progress" id="xpProgress" role="progressbar" aria-label="Experiência para o próximo nível" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i id="xpFill" style="width:0%"></i></div></div>
       <div class="stat"><span>Campo</span><b id="fieldStat">0/2</b></div>
     </div>
   </header>
@@ -452,7 +452,10 @@
   }
   function renderStats(){
     $('#roundStat').textContent=state.round+'/'+state.maxRounds;$('#hpStat').textContent=Math.max(0,state.hp);$('#goldStat').textContent=state.gold;$('#levelStat').textContent=state.level;$('#fieldStat').textContent=fieldCount()+'/'+state.level;
-    const need=xpNeed();$('#levelStat').title=state.level>=7?'Nível máximo':state.xp+'/'+need+' XP';
+    const need=xpNeed(),maxLevel=state.level>=7,xpText=maxLevel?'XP • Nível máximo':state.xp+'/'+need+' XP';
+    $('#levelStat').title=maxLevel?'Nível máximo':xpText;
+    $('#xpStat').textContent=xpText;$('#xpFill').style.width=(maxLevel?100:Math.min(100,state.xp/need*100))+'%';
+    const xpProgress=$('#xpProgress');xpProgress.setAttribute('aria-valuemax',maxLevel?1:need);xpProgress.setAttribute('aria-valuenow',maxLevel?1:state.xp);xpProgress.setAttribute('aria-valuetext',xpText);
     $('#battleBtn').textContent=state.gameOver?'Reiniciar partida':'Iniciar batalha';$('#battleBtn').disabled=state.battle||(!state.gameOver&&fieldCount()===0);$('#xpBtn').disabled=state.battle||state.gameOver||state.level>=7;$('#rerollBtn').disabled=state.battle||state.gameOver;
     $('#phaseText').textContent=state.gameOver?'FIM DE JOGO':state.battle?'BATALHA AUTOMÁTICA':state.rewardChoices?'RECOMPENSA DISPONÍVEL — escolha seu pacote na mochila':'PREPARAÇÃO';
   }
