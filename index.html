@@ -148,7 +148,7 @@
       const read=paths=>Promise.all(paths.map(p=>fetch(p,{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error('asset '+p);return r.text()}))).then(parts=>parts.join('').replace(/\s/g,''));
       const [bg,logo]=await Promise.all([
         read(['assets/tftmon-bg-1.b64','assets/tftmon-bg-2.b64','assets/tftmon-bg-3.b64']),
-        read(['assets/tftmon-logo-1.b64','assets/tftmon-logo-2.b64','assets/tftmon-logo-3.b64','assets/tftmon-logo-4.b64','assets/tftmon-logo-5.b64','assets/tftmon-logo-6.b64','assets/tftmon-logo-7.b64'])
+        read(['assets/tftmon-logo-1.b64','assets/tftmon-logo-2.b64'])
       ]);
       const root=document.documentElement.style,bgUrl='url("data:image/webp;base64,'+bg+'")',logoUrl='url("data:image/webp;base64,'+logo+'")';
       root.setProperty('--start-bg-image',bgUrl);root.setProperty('--game-bg-image',bgUrl);root.setProperty('--logo-image',logoUrl);
