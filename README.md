@@ -71,7 +71,7 @@ Preços normais seguem o valor equivalente do estágio: custo base × 3 por evol
 - **Gible → Gabite → Garchomp**: Pele Áspera devolve 8% / 12% / 18% do dano efetivo recebido de ataques básicos. Investida do Dragão ganha dano e velocidade temporária a cada evolução.
 - **Beldum → Metang → Metagross**: Corpo Metálico reduz o primeiro controle recebido em 50% / 75% / 100%. Meteor Mash aumenta dano e escudo por inimigo atingido.
 
-Os especiais mantêm seus tipos normais e só contribuem para conjuntos já existentes. Dragon e Dark, por exemplo, ainda não possuem conjunto próprio. Os 4★ não entram nas composições normais da IA e não substituem os lendários de boss.
+Os especiais mantêm seus tipos normais e só contribuem para conjuntos existentes. Dragon agora possui conjunto próprio em 1/4; Dark continua sem conjunto. Os 4★ não entram nas composições normais da IA e não substituem os lendários de boss.
 
 ## Elenco: 33 linhas padrão + 5 linhas especiais 4★
 
@@ -113,25 +113,35 @@ A IA continua buscando composições de 3 e 5 linhas. Quando um tipo necessário
 - Repetidos e formas diferentes da mesma linha contam uma vez por tipo. Por exemplo, Pikachu + Raichu = 1 Electric.
 - Tipos duplos contribuem para ambos os conjuntos. O tipo da forma atual é considerado (Charizard adiciona Flying; Charmander não).
 - Os bônus são definidos no início de cada combate e continuam até o fim, mesmo após derrotas de membros do time.
-- Bônus só afetam unidades do tipo correspondente. O nível de 5 substitui o de 3.
+- Bônus só afetam unidades do tipo correspondente. O patamar maior substitui o menor; nas sinergias comuns, 5 substitui 3, e em Dragon, 4 substitui 1.
 - A mesma regra vale para o jogador e o rival.
 - Tipos sem conjunto ativo, como Normal, Bug, Steel e Rock, são apenas identificados.
 - **Sem fraquezas, resistências ou imunidades por tipo.** O dano depende dos atributos, habilidades, defesa, escudos e conjuntos; Água não tem vantagem de dano sobre Fogo.
 
-| Tipo | 3 linhas | 5 linhas |
+| Tipo | 1º patamar | 2º patamar |
 |---|---|---|
-| Fire | +15% ATK | +30% ATK; dano de habilidades aplica queimadura de 2% HP máximo/s durante 3s |
-| Water | +20% HP máximo | +35% HP máximo; cura 2% HP máximo a cada 3s |
-| Electric | +20% velocidade de ação | Mantém +20% e invoca Zapdos uma vez no início do combate |
-| Grass | Cura 2% HP máximo a cada 3s | Cura 4% HP máximo a cada 3s; primeira habilidade de cada unidade enraíza o alvo por 1,5s |
-| Psychic | +25 mana inicial | +40 mana inicial; +20% potência de dano, cura e escudo das habilidades |
-| Flying | 10% esquiva contra ataques básicos | 20% esquiva básica; +15% velocidade de ação |
-| Poison | Ataques básicos aplicam veneno de 1% HP máximo/s durante 3s | Veneno de 2% HP máximo/s; alvo recebe 30% menos cura enquanto envenenado |
-| Ground | +20% DEF | +40% DEF; escudo inicial de 15% HP máximo |
+| Fire | **3:** +15% ATK | **5:** +30% ATK; dano de habilidades aplica queimadura de 2% HP máximo/s durante 3s |
+| Water | **3:** +20% HP máximo | **5:** +35% HP máximo; cura 2% HP máximo a cada 3s |
+| Electric | **3:** +20% velocidade de ação | **5:** mantém +20% e invoca Zapdos uma vez no início do combate |
+| Grass | **3:** cura 2% HP máximo a cada 3s | **5:** cura 4% HP máximo a cada 3s; primeira habilidade de cada unidade enraíza o alvo por 1,5s |
+| Psychic | **3:** +25 mana inicial | **5:** +40 mana inicial; +20% potência de dano, cura e escudo das habilidades |
+| Flying | **3:** 10% esquiva contra ataques básicos | **5:** 20% esquiva básica; +15% velocidade de ação |
+| Poison | **3:** ataques básicos aplicam veneno de 1% HP máximo/s durante 3s | **5:** veneno de 2% HP máximo/s; alvo recebe 30% menos cura enquanto envenenado |
+| Ground | **3:** +20% DEF | **5:** +40% DEF; escudo inicial de 15% HP máximo |
+| Dragon | **1 — Sangue Dracônico:** +15% HP máximo e +15% ATK | **4 — Ascensão Dracônica:** +45% HP máximo e ATK, 25% redução de dano e +40 mana inicial; a primeira vez que cada Dragon fica abaixo de 40% HP, recupera 25% HP máximo e ganha +30% velocidade por 4s |
 
 Enraizamento impede movimento, mas permite ataques e habilidades. Dano periódico usa o HP máximo do alvo, consome escudos e não recebe modificadores de tipo ou esquiva. Veneno e queimadura podem coexistir, mas aplicações do mesmo efeito apenas renovam a duração, sem acumular intensidade. Os tempos seguem o relógio de combate (atualizado a cada 260ms), não a frequência das ações de cada unidade.
 
 Foram corrigidos os tipos do Beedrill (Bug/Poison, sem Flying) e completadas as identificações de Bug, Normal e Steel em linhas antigas, sem criar novos conjuntos.
+
+### Dragon — linhas disponíveis
+
+- **Dratini → Dragonair → Dragonite:** Dragon nos três estágios.
+- **Gible → Gabite → Garchomp:** Dragon nos três estágios.
+- **Trapinch → Vibrava → Flygon:** Trapinch ainda não conta; Vibrava e Flygon contam como Dragon.
+- **Horsea → Seadra → Kingdra:** apenas Kingdra conta como Dragon.
+- Com 4 linhas Dragon ativas, surge **Ascensão Dracônica**; o efeito de 4 substitui completamente o bônus de 1 e não acumula com ele.
+- A ativação de 4 Dragon recebe destaque visual durante o combate, e o renascimento abaixo de 40% HP só pode acontecer uma vez por Dragon a cada batalha.
 
 ## Zapdos
 
