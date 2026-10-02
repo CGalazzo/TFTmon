@@ -27,7 +27,7 @@
     .cell{border:1px solid #ffffff20;border-radius:9px;background:#ffffff09;position:relative;overflow:hidden}.cell.player-zone{background:#4bb6ff0b}.cell.enemy-zone{background:#ff6b6b08}.cell:hover{outline:2px solid #ffffff42;cursor:pointer}
     .token{position:absolute;inset:2px;display:flex;align-items:center;justify-content:center;flex-direction:column;border-radius:8px;z-index:2;cursor:pointer;background:linear-gradient(180deg,#1e3550dd,#0b1726ee);border:1px solid #ffffff30}.token.selected{outline:3px solid var(--accent);box-shadow:0 0 18px #f5c54288}.token img{width:72%;height:72%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 4px 4px #0007)}.token .mini{position:absolute;bottom:2px;font-size:9px;background:#050b13dd;border-radius:8px;padding:2px 5px;white-space:nowrap}
     .battle-layer{position:absolute;inset:8px;pointer-events:none;z-index:5}.fighter{position:absolute;width:var(--cell);height:var(--cell);transition:left .22s linear,top .22s linear;display:flex;align-items:center;justify-content:center;flex-direction:column}.fighter img{width:78%;height:70%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 6px 5px #0009)}.fighter.enemy img{transform:scaleX(-1)}.fighter .hp{position:absolute;top:1px;width:86%;height:6px;border-radius:5px;background:#260b0b;overflow:hidden;border:1px solid #000}.fighter .hp i{display:block;height:100%;background:#68df8f}.fighter .mana{position:absolute;top:8px;width:70%;height:3px;border-radius:4px;background:#081a2d;overflow:hidden}.fighter .mana i{display:block;height:100%;background:#5bb7ff}.fighter .label{font-size:8px;background:#08101bdd;padding:1px 4px;border-radius:5px;position:absolute;bottom:0}.fighter.hit{animation:hit .2s}.fighter.cast{animation:cast .35s}.fighter.dead{opacity:0;transform:scale(.3);transition:.35s}
-    @keyframes hit{50%{filter:brightness(2);transform:translateX(4px)}}@keyframes cast{50%{filter:drop-shadow(0 0 14px #fff) brightness(1.5);transform:scale(1.12)}}
+    @keyframes hit{50%{filter:brightness(2);transform:translateX(4px)}}@keyframes cast{50%{filter:drop-shadow(0 0 14px #fff) brightness(1.5);transform:scale(1.12)}}@keyframes dragonAura{50%{filter:drop-shadow(0 0 12px #ffe173) brightness(1.25)}}@keyframes dragonResurgence{50%{transform:scale(1.08);filter:drop-shadow(0 0 18px #fff) brightness(1.5)}}.fighter.dragon-ascended img{animation:dragonAura 1.1s ease-in-out infinite}.fighter.dragon-resurgence img{animation:dragonResurgence .45s ease-in-out infinite}
     .bench{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;width:min(100%,calc(var(--cell)*7 + 40px));background:#0a1625;border:1px solid var(--line);padding:8px;border-radius:14px}.bench-slot{min-height:64px;border:1px dashed #35506c;border-radius:9px;display:flex;align-items:center;justify-content:center;position:relative}.bench-slot .token{position:relative;width:100%;height:62px}.bench-slot .token img{height:48px;width:58px}.bench-slot.empty:after{content:"";width:18px;height:2px;background:#38506a}
     .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:10px}.btn{border:1px solid #3b5874;background:#142943;color:#fff;border-radius:11px;padding:9px 13px;font-weight:700;cursor:pointer}.btn:hover{filter:brightness(1.15)}.btn.primary{background:linear-gradient(#f6d762,#d6a91b);color:#211900;border-color:#ffdf67}.btn.danger{background:#51202a;border-color:#8e3949}.btn:disabled{opacity:.45;cursor:not-allowed}
     .shop{margin-top:14px}.shop-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.card{background:linear-gradient(180deg,#162c46,#0a1625);border:2px solid #6f7d8a;border-radius:14px;padding:8px;text-align:center;position:relative;min-height:190px}.card.rarity-1{border-color:#aeb8c2}.card.rarity-2{border-color:#58c978;box-shadow:inset 0 0 18px #58c97815}.card.rarity-3{border-color:#55a8ff;box-shadow:inset 0 0 20px #55a8ff1b}.card.rarity-4{border-color:#ffd85a;box-shadow:0 0 18px #ffd85a55,inset 0 0 24px #ffd85a1f;animation:specialGlow 1.8s ease-in-out infinite alternate}.card img{width:92px;height:92px;image-rendering:pixelated;object-fit:contain}.card .name{font-weight:800}.card .meta{font-size:10px;color:var(--muted);min-height:32px}.rarity-label{font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin:2px 0 4px}.rarity-1 .rarity-label{color:#d5dce3}.rarity-2 .rarity-label{color:#72e492}.rarity-3 .rarity-label{color:#75baff}.rarity-4 .rarity-label{color:#ffe173}.cost{position:absolute;top:8px;right:8px;border-radius:50%;min-width:29px;height:29px;padding:0 6px;background:#e8bd31;color:#2d2200;display:grid;place-items:center;font-weight:900}.buy{width:100%;margin-top:5px}@keyframes specialGlow{from{box-shadow:0 0 9px #ffd85a42,inset 0 0 16px #ffd85a16}to{box-shadow:0 0 24px #ffd85a88,inset 0 0 28px #ffd85a2b}}.token.special-token{border-color:#f4cf54;box-shadow:0 0 10px #f4cf5444}.special-stars{color:#ffe173;font-weight:900}
@@ -120,7 +120,7 @@
 <div id="rulesModal" class="type-modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle"><div class="type-modal-card"><div class="type-modal-head"><div><h2 id="rulesTitle">Regras do TFTmon</h2><div class="subtitle">Tudo que você precisa saber durante a partida.</div></div><button class="btn" id="rulesClose">Fechar</button></div>
   <div class="modal-section"><h3>🛒 Loja e economia</h3><p>Compre Pokémon, use reroll por 2 ouro e compre 4 XP por 4 ouro. Guardar ouro gera juros de +1 por cada 10, até +5. Sequências de vitória ou derrota dão bônus a partir de 3 resultados iguais.</p></div>
   <div class="modal-section"><h3>✨ Evolução e campo</h3><p>3 cópias iguais do mesmo estágio evoluem automaticamente. Formas finais não fundem. O limite de Pokémon no campo é igual ao nível do treinador, que vai até 9.</p></div>
-  <div class="modal-section"><h3>🧩 Sinergias</h3><p>3 ou 5 linhas evolutivas diferentes da mesma tipagem ativam bônus. Repetidos da mesma linha contam uma vez. Toque em qualquer tipagem durante a partida para ver os Pokémon válidos e seus efeitos.</p></div>
+  <div class="modal-section"><h3>🧩 Sinergias</h3><p>A maioria das tipagens ativa bônus com 3 ou 5 linhas evolutivas diferentes. Dragon é especial: ativa com 1 e alcança Ascensão Dracônica com 4. Repetidos da mesma linha contam uma vez. Toque em qualquer tipagem durante a partida para ver os Pokémon válidos e seus efeitos.</p></div>
   <div class="modal-section"><h3>★★★★ Pokémon especiais</h3><p>Dratini, Larvitar, Gastly, Gible e Beldum são 4★. Eles começam a aparecer no nível 6, podem vir evoluídos e possuem habilidades/passivas exclusivas.</p></div>
   <div class="modal-section"><h3>🎒 Itens</h3><p>Você começa com 2 componentes. Combine 2 componentes para formar equipamentos. Cada Pokémon pode carregar até 3 itens. Bosses podem conceder novos componentes.</p></div>
   <div class="modal-section"><h3>👑 Bosses</h3><p>Etapa 6: Onix • 12: 3 Tauros • 18: Raikou, Entei ou Suicune • 25: Mewtwo. Vitória rende 2 componentes; ao perder removendo pelo menos 50% do HP total do boss, você recebe 1.</p></div>
@@ -164,7 +164,8 @@
     Psychic:{icon:'🔮',levels:[3,5],desc:['+25 mana inicial','+40 mana inicial; +20% potência das habilidades']},
     Flying:{icon:'🪽',levels:[3,5],desc:['10% esquiva de ataques básicos','20% esquiva básica; +15% velocidade de ação']},
     Poison:{icon:'☠️',levels:[3,5],desc:['ataques: veneno de 1% HP/s por 3s','veneno de 2% HP/s por 3s; -30% cura recebida']},
-    Ground:{icon:'⛰️',levels:[3,5],desc:['+20% DEF','+40% DEF; escudo inicial de 15% HP']}
+    Ground:{icon:'⛰️',levels:[3,5],desc:['+20% DEF','+40% DEF; escudo inicial de 15% HP']},
+    Dragon:{icon:'🐉',levels:[1,4],desc:['Sangue Dracônico: +15% HP máximo e +15% ATK','Ascensão Dracônica: +45% HP e ATK, 25% redução de dano, +40 mana inicial; abaixo de 40% HP recupera 25% e ganha +30% velocidade por 4s']}
   };
 
   const ITEM_DEFS = {
@@ -454,7 +455,7 @@
     const list=typeCatalog(type),active=activeCounts()[type]||0;
     $('#typeModalTitle').textContent=inf.icon+' '+type;
     $('#typeModalCurrent').textContent='Você tem '+active+' linha'+(active===1?'':'s')+' diferente'+(active===1?'':'s')+' dessa tipagem no campo.';
-    $('#typeModalEffects').innerHTML='<div class="type-effect"><strong>3 Pokémon diferentes</strong><span>'+inf.desc[0]+'</span></div><div class="type-effect"><strong>5 Pokémon diferentes</strong><span>'+inf.desc[1]+'</span></div>';
+    $('#typeModalEffects').innerHTML=inf.levels.map((level,i)=>'<div class="type-effect"><strong>'+level+' linha'+(level===1?'':'s')+' diferente'+(level===1?'':'s')+'</strong><span>'+inf.desc[i]+'</span></div>').join('');
     $('#typeModalCount').textContent=list.length+' formas dessa tipagem podem aparecer na loja conforme seu nível e as chances de evolução.';
     $('#typeModalCatalog').innerHTML=list.map(p=>'<div class="type-pokemon"><img src="'+SPRITE(p.dex)+'" alt="'+p.name+'"><div><b>'+(p.special?'★★★★ ':'')+p.name+'</b><small>'+(p.special?'Especial 4★':'Raridade '+p.cost)+' • '+(p.stage===0?'Base':p.final?'Final':'Evolução '+(p.stage+1))+'</small></div></div>').join('');
     const modal=$('#typeModal');modal.dataset.type=type;modal.classList.add('open');
@@ -464,7 +465,7 @@
     Object.entries(TYPE_INFO).forEach(([t,inf])=>{
       const tier=synergyTier(t,c[t]),d=document.createElement('button');d.type='button';d.className='synergy'+(tier?' active':'');
       const next=tier>=inf.levels.length?'MAX':inf.levels[tier];
-      d.title='Clique para ver Pokémon disponíveis e bônus de 3/5.';
+      d.title='Clique para ver Pokémon disponíveis e bônus de '+inf.levels.join('/')+'.';
       d.setAttribute('aria-label',t+': '+c[t]+' linhas ativas. Abrir detalhes.');
       d.innerHTML='<span><b>'+inf.icon+' '+t+'</b><br><small>'+c[t]+' linhas • '+(tier?inf.desc[tier-1]:'próximo: '+next)+'</small></span><strong>'+c[t]+'</strong>';
       d.onclick=()=>openTypeInfo(t);els.synergies.appendChild(d);
@@ -756,20 +757,23 @@
     state.combat={units:[...player,...enemy],ticks:0,elapsedMs:0,timer:null,bossKey,bossInitialHp:enemy.filter(c=>c.boss).reduce((s,c)=>s+c.maxHp,0),enemyInitialHp:enemy.reduce((s,c)=>s+c.maxHp,0)};
     if(pb.Electric===2)summonZapdos('player');
     if(!bossKey&&eb.Electric===2)summonZapdos('enemy');
+    if(pb.Dragon===2)log('🐉 Ascensão Dracônica ativada! Seus 4 Dragons despertaram poder máximo.','win');
+    if(eb.Dragon===2)log('🐉 O rival ativou Ascensão Dracônica.','loss');
     applySpecialBattleStart('player');applySpecialBattleStart('enemy');
     const label=bossKey?'BOSS • '+BOSS_DEFS[bossKey].name:'RODADA '+state.round;
     banner(label);log(bossKey?'👑 Boss da etapa '+state.round+': '+BOSS_DEFS[bossKey].name+'.':'⚔️ Rodada '+state.round+' começou.');render();state.combat.timer=setInterval(combatTick,COMBAT_TICK_MS);
   }
   function applyBonus(c,tiers){
-    const tier=t=>c.summoned||!c.types.includes(t)?0:(tiers[t]||0),ib=c.summoned?itemBonuses(c):(c.itemBonus||itemBonuses(c));
-    const b={atk:[1,1.15,1.30][tier('Fire')],hp:[1,1.20,1.35][tier('Water')],def:[1,1.20,1.40][tier('Ground')],
-      speed:(tier('Electric')?1.20:1)*(tier('Flying')===2?1.15:1),mana:[0,25,40][tier('Psychic')],
+    const tier=t=>c.summoned||!c.types.includes(t)?0:(tiers[t]||0),ib=c.summoned?itemBonuses(c):(c.itemBonus||itemBonuses(c)),dragon=tier('Dragon');
+    const b={atk:[1,1.15,1.30][tier('Fire')]*[1,1.15,1.45][dragon],hp:[1,1.20,1.35][tier('Water')]*[1,1.15,1.45][dragon],def:[1,1.20,1.40][tier('Ground')],
+      speed:(tier('Electric')?1.20:1)*(tier('Flying')===2?1.15:1),mana:[0,25,40][tier('Psychic')]+(dragon===2?40:0),
       power:tier('Psychic')===2?1.20:1,dodge:[0,.10,.20][tier('Flying')],
       regen:(tier('Water')===2?.02:0)+[0,.02,.04][tier('Grass')],root:tier('Grass')===2,
       poison:[0,.01,.02][tier('Poison')],antiHeal:tier('Poison')===2?.30:0,burn:tier('Fire')===2?.02:0,
-      shield:tier('Ground')===2?.15:0};
+      shield:tier('Ground')===2?.15:0,dragonReduction:dragon===2?.25:0,dragonAscension:dragon===2};
     c.maxHp=Math.round(c.maxHp*(1+ib.hp)*b.hp);c.hp=c.maxHp;c.atk=Math.round(c.atk*(1+ib.atk)*b.atk);c.def=Math.round(c.def*(1+ib.def)*b.def);
     c.speed=c.speed*(1+ib.speed)*b.speed;c.mana=b.mana;c.shield=Math.round(c.maxHp*(b.shield+ib.shield));
+    c.dragonDamageReduction=b.dragonReduction;c.dragonAscension=b.dragonAscension;c.dragonResurgenceUsed=false;c.dragonResurgenceUntil=0;
     b.power*=1+ib.power;b.regen+=ib.regen;b.basicLeech=ib.basicLeech;b.abilityLeech=ib.abilityLeech;b.manaOnAttack=ib.manaOnAttack;c.bonus=b;
   }
   function applySpecialBattleStart(side){
@@ -823,8 +827,14 @@
     const now=state.combat?.elapsedMs||0;if(t.intangibleUntil>now)return 0;
     const before=t.hp;let raw=Math.max(0,amount);
     if(t.damageReductionAbove70&&t.maxHp&&t.hp/t.maxHp>.70)raw*=1-t.damageReductionAbove70;
+    if(t.dragonDamageReduction)raw*=1-t.dragonDamageReduction;
     if(t.shield>0){const absorbed=Math.min(t.shield,raw);t.shield-=absorbed;raw-=absorbed}
-    t.hp=Math.max(0,t.hp-raw);if(t.hp===0)t.dead=true;return before-t.hp;
+    t.hp=Math.max(0,t.hp-raw);const dealt=before-t.hp;
+    if(t.hp===0)t.dead=true;
+    else if(t.dragonAscension&&!t.dragonResurgenceUsed&&t.maxHp&&t.hp/t.maxHp<.40){
+      t.dragonResurgenceUsed=true;heal(t,t.maxHp*.25);t.speedBoost=Math.max(t.speedBoost||0,.30);t.speedBoostUntil=Math.max(t.speedBoostUntil||0,now+4000);t.dragonResurgenceUntil=now+4000;
+    }
+    return dealt;
   }
   function applyDot(t,kind,rate,antiHeal=0){
     if(t.dead)return;
@@ -916,7 +926,7 @@
     const layer=$('#battleLayer');if(!layer||!state.combat)return;layer.innerHTML='';
     const gap=4;
     state.combat.units.forEach(c=>{
-      if(c.dead&&c.hp<=0)return;const d=document.createElement('div');d.className='fighter '+c.side;d.dataset.cid=c.cid;
+      if(c.dead&&c.hp<=0)return;const d=document.createElement('div');d.className='fighter '+c.side+(c.dragonAscension?' dragon-ascended':'')+(c.dragonResurgenceUntil>state.combat.elapsedMs?' dragon-resurgence':'');d.dataset.cid=c.cid;
       d.title=c.name+' • HP '+Math.ceil(c.hp)+'/'+c.maxHp+' • Escudo '+Math.ceil(c.shield)+(c.effects.poison?' • Veneno':'')+(c.effects.burn?' • Queimadura':'')+(c.rootUntil>state.combat.elapsedMs?' • Enraizado':'');
       const cells=els.board.querySelectorAll('.cell'),sx=cells.length>1?cells[1].offsetLeft-cells[0].offsetLeft:60,sy=cells.length>7?cells[7].offsetTop-cells[0].offsetTop:60;
       const ox=cells.length?cells[0].offsetLeft-layer.offsetLeft:0,oy=cells.length?cells[0].offsetTop-layer.offsetTop:0;
