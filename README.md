@@ -12,7 +12,7 @@ Protótipo fan-made de auto-battler com Pokémon de várias gerações, organiza
 - XP visível abaixo do nível, com experiência atual/necessária e barra de progresso. Atualiza ao comprar XP, concluir rodada, subir de nível e reiniciar; nível 9 mostra nível máximo.
 - Sequências de vitórias ou derrotas: 3 dão +1 ouro; 4 dão +2; 5 ou mais dão +3 por rodada. Resultado diferente reinicia a sequência em 1; nova partida zera.
 - Mana, habilidades automáticas, movimentação e combate automático; jornada ampliada para 25 etapas, com quatro encontros de boss.
-- Selecione um Pokémon no campo e clique em um espaço vazio do banco para retirá-lo.
+- Posicionamento com duas opções: clique no Pokémon e depois no destino, ou clique/segure e arraste para reorganizar entre banco e seu lado do tabuleiro. Arrastar sobre um espaço ocupado troca os dois Pokémon; o limite de campo continua sendo respeitado.
 - Correções da v0.2 mantidas: sem ação contra alvo inexistente e sem ação após morte por dano periódico.
 
 
