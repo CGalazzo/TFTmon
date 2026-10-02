@@ -8,10 +8,10 @@
     :root{
       --bg:#07111f;--panel:#0e1b2d;--panel2:#13243b;--line:#28415f;--text:#f7fbff;
       --muted:#9fb3c8;--accent:#f5c542;--good:#66e29b;--bad:#ff6b6b;--blue:#5bb7ff;
-      --cell:clamp(48px,7vw,82px)
+      --cell:clamp(48px,7vw,82px);--game-bg-image:none;--start-bg-image:none;--logo-image:none;--hero-image:none
     }
     *{box-sizing:border-box}
-    body{margin:0;background:radial-gradient(circle at top,#18314c 0,#07111f 52%,#050b13 100%);color:var(--text);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;min-height:100vh}
+    body{margin:0;background-image:var(--game-bg-image),radial-gradient(circle at top,#18314c 0,#07111f 52%,#050b13 100%);background-size:cover;background-attachment:fixed;color:var(--text);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;min-height:100vh}
     button{font:inherit}
     .app{max-width:1500px;margin:auto;padding:16px}
     .topbar{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:rgba(14,27,45,.94);border:1px solid var(--line);border-radius:18px;padding:12px 16px;box-shadow:0 14px 40px #0007}
@@ -35,13 +35,33 @@
     .progress{height:7px;border-radius:7px;background:#07111f;overflow:hidden;margin-top:5px}.progress i{display:block;height:100%;background:#5bb7ff}.round-banner{position:fixed;left:50%;top:42%;transform:translate(-50%,-50%) scale(.9);background:#081421ee;border:2px solid #f5c542;border-radius:18px;padding:18px 28px;font-size:24px;font-weight:900;z-index:99;opacity:0;pointer-events:none;transition:.25s}.round-banner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
     .toast{position:fixed;right:18px;bottom:18px;background:#0e1b2df4;border:1px solid #56708b;border-radius:12px;padding:12px 15px;z-index:100;transform:translateY(20px);opacity:0;transition:.25s;max-width:330px}.toast.show{transform:none;opacity:1}.evo{color:#ffe06a;font-weight:800}
     .tag{display:inline-block;padding:2px 6px;border-radius:8px;background:#19314b;border:1px solid #31506e;font-size:9px;margin:2px}.phase{font-weight:800;color:#ffe06a;text-align:center;margin-bottom:8px}
-    .items-panel{margin-top:14px}.item-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.item-button{text-align:left;white-space:normal;max-width:250px}.item-button small{display:block;font-weight:400;color:var(--muted);margin-top:4px}.item-button.chosen{outline:2px solid var(--accent)}.item-complete{border-color:#caa53c}.item-preview,.reward-box{background:#142943;border:1px solid #d1ae3b;border-radius:12px;padding:12px;margin:12px 0}.item-slots{display:flex;flex-wrap:wrap;gap:10px}.item-slot{border:1px solid var(--line);border-radius:10px;padding:8px;flex:1;min-width:155px}.item-icons{position:absolute;top:2px;right:2px;font-size:10px;background:#081421dd;border-radius:5px;padding:1px 3px}.recipe-scroll{overflow-x:auto}.recipe-table{border-collapse:collapse;width:100%;font-size:12px}.recipe-table td,.recipe-table th{padding:8px;border-bottom:1px solid var(--line);text-align:left}.item-note{color:var(--muted);font-size:12px;line-height:1.5}.reward-options{display:flex;flex-wrap:wrap;gap:8px}.reward-options .btn{flex:1;min-width:200px} .type-modal{position:fixed;inset:0;background:#02070dbd;display:none;align-items:center;justify-content:center;padding:18px;z-index:150}.type-modal.open{display:flex}.type-modal-card{width:min(760px,96vw);max-height:88vh;overflow:auto;background:#0e1b2d;border:1px solid #4d6e90;border-radius:18px;box-shadow:0 24px 70px #000a;padding:18px}.type-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}.type-modal-head h2{margin:0;font-size:20px}.type-effects{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.type-effect{background:#091524;border:1px solid #2e4a67;border-radius:12px;padding:11px}.type-effect strong{display:block;color:#ffe173;margin-bottom:4px}.type-catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}.type-pokemon{display:flex;align-items:center;gap:8px;background:#091524;border:1px solid #263f59;border-radius:11px;padding:7px}.type-pokemon img{width:46px;height:46px;object-fit:contain;image-rendering:pixelated}.type-pokemon b{font-size:12px;display:block}.type-pokemon small{font-size:9px;color:var(--muted)}.type-current{color:#87e3a7;font-size:11px;margin-top:4px}.battle-preview{width:min(100%,calc(var(--cell)*7 + 40px));background:#091524;border:1px solid #2d4965;border-radius:12px;padding:9px 11px;font-size:11px;color:#c8d8e8;text-align:center}.battle-preview.boss{border-color:#d2aa32;background:#211d0d;color:#ffe78a}.battle-summary{display:none;width:min(100%,calc(var(--cell)*7 + 40px));margin-top:10px;background:#091524;border:1px solid #31506e;border-radius:12px;padding:10px;font-size:11px}.battle-summary.show{display:block}.battle-summary b{font-size:13px}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px}.detail-row{background:#07111f;border:1px solid #1d344e;border-radius:8px;padding:6px;font-size:10px}.equipment-mini{margin-top:7px;font-size:10px;color:#c4d5e6}.shop-actions{display:flex;gap:7px;flex-wrap:wrap}.btn.locked{border-color:#f5c542;background:#352d0b;color:#ffe783}.final-modal{position:fixed;inset:0;background:#02070de0;display:none;align-items:center;justify-content:center;padding:18px;z-index:170}.final-modal.open{display:flex}.final-card{width:min(820px,96vw);max-height:90vh;overflow:auto;background:#0e1b2d;border:2px solid #d7b33f;border-radius:20px;padding:20px;box-shadow:0 25px 80px #000c}.final-team{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.final-mon{background:#091524;border:1px solid #2a4865;border-radius:11px;padding:7px;text-align:center;min-width:92px}.final-mon img{width:58px;height:58px;object-fit:contain;image-rendering:pixelated}.final-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:12px 0}.final-stat{background:#091524;border:1px solid #2a4865;border-radius:10px;padding:10px}.shop-table{width:100%;border-collapse:collapse;font-size:11px}.shop-table th,.shop-table td{border-bottom:1px solid #29445f;padding:7px;text-align:center}.shop-table th:first-child,.shop-table td:first-child{text-align:left}@media(max-width:560px){.detail-grid{grid-template-columns:1fr}.shop-actions{width:100%}.shop-actions .btn{flex:1}}@media(max-width:560px){.type-effects{grid-template-columns:1fr}.type-catalog{grid-template-columns:repeat(2,minmax(0,1fr))}.type-modal-card{padding:13px}}
+    .items-panel{margin-top:14px}.item-grid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.item-button{text-align:left;white-space:normal;max-width:250px}.item-button small{display:block;font-weight:400;color:var(--muted);margin-top:4px}.item-button.chosen{outline:2px solid var(--accent)}.item-complete{border-color:#caa53c}.item-preview,.reward-box{background:#142943;border:1px solid #d1ae3b;border-radius:12px;padding:12px;margin:12px 0}.item-slots{display:flex;flex-wrap:wrap;gap:10px}.item-slot{border:1px solid var(--line);border-radius:10px;padding:8px;flex:1;min-width:155px}.item-icons{position:absolute;top:2px;right:2px;font-size:10px;background:#081421dd;border-radius:5px;padding:1px 3px}.recipe-scroll{overflow-x:auto}.recipe-table{border-collapse:collapse;width:100%;font-size:12px}.recipe-table td,.recipe-table th{padding:8px;border-bottom:1px solid var(--line);text-align:left}.item-note{color:var(--muted);font-size:12px;line-height:1.5}.reward-options{display:flex;flex-wrap:wrap;gap:8px}.reward-options .btn{flex:1;min-width:200px} .type-modal{position:fixed;inset:0;background:#02070dbd;display:none;align-items:center;justify-content:center;padding:18px;z-index:150}.type-modal.open{display:flex}.type-modal-card{width:min(760px,96vw);max-height:88vh;overflow:auto;background:#0e1b2d;border:1px solid #4d6e90;border-radius:18px;box-shadow:0 24px 70px #000a;padding:18px}.type-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:12px}.type-modal-head h2{margin:0;font-size:20px}.type-effects{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.type-effect{background:#091524;border:1px solid #2e4a67;border-radius:12px;padding:11px}.type-effect strong{display:block;color:#ffe173;margin-bottom:4px}.type-catalog{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-top:12px}.type-pokemon{display:flex;align-items:center;gap:8px;background:#091524;border:1px solid #263f59;border-radius:11px;padding:7px}.type-pokemon img{width:46px;height:46px;object-fit:contain;image-rendering:pixelated}.type-pokemon b{font-size:12px;display:block}.type-pokemon small{font-size:9px;color:var(--muted)}.type-current{color:#87e3a7;font-size:11px;margin-top:4px}.battle-preview{width:min(100%,calc(var(--cell)*7 + 40px));background:#091524;border:1px solid #2d4965;border-radius:12px;padding:9px 11px;font-size:11px;color:#c8d8e8;text-align:center}.battle-preview.boss{border-color:#d2aa32;background:#211d0d;color:#ffe78a}.battle-summary{display:none;width:min(100%,calc(var(--cell)*7 + 40px));margin-top:10px;background:#091524;border:1px solid #31506e;border-radius:12px;padding:10px;font-size:11px}.battle-summary.show{display:block}.battle-summary b{font-size:13px}.detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px}.detail-row{background:#07111f;border:1px solid #1d344e;border-radius:8px;padding:6px;font-size:10px}.equipment-mini{margin-top:7px;font-size:10px;color:#c4d5e6}.shop-actions{display:flex;gap:7px;flex-wrap:wrap}.btn.locked{border-color:#f5c542;background:#352d0b;color:#ffe783}.final-modal{position:fixed;inset:0;background:#02070de0;display:none;align-items:center;justify-content:center;padding:18px;z-index:170}.final-modal.open{display:flex}.final-card{width:min(820px,96vw);max-height:90vh;overflow:auto;background:#0e1b2d;border:2px solid #d7b33f;border-radius:20px;padding:20px;box-shadow:0 25px 80px #000c}.final-team{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.final-mon{background:#091524;border:1px solid #2a4865;border-radius:11px;padding:7px;text-align:center;min-width:92px}.final-mon img{width:58px;height:58px;object-fit:contain;image-rendering:pixelated}.final-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin:12px 0}.final-stat{background:#091524;border:1px solid #2a4865;border-radius:10px;padding:10px}.shop-table{width:100%;border-collapse:collapse;font-size:11px}.shop-table th,.shop-table td{border-bottom:1px solid #29445f;padding:7px;text-align:center}.shop-table th:first-child,.shop-table td:first-child{text-align:left}.game-hidden{display:none!important}.start-screen{min-height:100vh;display:grid;place-items:center;padding:28px;background-image:var(--start-bg-image),radial-gradient(circle at 50% 15%,#21476b 0,#091827 45%,#050b13 100%);background-size:cover;background-position:center}.start-shell{width:min(1040px,96vw);display:grid;grid-template-columns:minmax(280px,.9fr) minmax(360px,1.1fr);gap:18px;align-items:stretch}.start-visual,.start-copy{background:#0e1b2de8;border:1px solid #355574;border-radius:22px;box-shadow:0 24px 70px #0008;padding:22px}.start-visual{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:510px;background-image:var(--hero-image);background-size:cover;background-position:center}.start-logo-slot{width:min(360px,90%);min-height:110px;border:1px dashed #557697;border-radius:18px;display:grid;place-items:center;text-align:center;background-image:var(--logo-image);background-size:contain;background-repeat:no-repeat;background-position:center}.start-logo-slot .fallback-logo{font-size:34px;font-weight:1000;letter-spacing:.08em}.start-logo-slot .fallback-logo small{display:block;font-size:11px;color:var(--muted);letter-spacing:.18em;margin-top:6px}.start-hero-placeholder{margin-top:24px;width:min(390px,92%);aspect-ratio:16/10;border:1px dashed #426581;border-radius:18px;display:grid;place-items:center;color:#7190aa;font-size:11px;text-align:center;padding:18px;background:radial-gradient(circle,#17334d,#091522)}.start-copy h2{font-size:28px;margin:0 0 8px}.start-copy>p{color:#bfd0e1;line-height:1.55;margin:0 0 16px}.how-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}.how-card{background:#091524;border:1px solid #284763;border-radius:12px;padding:11px;font-size:11px;line-height:1.4}.how-card b{display:block;font-size:13px;margin-bottom:3px}.start-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.start-actions .btn{flex:1;min-width:160px;padding:12px}.utility-bar{max-width:1500px;margin:10px auto 0;display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}.utility-bar .btn{padding:7px 10px;font-size:11px}.compact-preview{cursor:default}.modal-section{background:#091524;border:1px solid #29445f;border-radius:12px;padding:11px;margin:9px 0}.modal-section h3{margin:0 0 5px;font-size:13px;color:#ffe173}.modal-section p{margin:0;color:#c4d5e6;font-size:11px;line-height:1.5}.items-modal-card{width:min(920px,96vw)}.history-modal-card{width:min(680px,96vw)}.history-modal-card .log{height:min(62vh,520px)}.shop .subtitle.long-shop-copy{display:none}.side-right{align-self:start}.selected-box{margin-bottom:0}@media(max-width:820px){.start-shell{grid-template-columns:1fr}.start-visual{min-height:290px}.start-hero-placeholder{max-height:170px}.how-grid{grid-template-columns:1fr 1fr}}@media(max-width:520px){.start-screen{padding:10px}.start-visual,.start-copy{padding:15px}.start-logo-slot .fallback-logo{font-size:26px}.how-grid{grid-template-columns:1fr}.utility-bar{padding:0 7px;justify-content:stretch}.utility-bar .btn{flex:1}}@media(max-width:560px){.detail-grid{grid-template-columns:1fr}.shop-actions{width:100%}.shop-actions .btn{flex:1}}@media(max-width:560px){.type-effects{grid-template-columns:1fr}.type-catalog{grid-template-columns:repeat(2,minmax(0,1fr))}.type-modal-card{padding:13px}}
     @media(max-width:1050px){.layout{grid-template-columns:1fr}.side-left,.side-right{display:grid;grid-template-columns:1fr 1fr;gap:10px}.side-left h2,.side-right h2{grid-column:1/-1}.log{height:150px}.shop-grid{grid-template-columns:repeat(5,minmax(120px,1fr));overflow-x:auto}.panel{padding:10px}}
     @media(max-width:700px){:root{--cell:12vw}.app{padding:7px}.topbar{border-radius:12px;padding:9px}.stats{width:100%}.stat{flex:1;min-width:64px;padding:6px}.layout{gap:8px;margin-top:8px}.board{gap:2px;padding:5px}.battle-layer{inset:5px}.bench{grid-template-columns:repeat(9,70px);overflow-x:auto}.shop-grid{grid-template-columns:repeat(5,130px)}.side-left,.side-right{display:block}.card{min-height:160px}.card img{width:78px;height:78px}}
   </style>
 </head>
 <body>
-<div class="app">
+<section id="startScreen" class="start-screen">
+  <div class="start-shell">
+    <div class="start-visual">
+      <div class="start-logo-slot" data-art-slot="logo"><div class="fallback-logo">KANTO TACTICS<small>TFTMON • v0.6</small></div></div>
+      <div class="start-hero-placeholder" data-art-slot="hero">Área reservada para a arte principal do jogo.<br>Esse espaço poderá receber a ilustração definitiva sem alterar a lógica.</div>
+    </div>
+    <div class="start-copy">
+      <h2>Monte. Evolua. Combine. Sobreviva.</h2>
+      <p>Compre Pokémon, forme sinergias, evolua juntando 3 cópias iguais e posicione sua equipe. As batalhas são automáticas e ficam mais difíceis até o confronto final da etapa 25.</p>
+      <div class="how-grid">
+        <div class="how-card"><b>🛒 Loja</b>Compre, rerolle e encontre formas evoluídas e Pokémon especiais 4★.</div>
+        <div class="how-card"><b>✨ Evolução</b>3 cópias do mesmo estágio evoluem automaticamente para a próxima forma.</div>
+        <div class="how-card"><b>⚔️ Combate</b>Posicione sua equipe no tabuleiro e deixe o combate acontecer automaticamente.</div>
+        <div class="how-card"><b>🧩 Sinergias</b>3 ou 5 linhas diferentes da mesma tipagem ativam bônus para aquela tipagem.</div>
+      </div>
+      <div class="modal-section"><h3>Objetivo</h3><p>Supere 25 etapas e os bosses das etapas 6, 12, 18 e 25. Economize ouro, compre XP, encontre 4★ a partir do nível 6 e fortaleça seu time com equipamentos.</p></div>
+      <div class="start-actions"><button class="btn primary" id="startGameBtn">Iniciar partida</button><button class="btn" id="startRulesBtn">📖 Regras completas</button></div>
+    </div>
+  </div>
+</section>
+<div id="gameApp" class="app game-hidden">
   <header class="topbar">
     <div class="brand"><div class="pokeball"></div><div><h1>KANTO TACTICS <span style="color:#f5c542">v0.6</span></h1><div class="subtitle">Auto-battler fan-made • 25 etapas • raridades • 4★ especiais • bosses</div></div></div>
     <div class="stats">
@@ -52,6 +72,11 @@
       <div class="stat"><span>Campo</span><b id="fieldStat">0/2</b></div>
     </div>
   </header>
+  <div class="utility-bar">
+    <button class="btn" id="rulesBtn">? Regras</button>
+    <button class="btn" id="backpackBtn">🎒 Mochila</button>
+    <button class="btn" id="historyBtn">📜 Histórico</button>
+  </div>
 
   <div class="layout">
     <aside class="panel side-left">
@@ -72,41 +97,45 @@
         <button class="btn danger" id="sellBtn" disabled>Vender selecionado</button>
       </div>
       <div id="battleSummary" class="battle-summary"></div>
-      <div style="margin-top:8px;text-align:center;font-size:11px;color:#9fb3c8">Clique em um Pokémon do banco/campo e depois em uma casa azul para posicionar. Para retirar, selecione no campo e clique em um espaço vazio do banco. Máximo no campo = seu nível.</div>
+
     </main>
 
     <aside class="panel side-right">
       <h2>Selecionado</h2>
-      <div id="selectedBox" class="selected-box"><small>Nenhum Pokémon selecionado.</small></div>
-      <h2>Registro</h2>
-      <div id="log" class="log"></div>
-      <h2 style="margin-top:10px">Regras rápidas</h2>
-      <div class="help">3 cópias iguais evoluem automaticamente. Conjuntos em 3 e 5 linhas evolutivas diferentes no campo; repetidos contam uma vez por tipo. Bônus apenas para Pokémon do tipo. Sem fraquezas, resistências ou imunidades por tipo. 5 Elétricos invocam Zapdos temporariamente. Evoluções finais não fundem. A batalha é automática e o dano sofrido depende dos inimigos sobreviventes. Você recebe ouro por rodada + juros. Sequências de vitórias ou derrotas: 3 = +1 ouro, 4 = +2, 5 ou mais = +3 por rodada. Mudar o resultado reinicia a sequência. Loja melhora até o nível 9; formas evoluídas podem aparecer e Pokémon especiais 4★ surgem a partir do nível 6. Bosses nas etapas 6, 12, 18 e 25. Derrote o boss para ganhar 2 componentes; retire ao menos 50% do HP para ganhar 1. Sobreviva às 25 etapas.</div>
+      <div id="selectedBox" class="selected-box"><small>Toque em um Pokémon para ver seus detalhes.</small></div>
     </aside>
   </div>
 
   <section class="panel shop">
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-      <div><h2 style="margin:0">Loja Pokémon</h2><div class="subtitle">A loja pode oferecer formas evoluídas. Suba de nível para melhorar raridades e liberar Pokémon especiais 4★.</div><div class="subtitle" id="shopOddsText" style="margin-top:4px"></div></div>
+      <div><h2 style="margin:0">Loja Pokémon</h2><div class="subtitle" id="shopOddsText" style="margin-top:4px"></div></div>
       <div class="shop-actions"><button class="btn" id="shopInfoBtn">Chances da loja</button><button class="btn" id="lockShopBtn">🔓 Travar loja</button><button class="btn" id="rerollBtn">Reroll • 2 ouro</button></div>
     </div>
     <div id="shop" class="shop-grid"></div>
-  </section>
-  <section class="panel items-panel" aria-label="Mochila e equipamentos">
-    <h2>Mochila e equipamentos</h2>
-    <p class="item-note">Você começa com 2 componentes. Novos componentes vêm dos bosses das etapas 6, 12, 18 e 25. Selecione um Pokémon e um item da mochila para equipar; combine dois componentes para criar equipamentos. Máximo de 3 itens por Pokémon; remover é grátis na preparação.</p>
-    <div id="itemRewards" aria-live="polite"></div>
-    <div id="itemInventory" class="item-grid"></div>
-    <button class="btn primary" id="equipItemBtn" disabled>Equipar no Pokémon selecionado</button>
-    <div id="itemPreview" aria-live="polite"></div>
-    <h3 id="equipmentTitle" style="font-size:14px">Selecione um Pokémon para ver seus equipamentos</h3>
-    <div id="equipmentSlots" class="item-slots"></div>
-    <details style="margin-top:12px"><summary style="cursor:pointer">Ver as 15 receitas</summary><div id="itemRecipes" class="recipe-scroll"></div></details>
   </section>
 </div>
 <div id="banner" class="round-banner"></div>
 <div id="toast" class="toast"></div>
 <div id="typeModal" class="type-modal" role="dialog" aria-modal="true" aria-labelledby="typeModalTitle"><div class="type-modal-card"><div class="type-modal-head"><div><h2 id="typeModalTitle">Tipagem</h2><div id="typeModalCurrent" class="type-current"></div></div><button class="btn" id="typeModalClose" aria-label="Fechar informações da tipagem">Fechar</button></div><div id="typeModalEffects" class="type-effects"></div><div id="typeModalCount" class="subtitle"></div><div id="typeModalCatalog" class="type-catalog"></div></div></div>
+<div id="rulesModal" class="type-modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle"><div class="type-modal-card"><div class="type-modal-head"><div><h2 id="rulesTitle">Regras do TFTmon</h2><div class="subtitle">Tudo que você precisa saber durante a partida.</div></div><button class="btn" id="rulesClose">Fechar</button></div>
+  <div class="modal-section"><h3>🛒 Loja e economia</h3><p>Compre Pokémon, use reroll por 2 ouro e compre 4 XP por 4 ouro. Guardar ouro gera juros de +1 por cada 10, até +5. Sequências de vitória ou derrota dão bônus a partir de 3 resultados iguais.</p></div>
+  <div class="modal-section"><h3>✨ Evolução e campo</h3><p>3 cópias iguais do mesmo estágio evoluem automaticamente. Formas finais não fundem. O limite de Pokémon no campo é igual ao nível do treinador, que vai até 9.</p></div>
+  <div class="modal-section"><h3>🧩 Sinergias</h3><p>3 ou 5 linhas evolutivas diferentes da mesma tipagem ativam bônus. Repetidos da mesma linha contam uma vez. Toque em qualquer tipagem durante a partida para ver os Pokémon válidos e seus efeitos.</p></div>
+  <div class="modal-section"><h3>★★★★ Pokémon especiais</h3><p>Dratini, Larvitar, Gastly, Lapras e Beldum são 4★. Eles começam a aparecer no nível 6, podem vir evoluídos e possuem habilidades/passivas exclusivas.</p></div>
+  <div class="modal-section"><h3>🎒 Itens</h3><p>Você começa com 2 componentes. Combine 2 componentes para formar equipamentos. Cada Pokémon pode carregar até 3 itens. Bosses podem conceder novos componentes.</p></div>
+  <div class="modal-section"><h3>👑 Bosses</h3><p>Etapa 6: Onix • 12: 3 Tauros • 18: Raikou, Entei ou Suicune • 25: Mewtwo. Vitória rende 2 componentes; ao perder removendo pelo menos 50% do HP total do boss, você recebe 1.</p></div>
+  <div class="modal-section"><h3>🏆 Objetivo</h3><p>Sobreviva às 25 etapas. Não existem fraquezas, resistências ou imunidades elementais de dano: as tipagens servem para formar sinergias.</p></div>
+</div></div>
+<div id="backpackModal" class="type-modal" role="dialog" aria-modal="true" aria-labelledby="backpackTitle"><div class="type-modal-card items-modal-card"><div class="type-modal-head"><div><h2 id="backpackTitle">🎒 Mochila e equipamentos</h2><div class="subtitle">Componentes, combinações e itens do Pokémon selecionado.</div></div><button class="btn" id="backpackClose">Fechar</button></div>
+  <div id="itemRewards" aria-live="polite"></div>
+  <div id="itemInventory" class="item-grid"></div>
+  <button class="btn primary" id="equipItemBtn" disabled>Equipar no Pokémon selecionado</button>
+  <div id="itemPreview" aria-live="polite"></div>
+  <h3 id="equipmentTitle" style="font-size:14px">Selecione um Pokémon para ver seus equipamentos</h3>
+  <div id="equipmentSlots" class="item-slots"></div>
+  <details style="margin-top:12px"><summary style="cursor:pointer">Ver as 15 receitas</summary><div id="itemRecipes" class="recipe-scroll"></div></details>
+</div></div>
+<div id="historyModal" class="type-modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle"><div class="type-modal-card history-modal-card"><div class="type-modal-head"><div><h2 id="historyTitle">📜 Histórico</h2><div class="subtitle">Eventos, compras, evoluções e resultados da partida.</div></div><button class="btn" id="historyClose">Fechar</button></div><div id="log" class="log"></div></div></div>
 <div id="shopInfoModal" class="type-modal" role="dialog" aria-modal="true" aria-labelledby="shopInfoTitle"><div class="type-modal-card"><div class="type-modal-head"><div><h2 id="shopInfoTitle">Chances da loja</h2><div class="subtitle">Raridade por nível e chance de estágio evolutivo.</div></div><button class="btn" id="shopInfoClose">Fechar</button></div><div id="shopInfoContent"></div></div></div>
 <div id="finalModal" class="final-modal" role="dialog" aria-modal="true" aria-labelledby="finalTitle"><div class="final-card"><h2 id="finalTitle">Resumo da partida</h2><div id="finalContent"></div><button class="btn primary" id="finalRestartBtn">Nova partida</button></div></div>
 
@@ -511,8 +540,8 @@
   function renderShop(){
     els.shop.innerHTML='';
     const odds=shopOdds(),normalStages=stageOdds(state.level,false),specialStages=stageOdds(state.level,true);
-    const specialText=state.level>=6?' • 4★ '+odds[3]+'% | 4★ formas: base '+specialStages[0]+'% / 2ª '+specialStages[1]+'% / final '+specialStages[2]+'%':' • 4★ bloqueado até o nível 6';
-    $('#shopOddsText').textContent='Nv '+state.level+': 1$ '+odds[0]+'% • 2$ '+odds[1]+'% • 3$ '+odds[2]+'%'+specialText+' | Normais: base '+normalStages[0]+'% / 2ª '+normalStages[1]+'% / final '+normalStages[2]+'%';
+    const specialText=state.level>=6?' • 4★ '+odds[3]+'%':' • 4★ bloqueado';
+    $('#shopOddsText').textContent='Nv. '+state.level+specialText;
     const lock=$('#lockShopBtn');lock.textContent=state.shopLocked?'🔒 Loja travada':'🔓 Travar loja';lock.classList.toggle('locked',state.shopLocked);lock.disabled=state.battle||state.gameOver;
 
     state.shop.forEach((entry,i)=>{
@@ -638,11 +667,11 @@
     if(state.gameOver){el.textContent='Partida encerrada.';el.classList.remove('boss');return}
     if(bossKey){
       const d=BOSS_DEFS[bossKey];el.classList.add('boss');
-      el.innerHTML='<b>👑 Etapa '+state.round+' — BOSS: '+(d.count>1?d.count+'× ':'')+d.name+'</b><br>Vitória = 2 componentes • retirar pelo menos 50% do HP total = 1 componente.';
+      el.innerHTML='<b>👑 Etapa '+state.round+' • '+(d.count>1?d.count+'× ':'')+d.name+'</b>';el.title='Boss: vitória = 2 componentes; remover pelo menos 50% do HP = 1 componente.';
     }else{
       const p=difficultyProfile(state.round);el.classList.remove('boss');
-      const synergy=p.synergy>=5?'composição avançada com sinergia 5':p.synergy>=3?'composição com sinergia 3':'composição simples';
-      el.innerHTML='<b>Próxima batalha: etapa '+state.round+'</b> • '+p.count+' inimigo'+(p.count===1?'':'s')+' • '+synergy+'.';
+      const synergy=p.synergy>=5?'Sinergia 5':p.synergy>=3?'Sinergia 3':'Composição simples';
+      el.innerHTML='<b>Etapa '+state.round+'</b> • '+p.count+' inimigo'+(p.count===1?'':'s')+' • '+synergy;el.title='Preview da próxima batalha.';
     }
   }
   function renderBattleSummary(){
@@ -907,16 +936,28 @@
     if(state.round>=state.maxRounds){state.gameOver=true;toast(win?'🏆 Você venceu o TFTmon v0.6!':'Fim do teste v0.6.');log(win?'🏆 TFTmon v0.6 concluído!':'Teste concluído.');render();showFinalSummary();return}
     state.round++;prepareItemRewards();rollShop(true);render();
   }
+  function openRules(){$('#rulesModal').classList.add('open')}
+  function closeRules(){$('#rulesModal').classList.remove('open')}
+  function openBackpack(){renderItems();$('#backpackModal').classList.add('open')}
+  function closeBackpack(){$('#backpackModal').classList.remove('open')}
+  function openHistory(){$('#historyModal').classList.add('open')}
+  function closeHistory(){$('#historyModal').classList.remove('open')}
+  function startGame(){
+    $('#startScreen').style.display='none';$('#gameApp').classList.remove('game-hidden');render();
+  }
   function reset(){
     clearInterval(state.combat?.timer);closeFinalSummary();Object.assign(state,{round:1,maxRounds:25,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss(),shopLocked:false,lastBattleSummary:null,runStats:{wins:0,losses:0,specialSeen:[],specialBought:[]}});
     els.log.innerHTML='';prepareItemRewards();rollShop(true);log('Bem-vindo ao TFTmon v0.6. Nível máximo 9 e Pokémon especiais 4★ liberados a partir do nível 6.');render();
   }
-  $('#rerollBtn').onclick=()=>rollShop(false);$('#xpBtn').onclick=buyXP;$('#sellBtn').onclick=sellSelected;$('#battleBtn').onclick=()=>{if(state.gameOver)reset();else startBattle()};$('#lockShopBtn').onclick=toggleShopLock;$('#shopInfoBtn').onclick=openShopInfo;
+  $('#rerollBtn').onclick=()=>rollShop(false);$('#xpBtn').onclick=buyXP;$('#sellBtn').onclick=sellSelected;$('#battleBtn').onclick=()=>{if(state.gameOver)reset();else startBattle()};$('#lockShopBtn').onclick=toggleShopLock;$('#shopInfoBtn').onclick=openShopInfo;$('#rulesBtn').onclick=openRules;$('#backpackBtn').onclick=openBackpack;$('#historyBtn').onclick=openHistory;$('#startGameBtn').onclick=startGame;$('#startRulesBtn').onclick=openRules;
   $('#typeModalClose').onclick=closeTypeInfo;
   $('#typeModal').onclick=e=>{if(e.target===$('#typeModal'))closeTypeInfo()};
   $('#shopInfoClose').onclick=closeShopInfo;$('#shopInfoModal').onclick=e=>{if(e.target===$('#shopInfoModal'))closeShopInfo()};
+  $('#rulesClose').onclick=closeRules;$('#rulesModal').onclick=e=>{if(e.target===$('#rulesModal'))closeRules()};
+  $('#backpackClose').onclick=closeBackpack;$('#backpackModal').onclick=e=>{if(e.target===$('#backpackModal'))closeBackpack()};
+  $('#historyClose').onclick=closeHistory;$('#historyModal').onclick=e=>{if(e.target===$('#historyModal'))closeHistory()};
   $('#finalRestartBtn').onclick=()=>{closeFinalSummary();reset()};
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTypeInfo();closeShopInfo()}if(e.target&&['BUTTON','INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;if(e.key.toLowerCase()==='r')rollShop(false);if(e.key===' '){e.preventDefault();if(!state.battle)startBattle()}});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTypeInfo();closeShopInfo();closeRules();closeBackpack();closeHistory()}if(e.target&&['BUTTON','INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;if(e.key.toLowerCase()==='r')rollShop(false);if(e.key===' '){e.preventDefault();if(!state.battle)startBattle()}});
   prepareItemRewards();rollShop(true);log('Bem-vindo ao TFTmon v0.6. Nível máximo 9 e Pokémon especiais 4★ liberados a partir do nível 6.');render();
 })();
 </script>
