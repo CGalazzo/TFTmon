@@ -1,6 +1,6 @@
 # Kanto Tactics v0.6
 
-Protótipo fan-made de auto-battler com base em Pokémon de Kanto e unidades especiais selecionadas de Johto e Hoenn. Site estático: `index.html` na raiz, sem build obrigatório para o Vercel.
+Protótipo fan-made de auto-battler com Pokémon de várias gerações, organizado em linhas evolutivas completas de três estágios. Site estático: `index.html` na raiz, sem build obrigatório para o Vercel.
 
 ## Base preservada
 
@@ -59,41 +59,53 @@ Formas normais também podem aparecer evoluídas:
 | 8 | 48% | 35% | 17% |
 | 9 | 40% | 37% | 23% |
 
-Para os especiais 4★: nível 6 = 94/5/1; nível 7 = 82/15/3; nível 8 = 72/21/7; nível 9 = 62/26/12 para forma base/2ª/final. Lapras sempre aparece como Lapras.
+Para os especiais 4★: nível 6 = 94/5/1; nível 7 = 82/15/3; nível 8 = 72/21/7; nível 9 = 62/26/12 para forma base/2ª/final. Todos os especiais agora possuem exatamente três estágios.
 
 Preços normais seguem o valor equivalente do estágio: custo base × 3 por evolução. Nos 4★, os preços são 4 ouro na forma base, 9 na segunda forma e 16 na forma final. A própria interface mostra as probabilidades do nível atual.
 
-## Pokémon especiais 4★ — v0.6
+## Pokémon especiais 4★ — elenco de três estágios
 
 - **Dratini → Dragonair → Dragonite**: Multiescala reduz dano acima de 70% do HP em 15% / 25% / 35%. Fúria do Dragão fica mais forte e concede velocidade temporária crescente.
 - **Larvitar → Pupitar → Tyranitar**: Tempestade de Areia reduz a velocidade inimiga em 8% / 12% / 18% e aumenta a própria defesa em 10% / 20% / 30%. Terremoto ganha alcance, dano e controle.
 - **Gastly → Haunter → Gengar**: Sombra concede intangibilidade inicial por 0,4s / 0,7s / 1,0s. Bola Sombria aumenta o dano e devolve 20 / 35 / 50 de mana ao finalizar um alvo.
-- **Lapras**: Canção Protetora concede escudo inicial de 12% do HP máximo aos aliados. Blizzard causa dano em área e reduz velocidade.
+- **Gible → Gabite → Garchomp**: Pele Áspera devolve 8% / 12% / 18% do dano efetivo recebido de ataques básicos. Investida do Dragão ganha dano e velocidade temporária a cada evolução.
 - **Beldum → Metang → Metagross**: Corpo Metálico reduz o primeiro controle recebido em 50% / 75% / 100%. Meteor Mash aumenta dano e escudo por inimigo atingido.
 
-Os especiais mantêm seus tipos normais e só contribuem para conjuntos já existentes. Dragon e Dark, por exemplo, ainda não possuem conjunto próprio. Os 4★ não foram adicionados ao gerador de composições normais da IA da v0.5 e não substituem os lendários de boss.
+Os especiais mantêm seus tipos normais e só contribuem para conjuntos já existentes. Dragon e Dark, por exemplo, ainda não possuem conjunto próprio. Os 4★ não entram nas composições normais da IA e não substituem os lendários de boss.
 
 ## Elenco: 33 linhas padrão + 5 linhas especiais 4★
 
-As 20 linhas existentes foram mantidas. Novas linhas disponíveis na loja:
+**Regra estrutural:** toda linha comprável possui exatamente três estágios. Três cópias do mesmo estágio formam a evolução seguinte; por isso nenhuma linha de um ou dois estágios permanece na loja.
 
-| Forma inicial | Evoluções no jogo | Tipos |
+As linhas que antes tinham menos de três estágios foram substituídas ou completadas assim:
+
+| Linha anterior | Nova linha de 3 estágios | Tipos principais |
 |---|---|---|
-| Growlithe | Arcanine | Fire |
-| Cyndaquil | Quilava → Typhlosion | Fire |
-| Voltorb | Electrode | Electric |
-| Mareep | Flaaffy → Ampharos | Electric |
-| Chinchou | Lanturn | Water / Electric |
-| Slowpoke | Slowbro | Water / Psychic |
-| Wooper | Quagsire | Water / Ground |
-| Drowzee | Hypno | Psychic |
-| Natu | Xatu | Psychic / Flying |
-| Hoppip | Skiploom → Jumpluff | Grass / Flying |
-| Spearow | Fearow | Normal / Flying |
-| Geodude | Graveler → Golem | Rock / Ground |
-| Phanpy | Donphan | Ground |
+| Pikachu → Raichu | Pichu → Pikachu → Raichu | Electric |
+| Sandshrew → Sandslash | Rhyhorn → Rhydon → Rhyperior | Ground / Rock |
+| Vulpix → Ninetales | Magby → Magmar → Magmortar | Fire |
+| Zubat → Golbat | Zubat → Golbat → Crobat | Poison / Flying |
+| Paras → Parasect | Bellsprout → Weepinbell → Victreebel | Grass / Poison |
+| Venonat → Venomoth | Wurmple → Cascoon → Dustox | Bug; Dustox também Poison |
+| Diglett → Dugtrio | Trapinch → Vibrava → Flygon | Ground; depois Dragon |
+| Psyduck → Golduck | Horsea → Seadra → Kingdra | Water; Kingdra também Dragon |
+| Ponyta → Rapidash | Torchic → Combusken → Blaziken | Fire; depois Fighting |
+| Magnemite → Magneton | Magnemite → Magneton → Magnezone | Electric / Steel |
+| Exeggcute → Exeggutor | Ralts → Kirlia → Gardevoir | Psychic / Fairy |
+| Growlithe → Arcanine | Litwick → Lampent → Chandelure | Ghost / Fire |
+| Voltorb → Electrode | Shinx → Luxio → Luxray | Electric |
+| Chinchou → Lanturn | Tynamo → Eelektrik → Eelektross | Electric |
+| Slowpoke → Slowbro | Spheal → Sealeo → Walrein | Ice / Water |
+| Wooper → Quagsire | Mudkip → Marshtomp → Swampert | Water; depois Ground |
+| Drowzee → Hypno | Solosis → Duosion → Reuniclus | Psychic |
+| Natu → Xatu | Hatenna → Hattrem → Hatterene | Psychic; Hatterene também Fairy |
+| Spearow → Fearow | Gothita → Gothorita → Gothitelle | Psychic |
+| Phanpy → Donphan | Lotad → Lombre → Ludicolo | Water / Grass |
+| Lapras 4★ | Gible → Gabite → Garchomp 4★ | Dragon / Ground |
 
-Utilizam-se as formas tradicionais, sem variantes regionais. Evoluções alternativas ficam para versões posteriores. Os atributos e custos iniciais dos novos Pokémon são valores de teste; as 20 linhas anteriores mantêm seus atributos base.
+As demais linhas que já possuíam três estágios foram preservadas. Custos-base e funções foram mantidos o mais próximo possível das linhas substituídas para evitar um rebalanceamento geral nesta etapa.
+
+A IA continua buscando composições de 3 e 5 linhas. Quando um tipo necessário só surge após evolução — por exemplo Flying em Butterfree/Charizard ou Ground em Marshtomp/Nidoqueen — a composição avançada pode usar o estágio mínimo necessário para realmente ativar a sinergia.
 
 ## Conjuntos de tipos
 
