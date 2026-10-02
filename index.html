@@ -612,7 +612,7 @@
     el.ondragleave=()=>el.classList.remove('drag-over');
     el.ondrop=e=>{
       e.preventDefault();el.classList.remove('drag-over');
-      const raw=e.dataTransfer?.getData?.('text/plain'),id=raw?Number(raw):draggingUnitId;
+      const raw=e.dataTransfer?.getData?.('text/plain'),id=raw?Number(raw):draggingUnitId;draggingUnitId=null;
       if(Number.isFinite(id))moveUnitTo(id,destination,index);
     };
   }
