@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kanto Tactics v0.4</title>
+  <title>Kanto Tactics v0.5</title>
   <style>
     :root{
       --bg:#07111f;--panel:#0e1b2d;--panel2:#13243b;--line:#28415f;--text:#f7fbff;
@@ -43,9 +43,9 @@
 <body>
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="pokeball"></div><div><h1>KANTO TACTICS <span style="color:#f5c542">v0.4</span></h1><div class="subtitle">Auto-battler fan-made • Pokémon de Kanto e Johto • equipamentos e conjuntos</div></div></div>
+    <div class="brand"><div class="pokeball"></div><div><h1>KANTO TACTICS <span style="color:#f5c542">v0.5</span></h1><div class="subtitle">Auto-battler fan-made • 25 etapas • bosses • equipamentos e conjuntos</div></div></div>
     <div class="stats">
-      <div class="stat"><span>Rodada</span><b id="roundStat">1/15</b></div>
+      <div class="stat"><span>Rodada</span><b id="roundStat">1/25</b></div>
       <div class="stat"><span>HP</span><b id="hpStat">100</b></div>
       <div class="stat"><span>Ouro</span><b id="goldStat">10</b></div>
       <div class="stat"><span>Nível</span><b id="levelStat">2</b><small id="xpStat">0/8 XP</small><div class="progress" id="xpProgress" role="progressbar" aria-label="Experiência para o próximo nível" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i id="xpFill" style="width:0%"></i></div></div>
@@ -55,7 +55,7 @@
 
   <div class="layout">
     <aside class="panel side-left">
-      <h2>Sinergias v0.4</h2>
+      <h2>Sinergias v0.5</h2>
       <div id="synergies"></div>
     </aside>
 
@@ -79,7 +79,7 @@
       <h2>Registro</h2>
       <div id="log" class="log"></div>
       <h2 style="margin-top:10px">Regras rápidas</h2>
-      <div class="help">3 cópias iguais evoluem automaticamente. Conjuntos em 3 e 5 linhas evolutivas diferentes no campo; repetidos contam uma vez por tipo. Bônus apenas para Pokémon do tipo. Sem fraquezas, resistências ou imunidades por tipo. 5 Elétricos invocam Zapdos temporariamente. Evoluções finais não fundem. A batalha é automática e o dano sofrido depende dos inimigos sobreviventes. Você recebe ouro por rodada + juros. Sequências de vitórias ou derrotas: 3 = +1 ouro, 4 = +2, 5 ou mais = +3 por rodada. Mudar o resultado reinicia a sequência. Sobreviva às 15 rodadas.</div>
+      <div class="help">3 cópias iguais evoluem automaticamente. Conjuntos em 3 e 5 linhas evolutivas diferentes no campo; repetidos contam uma vez por tipo. Bônus apenas para Pokémon do tipo. Sem fraquezas, resistências ou imunidades por tipo. 5 Elétricos invocam Zapdos temporariamente. Evoluções finais não fundem. A batalha é automática e o dano sofrido depende dos inimigos sobreviventes. Você recebe ouro por rodada + juros. Sequências de vitórias ou derrotas: 3 = +1 ouro, 4 = +2, 5 ou mais = +3 por rodada. Mudar o resultado reinicia a sequência. Bosses nas etapas 6, 12, 18 e 25. Derrote o boss para ganhar 2 componentes; retire ao menos 50% do HP para ganhar 1. Sobreviva às 25 etapas.</div>
     </aside>
   </div>
 
@@ -92,7 +92,7 @@
   </section>
   <section class="panel items-panel" aria-label="Mochila e equipamentos">
     <h2>Mochila e equipamentos</h2>
-    <p class="item-note">Selecione um Pokémon e um item da mochila para equipar. Para combinar, clique em dois componentes e confira a receita. Máximo de 3 itens por Pokémon; remover é grátis na preparação.</p>
+    <p class="item-note">Você começa com 2 componentes. Novos componentes vêm dos bosses das etapas 6, 12, 18 e 25. Selecione um Pokémon e um item da mochila para equipar; combine dois componentes para criar equipamentos. Máximo de 3 itens por Pokémon; remover é grátis na preparação.</p>
     <div id="itemRewards" aria-live="polite"></div>
     <div id="itemInventory" class="item-grid"></div>
     <button class="btn primary" id="equipItemBtn" disabled>Equipar no Pokémon selecionado</button>
@@ -182,9 +182,45 @@
   };
   const KEYS = Object.keys(LINES);
 
+  const BOSS_ROUNDS=[6,12,18,25];
+  const BOSS_DEFS={
+    onix:{name:'Onix',dex:95,types:['Rock','Ground'],role:'Boss',hp:360,atk:24,def:20,range:1,speed:68,ability:{name:'Deslizamento de Pedras',kind:'blast',power:1.45},count:1},
+    tauros:{name:'Tauros',dex:128,types:['Normal'],role:'Boss',hp:285,atk:31,def:11,range:1,speed:108,ability:{name:'Investida',kind:'blast',power:1.48},count:3},
+    raikou:{name:'Raikou',dex:243,types:['Electric'],role:'Boss Lendário',hp:820,atk:50,def:15,range:3,speed:126,ability:{name:'Trovão Lendário',kind:'multi',power:1.55},count:1},
+    entei:{name:'Entei',dex:244,types:['Fire'],role:'Boss Lendário',hp:930,atk:54,def:18,range:2,speed:103,ability:{name:'Fogo Sagrado',kind:'blast',power:1.72},count:1},
+    suicune:{name:'Suicune',dex:245,types:['Water'],role:'Boss Lendário',hp:1050,atk:44,def:23,range:2,speed:98,ability:{name:'Aurora',kind:'heal',power:.42},count:1},
+    mewtwo:{name:'Mewtwo',dex:150,types:['Psychic'],role:'Boss Final',hp:1650,atk:66,def:25,range:3,speed:128,ability:{name:'Psíquico Supremo',kind:'multi',power:1.82},count:1}
+  };
+  const ENEMY_TRAIT_POOLS={
+    Fire:['charmander','vulpix','ponyta','growlithe','cyndaquil'],
+    Water:['squirtle','psyduck','chinchou','slowpoke','wooper'],
+    Electric:['pikachu','magnemite','voltorb','mareep','chinchou'],
+    Grass:['bulbasaur','oddish','paras','exeggcute','hoppip'],
+    Psychic:['abra','exeggcute','slowpoke','drowzee','natu'],
+    Flying:['pidgey','zubat','spearow','natu','hoppip'],
+    Poison:['bulbasaur','weedle','nidoranf','zubat','oddish'],
+    Ground:['sandshrew','diglett','wooper','geodude','phanpy']
+  };
+  function randomLegendaryBoss(){return ['raikou','entei','suicune'][Math.floor(Math.random()*3)]}
+  function bossKeyForRound(round,legendary){
+    if(round===6)return 'onix';if(round===12)return 'tauros';if(round===18)return legendary||'raikou';if(round===25)return 'mewtwo';return null;
+  }
+  function difficultyProfile(round){
+    if(round<=1)return {count:1,scale:.70,stage1:0,stage2:0,synergy:0};
+    if(round===2)return {count:1,scale:.76,stage1:0,stage2:0,synergy:0};
+    if(round===3)return {count:2,scale:.80,stage1:0,stage2:0,synergy:0};
+    if(round<=5)return {count:round===4?2:3,scale:round===4?.86:.92,stage1:.05,stage2:0,synergy:0};
+    if(round<=8)return {count:3,scale:.96,stage1:.15,stage2:0,synergy:3};
+    if(round<=11)return {count:4,scale:1.00,stage1:.25,stage2:.03,synergy:3};
+    if(round<=14)return {count:5,scale:1.06,stage1:.38,stage2:.06,synergy:3};
+    if(round<=17)return {count:5,scale:1.11,stage1:.50,stage2:.12,synergy:5};
+    if(round<=21)return {count:6,scale:1.16,stage1:.58,stage2:.18,synergy:5};
+    return {count:7,scale:1.23,stage1:.64,stage2:.24,synergy:5};
+  }
+
   const state = {
-    round:1,maxRounds:15,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,
-    bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[]
+    round:1,maxRounds:25,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,
+    bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss()
   };
 
   const $ = s => document.querySelector(s);
@@ -258,21 +294,23 @@
     clearItemSelection();
   }
   function prepareItemRewards(){
-    if(state.rewardRounds.includes(state.round)||state.rewardChoices)return;
+    if(state.rewardRounds.includes(1))return;
     if(state.round===1){
       for(let i=0;i<2;i++)state.inventory.push(newItem(COMPONENTS[Math.floor(Math.random()*COMPONENTS.length)]));
       state.rewardRounds.push(1);log('🎒 Você recebeu 2 componentes iniciais.');
-    }else if([4,7,10,13].includes(state.round)){
-      const pairs=Object.values(ITEM_DEFS).filter(d=>d.recipe).map(d=>d.recipe.slice());
-      for(let i=pairs.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pairs[i],pairs[j]]=[pairs[j],pairs[i]]}
-      state.rewardChoices={round:state.round,options:pairs.slice(0,3)};
     }
   }
-  function chooseItemReward(index){
-    const reward=state.rewardChoices;
-    if(!canManageItems()||!reward||reward.round!==state.round||!Number.isInteger(index)||!reward.options[index])return;
-    reward.options[index].forEach(k=>state.inventory.push(newItem(k)));state.rewardRounds.push(reward.round);state.rewardChoices=null;
-    log('🎒 Rodada '+state.round+': pacote de 2 componentes recebido.');render();
+  function chooseItemReward(){return false}
+  function grantBossReward(bossKey,win,damageRatio){
+    const count=win?2:damageRatio>=.5?1:0,def=BOSS_DEFS[bossKey];
+    if(state.bossRewards.some(r=>r.round===state.round))return 0;
+    for(let i=0;i<count;i++)state.inventory.push(newItem(COMPONENTS[Math.floor(Math.random()*COMPONENTS.length)]));
+    state.bossRewards.push({round:state.round,boss:bossKey,damageRatio,count});
+    const pct=Math.round(damageRatio*100);
+    if(count===2){log('🎁 '+def.name+' derrotado: 2 componentes recebidos!','win');toast('🏆 Boss derrotado! +2 componentes');}
+    else if(count===1){log('🎁 Você retirou '+pct+'% do HP do boss: 1 componente recebido.','win');toast('🎁 '+pct+'% do boss: +1 componente');}
+    else{log('Boss '+def.name+': '+pct+'% do HP removido. Nenhum componente recebido.','loss');toast('Boss: menos de 50% de dano — sem item');}
+    return count;
   }
   function itemButton(item){
     const d=ITEM_DEFS[item.key],button=document.createElement('button');
@@ -457,7 +495,8 @@
     $('#xpStat').textContent=xpText;$('#xpFill').style.width=(maxLevel?100:Math.min(100,state.xp/need*100))+'%';
     const xpProgress=$('#xpProgress');xpProgress.setAttribute('aria-valuemax',maxLevel?1:need);xpProgress.setAttribute('aria-valuenow',maxLevel?1:state.xp);xpProgress.setAttribute('aria-valuetext',xpText);
     $('#battleBtn').textContent=state.gameOver?'Reiniciar partida':'Iniciar batalha';$('#battleBtn').disabled=state.battle||(!state.gameOver&&fieldCount()===0);$('#xpBtn').disabled=state.battle||state.gameOver||state.level>=7;$('#rerollBtn').disabled=state.battle||state.gameOver;
-    $('#phaseText').textContent=state.gameOver?'FIM DE JOGO':state.battle?'BATALHA AUTOMÁTICA':state.rewardChoices?'RECOMPENSA DISPONÍVEL — escolha seu pacote na mochila':'PREPARAÇÃO';
+    const bossKey=bossKeyForRound(state.round,state.legendaryBoss);
+    $('#phaseText').textContent=state.gameOver?'FIM DE JOGO':state.battle?(bossKey?'BATALHA DE BOSS — '+BOSS_DEFS[bossKey].name:'BATALHA AUTOMÁTICA'):(bossKey?'PREPARAÇÃO — BOSS: '+BOSS_DEFS[bossKey].name:'PREPARAÇÃO');
   }
   function render(){renderStats();renderSynergies();renderBoard();renderBench();renderShop();selectedBox();renderItems()}
 
@@ -470,34 +509,52 @@
       maxHp:p.hp,hp:p.hp,atk:p.atk,def:p.def,range:p.range,speed:p.speed,ability:p.ability,mana:0,shield:0,x,y,meter:Math.random()*35,stun:0,
       effects:{},rootUntil:0,hasCast:false,nextRegenAt:3000,summoned:false,dead:false,itemBonus:itemBonuses(u)};
   }
+  function scaleEnemy(c,scale){
+    c.maxHp=Math.max(1,Math.round(c.maxHp*scale));c.hp=c.maxHp;c.atk=Math.max(1,Math.round(c.atk*scale));c.def=Math.max(0,Math.round(c.def*scale));
+    if(scale>1)c.speed*=1+Math.min(.12,(scale-1)*.45);return c;
+  }
+  function chooseEnemyStage(line,profile){
+    const max=LINES[line].stages.length-1,r=Math.random();
+    if(max>=2&&r<profile.stage2)return 2;
+    if(max>=1&&r<profile.stage2+profile.stage1)return 1;
+    return 0;
+  }
   function generateEnemy(){
-    const count=Math.min(7,2+Math.floor((state.round-1)/2)),arr=[],used=new Set();
-    for(let n=0;n<count;n++){
-      const key=KEYS[Math.floor(Math.random()*KEYS.length)],l=LINES[key];
-      let stage=0;const r=Math.random();
-      if(state.round>=11&&r<.32)stage=Math.min(2,l.stages.length-1);
-      else if(state.round>=5&&r<.52)stage=Math.min(1,l.stages.length-1);
-      let pos;do{pos=Math.floor(Math.random()*21)}while(used.has(pos));used.add(pos);
-      arr.push(makeCombatant({id:8000+n,line:key,stage},'enemy',pos%7,Math.floor(pos/7)));
+    const profile=difficultyProfile(state.round),arr=[],positions=[];
+    while(positions.length<profile.count){const p=Math.floor(Math.random()*21);if(!positions.includes(p))positions.push(p)}
+    let picks=[];
+    if(profile.synergy){
+      const types=Object.keys(ENEMY_TRAIT_POOLS),type=types[Math.floor(Math.random()*types.length)];
+      picks.push(...ENEMY_TRAIT_POOLS[type].slice().sort(()=>Math.random()-.5).slice(0,Math.min(profile.synergy,profile.count)));
     }
-    if(state.round===15){
-      const ace=arr[0],l=LINES[ace.line];ace.stage=l.stages.length-1;
-      const p=stageData({line:ace.line,stage:ace.stage});Object.assign(ace,{name:p.name,dex:p.dex,types:p.types,maxHp:Math.round(p.hp*1.35),hp:Math.round(p.hp*1.35),atk:Math.round(p.atk*1.25),def:Math.round(p.def*1.2),ability:p.ability,role:p.role});
-    }
+    const remainder=KEYS.filter(k=>!picks.includes(k)).sort(()=>Math.random()-.5);
+    while(picks.length<profile.count)picks.push(remainder.shift()||KEYS[Math.floor(Math.random()*KEYS.length)]);
+    picks.forEach((key,n)=>{
+      const stage=chooseEnemyStage(key,profile),pos=positions[n],combatant=makeCombatant({id:8000+n,line:key,stage},'enemy',pos%7,Math.floor(pos/7));
+      scaleEnemy(combatant,profile.scale);arr.push(combatant);
+    });
     return arr;
   }
+  function makeBossCombatant(key,index=0){
+    const d=BOSS_DEFS[key],positions=d.count===3?[{x:1,y:1},{x:3,y:1},{x:5,y:1}]:[{x:3,y:1}],p=positions[index]||positions[0];
+    return {cid:'enemy-boss-'+key+'-'+index,side:'enemy',line:'boss-'+key,stage:0,name:d.name,dex:d.dex,types:d.types,role:d.role,
+      maxHp:d.hp,hp:d.hp,atk:d.atk,def:d.def,range:d.range,speed:d.speed,ability:d.ability,mana:0,shield:0,x:p.x,y:p.y,meter:0,stun:0,
+      effects:{},rootUntil:0,hasCast:false,nextRegenAt:3000,summoned:false,boss:true,bossKey:key,dead:false,itemBonus:{atk:0,hp:0,def:0,speed:0,power:0,regen:0,shield:0,basicLeech:0,abilityLeech:0,manaOnAttack:0}};
+  }
+  function generateBossEnemy(key){const d=BOSS_DEFS[key];return Array.from({length:d.count},(_,i)=>makeBossCombatant(key,i))}
   function startBattle(){
     if(state.battle||state.gameOver||fieldCount()===0)return;
     if(state.rewardChoices){$('#itemRewards').scrollIntoView?.({behavior:'smooth',block:'center'});toast('Escolha seu pacote de componentes antes da batalha.');return}
     if(state.pendingCombine){$('#itemPreview').scrollIntoView?.({behavior:'smooth',block:'center'});toast('Confirme ou cancele a combinação antes da batalha.');return}
     clearItemSelection();state.selected=null;state.battle=true;
     const player=[];state.board.forEach((u,i)=>{if(u)player.push(makeCombatant(u,'player',i%7,Math.floor(i/7)))});
-    const enemy=generateEnemy(),pb=synergyBonuses(player),eb=synergyBonuses(enemy);
+    const bossKey=bossKeyForRound(state.round,state.legendaryBoss),enemy=bossKey?generateBossEnemy(bossKey):generateEnemy(),pb=synergyBonuses(player),eb=synergyBonuses(enemy);
     for(const c of player)applyBonus(c,pb);for(const c of enemy)applyBonus(c,eb);
-    state.combat={units:[...player,...enemy],ticks:0,elapsedMs:0,timer:null};
+    state.combat={units:[...player,...enemy],ticks:0,elapsedMs:0,timer:null,bossKey,bossInitialHp:enemy.filter(c=>c.boss).reduce((s,c)=>s+c.maxHp,0)};
     if(pb.Electric===2)summonZapdos('player');
-    if(eb.Electric===2)summonZapdos('enemy');
-    banner('RODADA '+state.round);log('⚔️ Rodada '+state.round+' começou.');render();state.combat.timer=setInterval(combatTick,COMBAT_TICK_MS);
+    if(!bossKey&&eb.Electric===2)summonZapdos('enemy');
+    const label=bossKey?'BOSS • '+BOSS_DEFS[bossKey].name:'RODADA '+state.round;
+    banner(label);log(bossKey?'👑 Boss da etapa '+state.round+': '+BOSS_DEFS[bossKey].name+'.':'⚔️ Rodada '+state.round+' começou.');render();state.combat.timer=setInterval(combatTick,COMBAT_TICK_MS);
   }
   function applyBonus(c,tiers){
     const tier=t=>c.summoned||!c.types.includes(t)?0:(tiers[t]||0),ib=c.summoned?itemBonuses(c):(c.itemBonus||itemBonuses(c));
@@ -593,7 +650,7 @@
   function combatTick(){
     if(!state.combat)return;state.combat.ticks++;state.combat.elapsedMs=state.combat.ticks*COMBAT_TICK_MS;
     const aliveP=state.combat.units.filter(c=>c.side==='player'&&!c.dead),aliveE=state.combat.units.filter(c=>c.side==='enemy'&&!c.dead);
-    if(!aliveP.length||!aliveE.length||state.combat.ticks>420){finishBattle(aliveP.length>aliveE.length);return}
+    if(!aliveP.length||!aliveE.length||state.combat.ticks>420){const win=state.combat.bossKey?!aliveE.length:aliveP.length>aliveE.length;finishBattle(win);return}
     for(const c of state.combat.units){
       if(c.dead)continue;
       processEffects(c,state.combat.elapsedMs);if(c.dead)continue;
@@ -623,23 +680,27 @@
     return Math.min(3,Math.max(0,state.streak-2));
   }
   function finishBattle(win){
-    clearInterval(state.combat.timer);const survivors=state.combat.units.filter(c=>c.side==='enemy'&&!c.dead&&!c.summoned).length;
+    clearInterval(state.combat.timer);
+    const combat=state.combat,bossKey=combat.bossKey||null,bossUnits=combat.units.filter(c=>c.boss),bossInitial=combat.bossInitialHp||0;
+    const bossRemaining=bossUnits.reduce((s,c)=>s+Math.max(0,c.hp),0),bossDamageRatio=bossKey&&bossInitial?Math.max(0,Math.min(1,1-bossRemaining/bossInitial)):0;
+    const survivors=combat.units.filter(c=>c.side==='enemy'&&!c.dead&&!c.summoned).length;
     state.battle=false;state.combat=null;const interest=Math.min(5,Math.floor(state.gold/10)),streakBonus=updateStreak(win);
     const incomeDetails=interest+' de juros + '+streakBonus+' de sequência • '+state.streak+' '+(win?'vitória(s)':'derrota(s)')+' consecutiva(s)';
-    if(win){const gain=6+interest+streakBonus;state.gold+=gain;log('✅ Vitória! +'+gain+' ouro ('+incomeDetails+').','win');banner('VITÓRIA');}
-    else{const dmg=4+survivors*3;state.hp-=dmg;const gain=5+interest+streakBonus;state.gold+=gain;log('❌ Derrota. -'+dmg+' HP • +'+gain+' ouro ('+incomeDetails+').','loss');banner('-'+dmg+' HP');}
+    if(win){const gain=6+interest+streakBonus;state.gold+=gain;log('✅ Vitória! +'+gain+' ouro ('+incomeDetails+').','win');banner(bossKey?'BOSS DERROTADO':'VITÓRIA');}
+    else{const bossDamage={6:8,12:12,18:16,25:20}[state.round]||0,dmg=Math.max(4+survivors*3,bossDamage);state.hp-=dmg;const gain=5+interest+streakBonus;state.gold+=gain;log('❌ Derrota. -'+dmg+' HP • +'+gain+' ouro ('+incomeDetails+').','loss');banner('-'+dmg+' HP');}
+    if(bossKey)grantBossReward(bossKey,win,bossDamageRatio);
     state.xp+=2;levelCheck();
-    if(state.hp<=0){state.hp=0;state.gameOver=true;toast('Fim de jogo na rodada '+state.round+'.');log('☠️ Sua jornada terminou.','loss');render();return}
-    if(state.round>=state.maxRounds){state.gameOver=true;toast(win?'🏆 Você venceu o protótipo v0.4!':'Fim do teste v0.4.');log(win?'🏆 Kanto Tactics v0.4 concluído!':'Teste concluído.');render();return}
+    if(state.hp<=0){state.hp=0;state.gameOver=true;toast('Fim de jogo na etapa '+state.round+'.');log('☠️ Sua jornada terminou.','loss');render();return}
+    if(state.round>=state.maxRounds){state.gameOver=true;toast(win?'🏆 Você venceu o TFTmon v0.5!':'Fim do teste v0.5.');log(win?'🏆 TFTmon v0.5 concluído!':'Teste concluído.');render();return}
     state.round++;prepareItemRewards();rollShop(true);render();
   }
   function reset(){
-    clearInterval(state.combat?.timer);Object.assign(state,{round:1,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[]});
-    els.log.innerHTML='';prepareItemRewards();rollShop(true);log('Bem-vindo ao Kanto Tactics v0.4. Monte seu primeiro time!');render();
+    clearInterval(state.combat?.timer);Object.assign(state,{round:1,maxRounds:25,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss()});
+    els.log.innerHTML='';prepareItemRewards();rollShop(true);log('Bem-vindo ao TFTmon v0.5. Os bosses aparecem nas etapas 6, 12, 18 e 25.');render();
   }
   $('#rerollBtn').onclick=()=>rollShop(false);$('#xpBtn').onclick=buyXP;$('#sellBtn').onclick=sellSelected;$('#battleBtn').onclick=()=>{if(state.gameOver)reset();else startBattle()};
   document.addEventListener('keydown',e=>{if(e.target&&['BUTTON','INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;if(e.key.toLowerCase()==='r')rollShop(false);if(e.key===' '){e.preventDefault();if(!state.battle)startBattle()}});
-  prepareItemRewards();rollShop(true);log('Bem-vindo ao Kanto Tactics v0.4. Monte seu primeiro time!');render();
+  prepareItemRewards();rollShop(true);log('Bem-vindo ao TFTmon v0.5. Os bosses aparecem nas etapas 6, 12, 18 e 25.');render();
 })();
 </script>
 </body>
