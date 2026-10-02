@@ -131,6 +131,20 @@ Foram corrigidos os tipos do Beedrill (Bug/Poison, sem Flying) e completadas as 
 - Desaparece ao fim da batalha. Invocações sobreviventes não acrescentam dano ao HP do treinador.
 - Nenhum lendário foi adicionado à loja.
 
+
+## Acabamento de gameplay antes da fase gráfica
+
+- **Detalhes completos do Pokémon selecionado:** raridade, estágio evolutivo, tipos, função, HP/ATK/DEF, habilidade, explicação do efeito, passiva dos 4★, valor de venda e equipamentos.
+- **Travar loja:** a loja pode ser bloqueada para permanecer igual ao avançar de etapa. Reroll manual continua funcionando e não remove o bloqueio.
+- **Preview da próxima batalha:** mostra etapa, quantidade de inimigos e nível de composição; em bosses mostra nome, quantidade e regra de recompensa.
+- **Painel de chances da loja:** tabela completa dos níveis 2–9, chances 1$/2$/3$/4★ e chances de forma base/2ª/final para Pokémon normais e especiais.
+- **Resumo pós-batalha:** mostra vitória/derrota, dano causado, ouro recebido, juros, bônus de sequência, HP perdido e, em boss, percentual de HP removido e recompensa.
+- **Resumo final da partida:** etapa alcançada, vitórias/derrotas, bosses vencidos, time final e histórico de 4★ vistos/comprados.
+- **Progressão até o nível 9 validada sem alterar a economia:** são 140 XP totais do nível 2 ao 9; as 25 batalhas entregam 50 XP passivos, restando 90 XP, equivalentes a 23 compras de 4 XP (92 ouro).
+- **Sanidade de balanceamento:** bosses e 4★ continuam com os atributos e habilidades já aprovados; foram adicionadas validações para garantir valores finitos e progressão das evoluções sem rebalanceamento automático.
+
+Este pacote não altera as regras aprovadas de itens, sinergias, bosses, raridades, recompensas, dano por tipo ou habilidades especiais.
+
 ## Validação
 
 Execute com Node.js:
