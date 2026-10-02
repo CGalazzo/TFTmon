@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Kanto Tactics v0.2</title>
+  <title>Kanto Tactics v0.3</title>
   <style>
     :root{
       --bg:#07111f;--panel:#0e1b2d;--panel2:#13243b;--line:#28415f;--text:#f7fbff;
@@ -42,7 +42,7 @@
 <body>
 <div class="app">
   <header class="topbar">
-    <div class="brand"><div class="pokeball"></div><div><h1>KANTO TACTICS <span style="color:#f5c542">v0.2</span></h1><div class="subtitle">Auto-battler fan-made • apenas Pokémon da 1ª geração • sem itens</div></div></div>
+    <div class="brand"><div class="pokeball"></div><div><h1>KANTO TACTICS <span style="color:#f5c542">v0.3</span></h1><div class="subtitle">Auto-battler fan-made • Pokémon de Kanto e Johto • sem itens</div></div></div>
     <div class="stats">
       <div class="stat"><span>Rodada</span><b id="roundStat">1/15</b></div>
       <div class="stat"><span>HP</span><b id="hpStat">100</b></div>
@@ -54,7 +54,7 @@
 
   <div class="layout">
     <aside class="panel side-left">
-      <h2>Sinergias v0.2</h2>
+      <h2>Sinergias v0.3</h2>
       <div id="synergies"></div>
     </aside>
 
@@ -78,7 +78,7 @@
       <h2>Registro</h2>
       <div id="log" class="log"></div>
       <h2 style="margin-top:10px">Regras rápidas</h2>
-      <div class="help">3 cópias iguais evoluem automaticamente. Evoluções finais não fundem. A batalha é automática e o dano sofrido depende dos inimigos sobreviventes. Você recebe ouro por rodada + juros. Sequências de vitórias ou derrotas: 3 = +1 ouro, 4 = +2, 5 ou mais = +3 por rodada. Mudar o resultado reinicia a sequência. Sobreviva às 15 rodadas.</div>
+      <div class="help">3 cópias iguais evoluem automaticamente. Conjuntos em 3 e 5 linhas evolutivas diferentes no campo; repetidos contam uma vez por tipo. Bônus apenas para Pokémon do tipo. Sem fraquezas, resistências ou imunidades por tipo. 5 Elétricos invocam Zapdos temporariamente. Evoluções finais não fundem. A batalha é automática e o dano sofrido depende dos inimigos sobreviventes. Você recebe ouro por rodada + juros. Sequências de vitórias ou derrotas: 3 = +1 ouro, 4 = +2, 5 ou mais = +3 por rodada. Mudar o resultado reinicia a sequência. Sobreviva às 15 rodadas.</div>
     </aside>
   </div>
 
@@ -96,15 +96,16 @@
 <script>
 (() => {
   const SPRITE = d => 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + d + '.png';
+  const COMBAT_TICK_MS = 260;
   const TYPE_INFO = {
-    Fire:{icon:'🔥',levels:[2,4,6],desc:['+10% ATK','+20% ATK','+35% ATK']},
-    Water:{icon:'💧',levels:[2,4,6],desc:['+10% HP','+20% HP','+35% HP']},
-    Electric:{icon:'⚡',levels:[2,4,6],desc:['15% ataque extra','25% ataque extra','40% ataque extra']},
-    Grass:{icon:'🌿',levels:[2,4,6],desc:['regenera 0,6%/ação','1,2%/ação','2%/ação']},
-    Psychic:{icon:'🔮',levels:[2,4,6],desc:['+20 mana inicial','+35 mana inicial','+50 mana inicial']},
-    Flying:{icon:'🪽',levels:[2,4,6],desc:['8% esquiva','15% esquiva','25% esquiva']},
-    Poison:{icon:'☠️',levels:[2,4,6],desc:['veneno leve','veneno médio','veneno forte']},
-    Ground:{icon:'⛰️',levels:[2,4,6],desc:['+10% DEF','+20% DEF','+35% DEF']}
+    Fire:{icon:'🔥',levels:[3,5],desc:['+15% ATK','+30% ATK; habilidades queimam 6% HP em 3s']},
+    Water:{icon:'💧',levels:[3,5],desc:['+20% HP','+35% HP; cura 2% HP a cada 3s']},
+    Electric:{icon:'⚡',levels:[3,5],desc:['+20% velocidade de ação','+20% velocidade de ação; invoca Zapdos']},
+    Grass:{icon:'🌿',levels:[3,5],desc:['cura 2% HP a cada 3s','cura 4% HP/3s; primeira habilidade enraíza 1,5s']},
+    Psychic:{icon:'🔮',levels:[3,5],desc:['+25 mana inicial','+40 mana inicial; +20% potência das habilidades']},
+    Flying:{icon:'🪽',levels:[3,5],desc:['10% esquiva de ataques básicos','20% esquiva básica; +15% velocidade de ação']},
+    Poison:{icon:'☠️',levels:[3,5],desc:['ataques: veneno de 1% HP/s por 3s','veneno de 2% HP/s por 3s; -30% cura recebida']},
+    Ground:{icon:'⛰️',levels:[3,5],desc:['+20% DEF','+40% DEF; escudo inicial de 15% HP']}
   };
 
   const LINES = {
@@ -112,22 +113,35 @@
     charmander:{cost:2,role:'Atacante',types:[['Fire'],['Fire'],['Fire','Flying']],base:[82,22,5,1,100],ability:{name:'Lança-Chamas',kind:'blast',power:1.55},stages:[['Charmander',4],['Charmeleon',5],['Charizard',6]]},
     squirtle:{cost:2,role:'Tanque',types:[['Water'],['Water'],['Water']],base:[118,15,11,1,78],ability:{name:'Jato d’Água',kind:'shield',power:.55},stages:[['Squirtle',7],['Wartortle',8],['Blastoise',9]]},
     caterpie:{cost:1,role:'Suporte',types:[['Bug'],['Bug'],['Bug','Flying']],base:[78,11,5,1,82],ability:{name:'Teia',kind:'stun',power:1.0},stages:[['Caterpie',10],['Metapod',11],['Butterfree',12]]},
-    weedle:{cost:1,role:'Atacante',types:[['Poison'],['Poison'],['Poison','Flying']],base:[70,13,4,1,94],ability:{name:'Ferrão',kind:'multi',power:1.12},stages:[['Weedle',13],['Kakuna',14],['Beedrill',15]]},
-    pidgey:{cost:1,role:'Atacante',types:[['Flying'],['Flying'],['Flying']],base:[76,15,5,2,105],ability:{name:'Rajada',kind:'multi',power:1.05},stages:[['Pidgey',16],['Pidgeotto',17],['Pidgeot',18]]},
+    weedle:{cost:1,role:'Atacante',types:[['Bug','Poison'],['Bug','Poison'],['Bug','Poison']],base:[70,13,4,1,94],ability:{name:'Ferrão',kind:'multi',power:1.12},stages:[['Weedle',13],['Kakuna',14],['Beedrill',15]]},
+    pidgey:{cost:1,role:'Atacante',types:[['Normal','Flying'],['Normal','Flying'],['Normal','Flying']],base:[76,15,5,2,105],ability:{name:'Rajada',kind:'multi',power:1.05},stages:[['Pidgey',16],['Pidgeotto',17],['Pidgeot',18]]},
     pikachu:{cost:2,role:'Atacante',types:[['Electric'],['Electric']],base:[74,23,4,2,118],ability:{name:'Thunderbolt',kind:'multi',power:1.35},stages:[['Pikachu',25],['Raichu',26]]},
     sandshrew:{cost:2,role:'Tanque',types:[['Ground'],['Ground']],base:[110,17,12,1,82],ability:{name:'Magnitude',kind:'blast',power:1.25},stages:[['Sandshrew',27],['Sandslash',28]]},
     nidoranf:{cost:2,role:'Tanque',types:[['Poison'],['Poison'],['Poison','Ground']],base:[108,16,10,1,84],ability:{name:'Golpe Tóxico',kind:'blast',power:1.28},stages:[['Nidoran♀',29],['Nidorina',30],['Nidoqueen',31]]},
     vulpix:{cost:2,role:'Mago',types:[['Fire'],['Fire']],base:[72,20,5,2,110],ability:{name:'Fire Spin',kind:'blast',power:1.65},stages:[['Vulpix',37],['Ninetales',38]]},
     zubat:{cost:1,role:'Atacante',types:[['Poison','Flying'],['Poison','Flying']],base:[68,14,4,1,120],ability:{name:'Supersônico',kind:'stun',power:1.0},stages:[['Zubat',41],['Golbat',42]]},
     oddish:{cost:1,role:'Suporte',types:[['Grass','Poison'],['Grass','Poison'],['Grass','Poison']],base:[84,14,6,2,82],ability:{name:'Absorver',kind:'heal',power:.5},stages:[['Oddish',43],['Gloom',44],['Vileplume',45]]},
-    paras:{cost:2,role:'Lutador',types:[['Grass'],['Grass']],base:[92,19,8,1,72],ability:{name:'Esporos',kind:'stun',power:1.15},stages:[['Paras',46],['Parasect',47]]},
-    venonat:{cost:2,role:'Mago',types:[['Poison'],['Poison']],base:[86,17,7,2,88],ability:{name:'Psybeam',kind:'blast',power:1.48},stages:[['Venonat',48],['Venomoth',49]]},
+    paras:{cost:2,role:'Lutador',types:[['Bug','Grass'],['Bug','Grass']],base:[92,19,8,1,72],ability:{name:'Esporos',kind:'stun',power:1.15},stages:[['Paras',46],['Parasect',47]]},
+    venonat:{cost:2,role:'Mago',types:[['Bug','Poison'],['Bug','Poison']],base:[86,17,7,2,88],ability:{name:'Psybeam',kind:'blast',power:1.48},stages:[['Venonat',48],['Venomoth',49]]},
     diglett:{cost:1,role:'Assassino',types:[['Ground'],['Ground']],base:[60,22,3,1,128],ability:{name:'Escavar',kind:'blast',power:1.55},stages:[['Diglett',50],['Dugtrio',51]]},
     psyduck:{cost:2,role:'Mago',types:[['Water'],['Water']],base:[92,18,6,2,94],ability:{name:'Confusão',kind:'blast',power:1.5},stages:[['Psyduck',54],['Golduck',55]]},
     abra:{cost:3,role:'Mago',types:[['Psychic'],['Psychic'],['Psychic']],base:[58,28,3,3,96],ability:{name:'Psíquico',kind:'blast',power:1.75},stages:[['Abra',63],['Kadabra',64],['Alakazam',65]]},
     ponyta:{cost:3,role:'Atacante',types:[['Fire'],['Fire']],base:[92,24,6,1,116],ability:{name:'Investida Flamejante',kind:'blast',power:1.55},stages:[['Ponyta',77],['Rapidash',78]]},
-    magnemite:{cost:3,role:'Tanque',types:[['Electric'],['Electric']],base:[100,21,13,2,72],ability:{name:'Onda de Choque',kind:'multi',power:1.22},stages:[['Magnemite',81],['Magneton',82]]},
-    exeggcute:{cost:3,role:'Suporte',types:[['Grass','Psychic'],['Grass','Psychic']],base:[104,18,10,2,70],ability:{name:'Hipnose',kind:'stun',power:1.18},stages:[['Exeggcute',102],['Exeggutor',103]]}
+    magnemite:{cost:3,role:'Tanque',types:[['Electric','Steel'],['Electric','Steel']],base:[100,21,13,2,72],ability:{name:'Onda de Choque',kind:'multi',power:1.22},stages:[['Magnemite',81],['Magneton',82]]},
+    exeggcute:{cost:3,role:'Suporte',types:[['Grass','Psychic'],['Grass','Psychic']],base:[104,18,10,2,70],ability:{name:'Hipnose',kind:'stun',power:1.18},stages:[['Exeggcute',102],['Exeggutor',103]]},
+    growlithe:{cost:2,role:'Atacante',types:[['Fire'],['Fire']],base:[96,22,7,1,104],ability:{name:'Presa de Fogo',kind:'blast',power:1.5},stages:[['Growlithe',58],['Arcanine',59]]},
+    cyndaquil:{cost:2,role:'Mago',types:[['Fire'],['Fire'],['Fire']],base:[78,21,5,2,102],ability:{name:'Erupção',kind:'blast',power:1.55},stages:[['Cyndaquil',155],['Quilava',156],['Typhlosion',157]]},
+    voltorb:{cost:1,role:'Atacante',types:[['Electric'],['Electric']],base:[68,16,5,1,124],ability:{name:'Descarga',kind:'blast',power:1.4},stages:[['Voltorb',100],['Electrode',101]]},
+    mareep:{cost:2,role:'Mago',types:[['Electric'],['Electric'],['Electric']],base:[86,22,6,2,82],ability:{name:'Raio',kind:'blast',power:1.6},stages:[['Mareep',179],['Flaaffy',180],['Ampharos',181]]},
+    chinchou:{cost:2,role:'Suporte',types:[['Water','Electric'],['Water','Electric']],base:[102,16,7,2,84],ability:{name:'Aqua Ring',kind:'heal',power:.4},stages:[['Chinchou',170],['Lanturn',171]]},
+    slowpoke:{cost:2,role:'Tanque',types:[['Water','Psychic'],['Water','Psychic']],base:[125,15,11,1,60],ability:{name:'Amnésia',kind:'shield',power:.5},stages:[['Slowpoke',79],['Slowbro',80]]},
+    wooper:{cost:1,role:'Tanque',types:[['Water','Ground'],['Water','Ground']],base:[102,12,8,1,65],ability:{name:'Recuperação',kind:'heal',power:.35},stages:[['Wooper',194],['Quagsire',195]]},
+    drowzee:{cost:2,role:'Suporte',types:[['Psychic'],['Psychic']],base:[92,17,7,2,80],ability:{name:'Hipnose',kind:'stun',power:1.2},stages:[['Drowzee',96],['Hypno',97]]},
+    natu:{cost:1,role:'Suporte',types:[['Psychic','Flying'],['Psychic','Flying']],base:[66,15,4,3,98],ability:{name:'Vento Psíquico',kind:'multi',power:1.05},stages:[['Natu',177],['Xatu',178]]},
+    hoppip:{cost:1,role:'Suporte',types:[['Grass','Flying'],['Grass','Flying'],['Grass','Flying']],base:[72,11,5,2,92],ability:{name:'Síntese',kind:'heal',power:.4},stages:[['Hoppip',187],['Skiploom',188],['Jumpluff',189]]},
+    spearow:{cost:1,role:'Atacante',types:[['Normal','Flying'],['Normal','Flying']],base:[70,17,4,1,116],ability:{name:'Bico Broca',kind:'blast',power:1.4},stages:[['Spearow',21],['Fearow',22]]},
+    geodude:{cost:1,role:'Tanque',types:[['Rock','Ground'],['Rock','Ground'],['Rock','Ground']],base:[112,13,12,1,58],ability:{name:'Defesa de Pedra',kind:'shield',power:.45},stages:[['Geodude',74],['Graveler',75],['Golem',76]]},
+    phanpy:{cost:2,role:'Lutador',types:[['Ground'],['Ground']],base:[110,20,9,1,82],ability:{name:'Rolagem',kind:'blast',power:1.4},stages:[['Phanpy',231],['Donphan',232]]}
   };
   const KEYS = Object.keys(LINES);
 
@@ -151,10 +165,15 @@
   function log(msg,cls=''){const d=document.createElement('div');d.className=cls;d.textContent=msg;els.log.prepend(d)}
   function toast(msg){const t=$('#toast');t.innerHTML=msg;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),1900)}
   function banner(msg){const b=$('#banner');b.textContent=msg;b.classList.add('show');setTimeout(()=>b.classList.remove('show'),1200)}
-  function activeCounts(){
-    const c={}; Object.keys(TYPE_INFO).forEach(t=>c[t]=0);
-    state.board.filter(Boolean).forEach(u=>{new Set(stageData(u).types).forEach(t=>{if(t in c)c[t]++})}); return c;
+  function countTypes(units){
+    const seen=Object.fromEntries(Object.keys(TYPE_INFO).map(t=>[t,new Set()]));
+    for(const u of units){
+      if(u.summoned)continue;
+      for(const t of u.types||stageData(u).types)if(seen[t])seen[t].add(u.line);
+    }
+    return Object.fromEntries(Object.entries(seen).map(([t,lines])=>[t,lines.size]));
   }
+  function activeCounts(){return countTypes(state.board.filter(Boolean))}
   function synergyTier(type,count){
     const lev=TYPE_INFO[type].levels; let tier=0; for(let i=0;i<lev.length;i++)if(count>=lev[i])tier=i+1; return tier;
   }
@@ -162,8 +181,9 @@
     const c=activeCounts(); els.synergies.innerHTML='';
     Object.entries(TYPE_INFO).forEach(([t,inf])=>{
       const tier=synergyTier(t,c[t]),d=document.createElement('div');d.className='synergy'+(tier?' active':'');
-      const next=tier>=3?'MAX':inf.levels[tier];
-      d.innerHTML='<span><b>'+inf.icon+' '+t+'</b><br><small>'+c[t]+' ativos • '+(tier?inf.desc[tier-1]:'próximo: '+next)+'</small></span><strong>'+c[t]+'</strong>';
+      const next=tier>=inf.levels.length?'MAX':inf.levels[tier];
+      d.title='Bônus apenas para Pokémon deste tipo. 3: '+inf.desc[0]+'. 5: '+inf.desc[1]+'.';
+      d.innerHTML='<span><b>'+inf.icon+' '+t+'</b><br><small>'+c[t]+' linhas • '+(tier?inf.desc[tier-1]:'próximo: '+next)+'</small></span><strong>'+c[t]+'</strong>';
       els.synergies.appendChild(d);
     });
   }
@@ -289,15 +309,13 @@
   function render(){renderStats();renderSynergies();renderBoard();renderBench();renderShop();selectedBox()}
 
   function synergyBonuses(sideUnits){
-    const counts={};Object.keys(TYPE_INFO).forEach(t=>counts[t]=0);
-    sideUnits.forEach(c=>new Set(c.types).forEach(t=>{if(t in counts)counts[t]++}));
-    const b={atk:1,hp:1,def:1,extra:0,regen:0,mana:0,dodge:0,poison:0};
-    const tier=t=>synergyTier(t,counts[t]);
-    b.atk=[1,1.10,1.20,1.35][tier('Fire')];b.hp=[1,1.10,1.20,1.35][tier('Water')];b.extra=[0,.15,.25,.40][tier('Electric')];b.regen=[0,.006,.012,.02][tier('Grass')];b.mana=[0,20,35,50][tier('Psychic')];b.dodge=[0,.08,.15,.25][tier('Flying')];b.poison=[0,.012,.022,.035][tier('Poison')];b.def=[1,1.10,1.20,1.35][tier('Ground')];return b;
+    const counts=countTypes(sideUnits);
+    return Object.fromEntries(Object.keys(TYPE_INFO).map(t=>[t,synergyTier(t,counts[t])]));
   }
   function makeCombatant(u,side,x,y){
     const p=stageData(u);return {cid:side+'-'+u.id+'-'+Math.random(),side,line:u.line,stage:u.stage,name:p.name,dex:p.dex,types:p.types,role:p.role,
-      maxHp:p.hp,hp:p.hp,atk:p.atk,def:p.def,range:p.range,speed:p.speed,ability:p.ability,mana:0,shield:0,x,y,meter:Math.random()*35,stun:0,poison:0,poisonTicks:0,dead:false};
+      maxHp:p.hp,hp:p.hp,atk:p.atk,def:p.def,range:p.range,speed:p.speed,ability:p.ability,mana:0,shield:0,x,y,meter:Math.random()*35,stun:0,
+      effects:{},rootUntil:0,hasCast:false,nextRegenAt:3000,summoned:false,dead:false};
   }
   function generateEnemy(){
     const count=Math.min(7,2+Math.floor((state.round-1)/2)),arr=[],used=new Set();
@@ -320,46 +338,107 @@
     const player=[];state.board.forEach((u,i)=>{if(u)player.push(makeCombatant(u,'player',i%7,Math.floor(i/7)))});
     const enemy=generateEnemy(),pb=synergyBonuses(player),eb=synergyBonuses(enemy);
     for(const c of player)applyBonus(c,pb);for(const c of enemy)applyBonus(c,eb);
-    state.combat={units:[...player,...enemy],ticks:0,timer:null};
-    banner('RODADA '+state.round);log('⚔️ Rodada '+state.round+' começou.');render();state.combat.timer=setInterval(combatTick,260);
+    state.combat={units:[...player,...enemy],ticks:0,elapsedMs:0,timer:null};
+    if(pb.Electric===2)summonZapdos('player');
+    if(eb.Electric===2)summonZapdos('enemy');
+    banner('RODADA '+state.round);log('⚔️ Rodada '+state.round+' começou.');render();state.combat.timer=setInterval(combatTick,COMBAT_TICK_MS);
   }
-  function applyBonus(c,b){c.maxHp=Math.round(c.maxHp*b.hp);c.hp=c.maxHp;c.atk=Math.round(c.atk*b.atk);c.def=Math.round(c.def*b.def);c.mana=b.mana;c.bonus=b}
+  function applyBonus(c,tiers){
+    const tier=t=>c.summoned||!c.types.includes(t)?0:(tiers[t]||0);
+    const b={atk:[1,1.15,1.30][tier('Fire')],hp:[1,1.20,1.35][tier('Water')],def:[1,1.20,1.40][tier('Ground')],
+      speed:(tier('Electric')?1.20:1)*(tier('Flying')===2?1.15:1),mana:[0,25,40][tier('Psychic')],
+      power:tier('Psychic')===2?1.20:1,dodge:[0,.10,.20][tier('Flying')],
+      regen:(tier('Water')===2?.02:0)+[0,.02,.04][tier('Grass')],root:tier('Grass')===2,
+      poison:[0,.01,.02][tier('Poison')],antiHeal:tier('Poison')===2?.30:0,burn:tier('Fire')===2?.02:0,
+      shield:tier('Ground')===2?.15:0};
+    c.maxHp=Math.round(c.maxHp*b.hp);c.hp=c.maxHp;c.atk=Math.round(c.atk*b.atk);c.def=Math.round(c.def*b.def);
+    c.speed=c.speed*b.speed;c.mana=b.mana;c.shield=Math.round(c.maxHp*b.shield);c.bonus=b;
+  }
+  function summonZapdos(side){
+    if(!state.combat||state.combat.units.some(c=>c.side===side&&c.summoned))return;
+    const allies=state.combat.units.filter(c=>c.side===side&&!c.dead&&!c.summoned);
+    if(!allies.length)return;
+    const free=[];
+    for(let y=side==='player'?3:0;y<(side==='player'?6:3);y++)for(let x=0;x<7;x++)if(!occupied(x,y))free.push({x,y});
+    free.sort((a,b)=>Math.min(...allies.map(c=>dist(a,c)))-Math.min(...allies.map(c=>dist(b,c)))||(side==='player'?b.y-a.y:a.y-b.y)||a.x-b.x);
+    if(!free.length)return;
+    const c={cid:side+'-zapdos',side,line:'zapdos',stage:0,name:'Zapdos',dex:145,types:['Electric','Flying'],role:'Invocação',
+      maxHp:180,hp:180,atk:24,def:8,range:3,speed:105,ability:{name:'Tempestade Elétrica',kind:'multi',power:1.25},
+      mana:0,shield:0,...free[0],meter:0,stun:0,effects:{},rootUntil:0,hasCast:false,nextRegenAt:3000,summoned:true,dead:false};
+    applyBonus(c,{});state.combat.units.push(c);
+    log('⚡ '+(side==='player'?'Seu time':'O rival')+' invocou Zapdos com 5 linhas Elétricas!');
+  }
   function dist(a,b){return Math.abs(a.x-b.x)+Math.abs(a.y-b.y)}
   function nearest(c,foes){return foes.filter(x=>!x.dead).slice().sort((a,b)=>dist(c,a)-dist(c,b)||a.hp-b.hp)[0]}
   function occupied(x,y,ignore){return state.combat.units.some(c=>!c.dead&&c!==ignore&&c.x===x&&c.y===y)}
   function moveToward(c,t){
+    if(c.rootUntil>(state.combat?.elapsedMs||0))return;
     const opts=[];const dx=t.x-c.x,dy=t.y-c.y;if(dx)opts.push([c.x+Math.sign(dx),c.y]);if(dy)opts.push([c.x,c.y+Math.sign(dy)]);
     if(dy)opts.push([c.x+1,c.y],[c.x-1,c.y]);if(dx)opts.push([c.x,c.y+1],[c.x,c.y-1]);
     for(const [x,y] of opts){if(x>=0&&x<7&&y>=0&&y<6&&!occupied(x,y,c)){c.x=x;c.y=y;return}}
   }
-  function damage(att,t,amount){
-    if(t.dead)return;if(Math.random()<(t.bonus?.dodge||0)){return}
-    let raw=Math.max(1,Math.round(amount-t.def*.32));if(t.shield>0){const s=Math.min(t.shield,raw);t.shield-=s;raw-=s}
-    t.hp-=raw;t.mana=Math.min(100,t.mana+12);
-    if(att.bonus?.poison){t.poison=Math.max(t.poison,Math.max(1,Math.round(t.maxHp*att.bonus.poison)));t.poisonTicks=3}
-    flash(t.cid,'hit');if(t.hp<=0){t.hp=0;t.dead=true;setTimeout(()=>{const el=document.querySelector('[data-cid="'+t.cid+'"]');if(el)el.classList.add('dead')},20)}
+  function takeDamage(t,amount){
+    let raw=Math.max(0,amount);
+    if(t.shield>0){const absorbed=Math.min(t.shield,raw);t.shield-=absorbed;raw-=absorbed}
+    t.hp=Math.max(0,t.hp-raw);if(t.hp===0)t.dead=true;
+  }
+  function applyDot(t,kind,rate,antiHeal=0){
+    if(t.dead)return;
+    const now=state.combat?.elapsedMs||0,current=t.effects[kind];
+    // Refresh duration without postponing the next tick or stacking applications.
+    t.effects[kind]={rate:Math.max(current?.rate||0,rate),expiresAt:now+3000,
+      nextAt:current?.nextAt??(now+1000),antiHeal:Math.max(current?.antiHeal||0,antiHeal)};
+  }
+  function heal(t,amount){
+    if(t.dead)return;
+    const reduction=t.effects.poison?.antiHeal||0;
+    t.hp=Math.min(t.maxHp,t.hp+Math.max(0,Math.round(amount*(1-reduction))));
+  }
+  function processEffects(c,now){
+    for(const kind of ['poison','burn']){
+      const effect=c.effects[kind];if(!effect)continue;
+      while(effect.nextAt<=effect.expiresAt&&now>=effect.nextAt&&!c.dead){
+        takeDamage(c,c.maxHp*effect.rate);effect.nextAt+=1000;
+      }
+      if(now>=effect.expiresAt)delete c.effects[kind];
+      if(c.dead)return;
+    }
+    while(now>=c.nextRegenAt){
+      if(c.bonus?.regen)heal(c,c.maxHp*c.bonus.regen);
+      c.nextRegenAt+=3000;
+    }
+  }
+  // Types activate traits only: no effectiveness, resistance or type immunity multipliers.
+  function damage(att,t,amount,kind='ability'){
+    if(t.dead)return;
+    if(kind==='basic'&&Math.random()<(t.bonus?.dodge||0))return;
+    takeDamage(t,Math.max(1,Math.round(amount-t.def*.32)));t.mana=Math.min(100,t.mana+12);
+    if(kind==='basic'&&att.bonus?.poison)applyDot(t,'poison',att.bonus.poison,att.bonus.antiHeal);
+    if(kind==='ability'&&att.bonus?.burn)applyDot(t,'burn',att.bonus.burn);
+    flash(t.cid,'hit');
   }
   function normalAttack(c,t){
-    damage(c,t,c.atk*(.90+Math.random()*.2));c.mana=Math.min(100,c.mana+34);
-    if(Math.random()<(c.bonus?.extra||0)&&!t.dead)damage(c,t,c.atk*.7);
+    damage(c,t,c.atk*(.90+Math.random()*.2),'basic');c.mana=Math.min(100,c.mana+34);
   }
   function cast(c,foes,allies){
-    c.mana=0;flash(c.cid,'cast');const a=c.ability,t=nearest(c,foes);if(!t)return;
-    if(a.kind==='blast'){damage(c,t,c.atk*a.power);foes.filter(x=>!x.dead&&x!==t&&dist(x,t)<=1).slice(0,2).forEach(x=>damage(c,x,c.atk*a.power*.45))}
-    else if(a.kind==='multi'){foes.filter(x=>!x.dead).sort((x,y)=>dist(c,x)-dist(c,y)).slice(0,3).forEach((x,i)=>damage(c,x,c.atk*a.power*(i?0.68:1)))}
-    else if(a.kind==='stun'){damage(c,t,c.atk*a.power);t.stun=Math.max(t.stun,2)}
-    else if(a.kind==='heal'){const a1=allies.filter(x=>!x.dead).sort((x,y)=>(x.hp/x.maxHp)-(y.hp/y.maxHp))[0];if(a1)a1.hp=Math.min(a1.maxHp,a1.hp+Math.round(c.maxHp*a.power));damage(c,t,c.atk*.7)}
-    else if(a.kind==='shield'){c.shield+=Math.round(c.maxHp*a.power);damage(c,t,c.atk*.8)}
+    const t=nearest(c,foes);if(!t)return;
+    c.mana=0;flash(c.cid,'cast');const a=c.ability,power=c.bonus?.power||1;
+    if(c.bonus?.root&&!c.hasCast)t.rootUntil=Math.max(t.rootUntil,(state.combat?.elapsedMs||0)+1500);
+    c.hasCast=true;
+    if(a.kind==='blast'){damage(c,t,c.atk*a.power*power);foes.filter(x=>!x.dead&&x!==t&&dist(x,t)<=1).slice(0,2).forEach(x=>damage(c,x,c.atk*a.power*.45*power))}
+    else if(a.kind==='multi'){foes.filter(x=>!x.dead).sort((x,y)=>dist(c,x)-dist(c,y)).slice(0,3).forEach((x,i)=>damage(c,x,c.atk*a.power*(i?0.68:1)*power))}
+    else if(a.kind==='stun'){damage(c,t,c.atk*a.power*power);t.stun=Math.max(t.stun,2)}
+    else if(a.kind==='heal'){const a1=allies.filter(x=>!x.dead).sort((x,y)=>(x.hp/x.maxHp)-(y.hp/y.maxHp))[0];if(a1)heal(a1,c.maxHp*a.power*power);damage(c,t,c.atk*.7*power)}
+    else if(a.kind==='shield'){c.shield+=Math.round(c.maxHp*a.power*power);damage(c,t,c.atk*.8*power)}
   }
   function flash(cid,cls){const e=document.querySelector('[data-cid="'+cid+'"]');if(!e)return;e.classList.remove(cls);void e.offsetWidth;e.classList.add(cls);setTimeout(()=>e.classList.remove(cls),360)}
   function combatTick(){
-    if(!state.combat)return;state.combat.ticks++;
+    if(!state.combat)return;state.combat.ticks++;state.combat.elapsedMs=state.combat.ticks*COMBAT_TICK_MS;
     const aliveP=state.combat.units.filter(c=>c.side==='player'&&!c.dead),aliveE=state.combat.units.filter(c=>c.side==='enemy'&&!c.dead);
     if(!aliveP.length||!aliveE.length||state.combat.ticks>420){finishBattle(aliveP.length>aliveE.length);return}
     for(const c of state.combat.units){
       if(c.dead)continue;
-      if(c.poisonTicks>0&&state.combat.ticks%4===0){c.hp-=c.poison;c.poisonTicks--;if(c.hp<=0){c.hp=0;c.dead=true;continue}}
-      if(c.bonus?.regen)c.hp=Math.min(c.maxHp,c.hp+Math.max(1,Math.round(c.maxHp*c.bonus.regen)));
+      processEffects(c,state.combat.elapsedMs);if(c.dead)continue;
       if(c.stun>0){c.stun--;continue}
       c.meter+=c.speed/3.2;if(c.meter<100)continue;c.meter-=100;
       const foes=c.side==='player'?aliveE:aliveP,allies=c.side==='player'?aliveP:aliveE;if(!foes.length)continue;
@@ -372,10 +451,11 @@
     const gap=4;
     state.combat.units.forEach(c=>{
       if(c.dead&&c.hp<=0)return;const d=document.createElement('div');d.className='fighter '+c.side;d.dataset.cid=c.cid;
+      d.title=c.name+' • HP '+Math.ceil(c.hp)+'/'+c.maxHp+' • Escudo '+Math.ceil(c.shield)+(c.effects.poison?' • Veneno':'')+(c.effects.burn?' • Queimadura':'')+(c.rootUntil>state.combat.elapsedMs?' • Enraizado':'');
       const cells=els.board.querySelectorAll('.cell'),sx=cells.length>1?cells[1].offsetLeft-cells[0].offsetLeft:60,sy=cells.length>7?cells[7].offsetTop-cells[0].offsetTop:60;
       const ox=cells.length?cells[0].offsetLeft-layer.offsetLeft:0,oy=cells.length?cells[0].offsetTop-layer.offsetTop:0;
       d.style.left=(ox+c.x*sx)+'px';d.style.top=(oy+c.y*sy)+'px';
-      const hp=Math.max(0,Math.round(c.hp/c.maxHp*100));d.innerHTML='<div class="hp"><i style="width:'+hp+'%"></i></div><div class="mana"><i style="width:'+Math.min(100,c.mana)+'%"></i></div><img src="'+SPRITE(c.dex)+'"><div class="label">'+c.name+'</div>';layer.appendChild(d)
+      const hp=Math.max(0,Math.round(c.hp/c.maxHp*100));d.innerHTML='<div class="hp"><i style="width:'+hp+'%"></i></div><div class="mana"><i style="width:'+Math.min(100,c.mana)+'%"></i></div><img src="'+SPRITE(c.dex)+'"><div class="label">'+c.name+(c.summoned?' ⚡':'')+'</div>';layer.appendChild(d)
     });
   }
   function updateStreak(win){
@@ -385,23 +465,23 @@
     return Math.min(3,Math.max(0,state.streak-2));
   }
   function finishBattle(win){
-    clearInterval(state.combat.timer);const survivors=state.combat.units.filter(c=>c.side==='enemy'&&!c.dead).length;
+    clearInterval(state.combat.timer);const survivors=state.combat.units.filter(c=>c.side==='enemy'&&!c.dead&&!c.summoned).length;
     state.battle=false;state.combat=null;const interest=Math.min(5,Math.floor(state.gold/10)),streakBonus=updateStreak(win);
     const incomeDetails=interest+' de juros + '+streakBonus+' de sequência • '+state.streak+' '+(win?'vitória(s)':'derrota(s)')+' consecutiva(s)';
     if(win){const gain=6+interest+streakBonus;state.gold+=gain;log('✅ Vitória! +'+gain+' ouro ('+incomeDetails+').','win');banner('VITÓRIA');}
     else{const dmg=4+survivors*3;state.hp-=dmg;const gain=5+interest+streakBonus;state.gold+=gain;log('❌ Derrota. -'+dmg+' HP • +'+gain+' ouro ('+incomeDetails+').','loss');banner('-'+dmg+' HP');}
     state.xp+=2;levelCheck();
     if(state.hp<=0){state.hp=0;state.gameOver=true;toast('Fim de jogo na rodada '+state.round+'.');log('☠️ Sua jornada terminou.','loss');render();return}
-    if(state.round>=state.maxRounds){state.gameOver=true;toast(win?'🏆 Você venceu o protótipo v0.2!':'Fim do teste v0.2.');log(win?'🏆 Kanto Tactics v0.2 concluído!':'Teste concluído.');render();return}
+    if(state.round>=state.maxRounds){state.gameOver=true;toast(win?'🏆 Você venceu o protótipo v0.3!':'Fim do teste v0.3.');log(win?'🏆 Kanto Tactics v0.3 concluído!':'Teste concluído.');render();return}
     state.round++;rollShop(true);render();
   }
   function reset(){
     clearInterval(state.combat?.timer);Object.assign(state,{round:1,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null});
-    els.log.innerHTML='';rollShop(true);log('Bem-vindo ao Kanto Tactics v0.2. Monte seu primeiro time!');render();
+    els.log.innerHTML='';rollShop(true);log('Bem-vindo ao Kanto Tactics v0.3. Monte seu primeiro time!');render();
   }
   $('#rerollBtn').onclick=()=>rollShop(false);$('#xpBtn').onclick=buyXP;$('#sellBtn').onclick=sellSelected;$('#battleBtn').onclick=()=>{if(state.gameOver)reset();else startBattle()};
   document.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='r')rollShop(false);if(e.key===' '){e.preventDefault();if(!state.battle)startBattle()}});
-  rollShop(true);log('Bem-vindo ao Kanto Tactics v0.2. Monte seu primeiro time!');render();
+  rollShop(true);log('Bem-vindo ao Kanto Tactics v0.3. Monte seu primeiro time!');render();
 })();
 </script>
 </body>
