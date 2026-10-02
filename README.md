@@ -145,6 +145,20 @@ Foram corrigidos os tipos do Beedrill (Bug/Poison, sem Flying) e completadas as 
 
 Este pacote não altera as regras aprovadas de itens, sinergias, bosses, raridades, recompensas, dano por tipo ou habilidades especiais.
 
+
+## Tela inicial e limpeza de interface
+
+- A partida agora abre com uma **tela inicial** que resume o objetivo e o ciclo principal: loja, evolução, combate automático e sinergias.
+- As **regras completas** ficam em uma janela própria, acessível tanto na tela inicial quanto durante a partida.
+- A tela principal foi simplificada: o bloco permanente de regras rápidas foi removido.
+- **Mochila/equipamentos** deixaram de ocupar uma seção longa da página e agora abrem em modal pelo botão `🎒 Mochila`.
+- O **registro da partida** deixou a lateral fixa e agora abre pelo botão `📜 Histórico`.
+- As chances completas da loja continuam disponíveis pelo botão `Chances da loja`; na tela principal aparece apenas o nível da loja e a chance atual de 4★.
+- O preview da próxima luta foi encurtado para etapa, quantidade de inimigos/sinergia ou nome do boss.
+- A lateral direita fica focada apenas no Pokémon selecionado.
+- Foram criados slots independentes para futura identidade visual: `--start-bg-image`, `--game-bg-image`, `--logo-image`, `--hero-image`, além de `data-art-slot="logo"` e `data-art-slot="hero"`. Isso permite trocar logo, fundos e arte principal depois sem mexer nas regras do jogo.
+- Nenhuma regra de combate, economia, boss, raridade, item, evolução, sinergia ou progressão foi alterada nesta etapa.
+
 ## Validação
 
 Execute com Node.js:
