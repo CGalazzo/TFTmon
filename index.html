@@ -211,6 +211,7 @@
   function renderShop(){
     els.shop.innerHTML='';
     state.shop.forEach((key,i)=>{
+      if(!key){const empty=document.createElement('div');empty.className='card';empty.style.opacity='.4';empty.innerHTML='<div style="margin-top:62px;color:#9fb3c8">Comprado</div>';els.shop.appendChild(empty);return}
       const l=LINES[key],u={line:key,stage:0},p=stageData(u),d=document.createElement('div');d.className='card';
       d.innerHTML='<div class="cost">'+l.cost+'</div><img src="'+SPRITE(p.dex)+'"><div class="name">'+p.name+'</div><div class="meta">'+p.types.join(' / ')+' • '+p.role+'<br>'+p.ability.name+'</div><button class="btn buy">Comprar</button>';
       d.querySelector('button').onclick=()=>buy(i);d.querySelector('button').disabled=state.battle||state.gold<l.cost;els.shop.appendChild(d);
@@ -220,9 +221,8 @@
   function countCopies(line,stage){return allPlayerUnits().filter(u=>u.line===line&&u.stage===stage).length}
   function buy(i){
     if(state.battle||state.gameOver)return;const key=state.shop[i];if(!key)return;const cost=LINES[key].cost;if(state.gold<cost)return;
-    const open=state.bench.findIndex(x=>!x);if(open<0&&countCopies(key,0)<2){toast('Banco cheio.');return}
-    state.gold-=cost;const u=unit(key,0);
-    if(open>=0)state.bench[open]=u;else{const idx=state.bench.findIndex(x=>x&&x.line===key&&x.stage===0);state.bench[idx]=u}
+    const open=state.bench.findIndex(x=>!x);if(open<0){toast('Banco cheio. Libere um espaço para comprar.');return}
+    state.gold-=cost;const u=unit(key,0);state.bench[open]=u;
     state.shop[i]=null;normalizeShop();tryMerge(key,0);render();
   }
   function normalizeShop(){state.shop=state.shop.map(x=>x)}
@@ -277,7 +277,7 @@
   function renderStats(){
     $('#roundStat').textContent=state.round+'/'+state.maxRounds;$('#hpStat').textContent=Math.max(0,state.hp);$('#goldStat').textContent=state.gold;$('#levelStat').textContent=state.level;$('#fieldStat').textContent=fieldCount()+'/'+state.level;
     const need=xpNeed();$('#levelStat').title=state.level>=7?'Nível máximo':state.xp+'/'+need+' XP';
-    $('#battleBtn').disabled=state.battle||state.gameOver||fieldCount()===0;$('#xpBtn').disabled=state.battle||state.gameOver||state.level>=7;$('#rerollBtn').disabled=state.battle||state.gameOver;
+    $('#battleBtn').textContent=state.gameOver?'Reiniciar partida':'Iniciar batalha';$('#battleBtn').disabled=state.battle||(!state.gameOver&&fieldCount()===0);$('#xpBtn').disabled=state.battle||state.gameOver||state.level>=7;$('#rerollBtn').disabled=state.battle||state.gameOver;
     $('#phaseText').textContent=state.gameOver?'FIM DE JOGO':state.battle?'BATALHA AUTOMÁTICA':'PREPARAÇÃO';
   }
   function render(){renderStats();renderSynergies();renderBoard();renderBench();renderShop();selectedBox()}
@@ -319,7 +319,7 @@
   }
   function applyBonus(c,b){c.maxHp=Math.round(c.maxHp*b.hp);c.hp=c.maxHp;c.atk=Math.round(c.atk*b.atk);c.def=Math.round(c.def*b.def);c.mana=b.mana;c.bonus=b}
   function dist(a,b){return Math.abs(a.x-b.x)+Math.abs(a.y-b.y)}
-  function nearest(c,foes){return foes.slice().sort((a,b)=>dist(c,a)-dist(c,b)||a.hp-b.hp)[0]}
+  function nearest(c,foes){return foes.filter(x=>!x.dead).slice().sort((a,b)=>dist(c,a)-dist(c,b)||a.hp-b.hp)[0]}
   function occupied(x,y,ignore){return state.combat.units.some(c=>!c.dead&&c!==ignore&&c.x===x&&c.y===y)}
   function moveToward(c,t){
     const opts=[];const dx=t.x-c.x,dy=t.y-c.y;if(dx)opts.push([c.x+Math.sign(dx),c.y]);if(dy)opts.push([c.x,c.y+Math.sign(dy)]);
@@ -366,7 +366,9 @@
     const gap=4;
     state.combat.units.forEach(c=>{
       if(c.dead&&c.hp<=0)return;const d=document.createElement('div');d.className='fighter '+c.side;d.dataset.cid=c.cid;
-      d.style.left='calc('+c.x+' * (var(--cell) + '+gap+'px))';d.style.top='calc('+c.y+' * (var(--cell) + '+gap+'px))';
+      const cells=els.board.querySelectorAll('.cell'),sx=cells.length>1?cells[1].offsetLeft-cells[0].offsetLeft:60,sy=cells.length>7?cells[7].offsetTop-cells[0].offsetTop:60;
+      const ox=cells.length?cells[0].offsetLeft-layer.offsetLeft:0,oy=cells.length?cells[0].offsetTop-layer.offsetTop:0;
+      d.style.left=(ox+c.x*sx)+'px';d.style.top=(oy+c.y*sy)+'px';
       const hp=Math.max(0,Math.round(c.hp/c.maxHp*100));d.innerHTML='<div class="hp"><i style="width:'+hp+'%"></i></div><div class="mana"><i style="width:'+Math.min(100,c.mana)+'%"></i></div><img src="'+SPRITE(c.dex)+'"><div class="label">'+c.name+'</div>';layer.appendChild(d)
     });
   }
