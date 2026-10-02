@@ -24,8 +24,8 @@
     .synergy{display:flex;width:100%;align-items:center;justify-content:space-between;padding:9px 10px;margin:6px 0;background:#0a1625;border:1px solid #1d344e;border-radius:11px;font-size:12px;color:var(--text);text-align:left;cursor:pointer}.synergy:hover,.synergy:focus-visible{border-color:#6f91b2;filter:brightness(1.08);outline:none}.synergy.active{border-color:#d9b338;background:#211d0d}.synergy b{font-size:13px}.synergy small{color:var(--muted)}
     .center{min-width:0}.board-wrap{display:flex;flex-direction:column;align-items:center;gap:10px}
     .board{position:relative;display:grid;grid-template-columns:repeat(7,var(--cell));grid-template-rows:repeat(6,var(--cell));gap:4px;padding:8px;border-radius:16px;background:linear-gradient(#4c2c35 0 49.7%,#183b53 50.3% 100%);border:2px solid #42627e;box-shadow:inset 0 0 40px #0008,0 20px 50px #0005;max-width:100%}
-    .cell{border:1px solid #ffffff20;border-radius:9px;background:#ffffff09;position:relative;overflow:hidden}.cell.player-zone{background:#4bb6ff0b}.cell.enemy-zone{background:#ff6b6b08}.cell:hover{outline:2px solid #ffffff42;cursor:pointer}
-    .token{position:absolute;inset:2px;display:flex;align-items:center;justify-content:center;flex-direction:column;border-radius:8px;z-index:2;cursor:pointer;background:linear-gradient(180deg,#1e3550dd,#0b1726ee);border:1px solid #ffffff30}.token.selected{outline:3px solid var(--accent);box-shadow:0 0 18px #f5c54288}.token img{width:72%;height:72%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 4px 4px #0007)}.token .mini{position:absolute;bottom:2px;font-size:9px;background:#050b13dd;border-radius:8px;padding:2px 5px;white-space:nowrap}
+    .cell{border:1px solid #ffffff20;border-radius:9px;background:#ffffff09;position:relative;overflow:hidden}.cell.player-zone{background:#4bb6ff0b}.cell.enemy-zone{background:#ff6b6b08}.cell:hover{outline:2px solid #ffffff42;cursor:pointer}.cell.drag-over,.bench-slot.drag-over{outline:3px solid var(--accent);box-shadow:inset 0 0 18px #f5c54255,0 0 16px #f5c54266}
+    .token{position:absolute;inset:2px;display:flex;align-items:center;justify-content:center;flex-direction:column;border-radius:8px;z-index:2;cursor:grab;background:linear-gradient(180deg,#1e3550dd,#0b1726ee);border:1px solid #ffffff30}.token.dragging{opacity:.48;cursor:grabbing;filter:saturate(.65)}.token.selected{outline:3px solid var(--accent);box-shadow:0 0 18px #f5c54288}.token img{width:72%;height:72%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 4px 4px #0007)}.token .mini{position:absolute;bottom:2px;font-size:9px;background:#050b13dd;border-radius:8px;padding:2px 5px;white-space:nowrap}
     .battle-layer{position:absolute;inset:8px;pointer-events:none;z-index:5}.fighter{position:absolute;width:var(--cell);height:var(--cell);transition:left .22s linear,top .22s linear;display:flex;align-items:center;justify-content:center;flex-direction:column}.fighter img{width:78%;height:70%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 6px 5px #0009)}.fighter.enemy img{transform:scaleX(-1)}.fighter .hp{position:absolute;top:1px;width:86%;height:6px;border-radius:5px;background:#260b0b;overflow:hidden;border:1px solid #000}.fighter .hp i{display:block;height:100%;background:#68df8f}.fighter .mana{position:absolute;top:8px;width:70%;height:3px;border-radius:4px;background:#081a2d;overflow:hidden}.fighter .mana i{display:block;height:100%;background:#5bb7ff}.fighter .label{font-size:8px;background:#08101bdd;padding:1px 4px;border-radius:5px;position:absolute;bottom:0}.fighter.hit{animation:hit .2s}.fighter.cast{animation:cast .35s}.fighter.dead{opacity:0;transform:scale(.3);transition:.35s}
     @keyframes hit{50%{filter:brightness(2);transform:translateX(4px)}}@keyframes cast{50%{filter:drop-shadow(0 0 14px #fff) brightness(1.5);transform:scale(1.12)}}@keyframes dragonAura{50%{filter:drop-shadow(0 0 12px #ffe173) brightness(1.25)}}@keyframes dragonResurgence{50%{transform:scale(1.08);filter:drop-shadow(0 0 18px #fff) brightness(1.5)}}.fighter.dragon-ascended img{animation:dragonAura 1.1s ease-in-out infinite}.fighter.dragon-resurgence img{animation:dragonResurgence .45s ease-in-out infinite}
     .bench{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;width:min(100%,calc(var(--cell)*7 + 40px));background:#0a1625;border:1px solid var(--line);padding:8px;border-radius:14px}.bench-slot{min-height:64px;border:1px dashed #35506c;border-radius:9px;display:flex;align-items:center;justify-content:center;position:relative}.bench-slot .token{position:relative;width:100%;height:62px}.bench-slot .token img{height:48px;width:58px}.bench-slot.empty:after{content:"";width:18px;height:2px;background:#38506a}
@@ -119,7 +119,7 @@
 <div id="typeModal" class="type-modal" role="dialog" aria-modal="true" aria-labelledby="typeModalTitle"><div class="type-modal-card"><div class="type-modal-head"><div><h2 id="typeModalTitle">Tipagem</h2><div id="typeModalCurrent" class="type-current"></div></div><button class="btn" id="typeModalClose" aria-label="Fechar informações da tipagem">Fechar</button></div><div id="typeModalEffects" class="type-effects"></div><div id="typeModalCount" class="subtitle"></div><div id="typeModalCatalog" class="type-catalog"></div></div></div>
 <div id="rulesModal" class="type-modal" role="dialog" aria-modal="true" aria-labelledby="rulesTitle"><div class="type-modal-card"><div class="type-modal-head"><div><h2 id="rulesTitle">Regras do TFTmon</h2><div class="subtitle">Tudo que você precisa saber durante a partida.</div></div><button class="btn" id="rulesClose">Fechar</button></div>
   <div class="modal-section"><h3>🛒 Loja e economia</h3><p>Compre Pokémon, use reroll por 2 ouro e compre 4 XP por 4 ouro. Guardar ouro gera juros de +1 por cada 10, até +5. Sequências de vitória ou derrota dão bônus a partir de 3 resultados iguais.</p></div>
-  <div class="modal-section"><h3>✨ Evolução e campo</h3><p>3 cópias iguais do mesmo estágio evoluem automaticamente. Formas finais não fundem. O limite de Pokémon no campo é igual ao nível do treinador, que vai até 9.</p></div>
+  <div class="modal-section"><h3>✨ Evolução e campo</h3><p>3 cópias iguais do mesmo estágio evoluem automaticamente. Formas finais não fundem. O limite de Pokémon no campo é igual ao nível do treinador, que vai até 9. Para posicionar, você pode clicar no Pokémon e depois no destino ou simplesmente clicar, arrastar e soltar entre o banco e o seu lado do tabuleiro.</p></div>
   <div class="modal-section"><h3>🧩 Sinergias</h3><p>A maioria das tipagens ativa bônus com 3 ou 5 linhas evolutivas diferentes. Dragon é especial: ativa com 1 e alcança Ascensão Dracônica com 4. Repetidos da mesma linha contam uma vez. Toque em qualquer tipagem durante a partida para ver os Pokémon válidos e seus efeitos.</p></div>
   <div class="modal-section"><h3>★★★★ Pokémon especiais</h3><p>Dratini, Larvitar, Gastly, Gible e Beldum são 4★. Eles começam a aparecer no nível 6, podem vir evoluídos e possuem habilidades/passivas exclusivas.</p></div>
   <div class="modal-section"><h3>🎒 Itens</h3><p>Você começa com 2 componentes. Combine 2 componentes para formar equipamentos. Cada Pokémon pode carregar até 3 itens. Bosses podem conceder novos componentes.</p></div>
@@ -475,6 +475,13 @@
     const p=stageData(u),d=document.createElement('div');d.className='token'+(p.special?' special-token':'')+(state.selected&&state.selected.id===u.id?' selected':'');
     d.innerHTML='<img src="'+SPRITE(p.dex)+'" alt="'+p.name+'"><div class="mini">'+(p.special?'<span class="special-stars">★★★★</span> ':'')+p.name+(u.stage?' • E'+(u.stage+1):'')+'</div>';
     if((u.items||[]).length){const icons=document.createElement('span');icons.className='item-icons';icons.textContent=u.items.map(i=>ITEM_DEFS[i.key].icon).join('');d.appendChild(icons)}
+    d.draggable=!state.battle&&!state.gameOver;
+    d.ondragstart=e=>{
+      if(state.battle||state.gameOver){e.preventDefault();return}
+      draggingUnitId=u.id;state.selected={id:u.id,location,index};d.classList.add('dragging');
+      if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(u.id))}
+    };
+    d.ondragend=()=>{draggingUnitId=null;d.classList.remove('dragging')};
     d.onclick=e=>{e.stopPropagation();if(state.battle)return;state.selected={id:u.id,location,index};render()};
     return d;
   }
@@ -482,7 +489,7 @@
     els.board.innerHTML='';
     for(let i=0;i<42;i++){
       const cell=document.createElement('div');cell.className='cell '+(i<21?'enemy-zone':'player-zone');cell.dataset.i=i;
-      if(i>=21)cell.onclick=()=>placeSelected(i);
+      if(i>=21){cell.onclick=()=>placeSelected(i);setDropZone(cell,'board',i)}
       const u=state.board[i]; if(u&&!state.battle)cell.appendChild(createToken(u,'board',i));
       els.board.appendChild(cell);
     }
@@ -491,7 +498,7 @@
   }
   function renderBench(){
     els.bench.innerHTML='';
-    for(let i=0;i<9;i++){const slot=document.createElement('div');slot.className='bench-slot'+(state.bench[i]?'':' empty');if(state.bench[i])slot.appendChild(createToken(state.bench[i],'bench',i));else slot.onclick=()=>returnToBench(i);els.bench.appendChild(slot)}
+    for(let i=0;i<9;i++){const slot=document.createElement('div');slot.className='bench-slot'+(state.bench[i]?'':' empty');setDropZone(slot,'bench',i);if(state.bench[i])slot.appendChild(createToken(state.bench[i],'bench',i));else slot.onclick=()=>returnToBench(i);els.bench.appendChild(slot)}
   }
   function shopOdds(level=state.level){
     if(level<=2)return [70,30,0,0];
@@ -584,6 +591,31 @@
     let i=state.bench.findIndex(u=>u&&u.id===id);if(i>=0)return {location:'bench',index:i,u:state.bench[i]};
     i=state.board.findIndex(u=>u&&u.id===id);if(i>=0)return {location:'board',index:i,u:state.board[i]};return null;
   }
+  let draggingUnitId=null;
+  function moveUnitTo(id,destination,index){
+    if(state.battle||state.gameOver)return false;
+    const source=findUnit(id);if(!source)return false;
+    const destArray=destination==='board'?state.board:destination==='bench'?state.bench:null;
+    if(!destArray||index<0||index>=destArray.length||(destination==='board'&&index<21))return false;
+    if(source.location===destination&&source.index===index)return false;
+    const sourceArray=source.location==='board'?state.board:state.bench,target=destArray[index]||null;
+    if(source.location==='bench'&&destination==='board'&&!target&&fieldCount()>=state.level){
+      toast('Seu nível permite apenas '+state.level+' Pokémon no campo.');return false;
+    }
+    sourceArray[source.index]=target;destArray[index]=source.u;
+    state.selected={id:source.u.id,location:destination,index};render();return true;
+  }
+  function setDropZone(el,destination,index){
+    el.dataset.dropLocation=destination;el.dataset.dropIndex=String(index);
+    el.ondragover=e=>{if(state.battle||state.gameOver||draggingUnitId==null)return;e.preventDefault();if(e.dataTransfer)e.dataTransfer.dropEffect='move';el.classList.add('drag-over')};
+    el.ondragenter=e=>{if(state.battle||state.gameOver||draggingUnitId==null)return;e.preventDefault();el.classList.add('drag-over')};
+    el.ondragleave=()=>el.classList.remove('drag-over');
+    el.ondrop=e=>{
+      e.preventDefault();el.classList.remove('drag-over');
+      const raw=e.dataTransfer?.getData?.('text/plain'),id=raw?Number(raw):draggingUnitId;
+      if(Number.isFinite(id))moveUnitTo(id,destination,index);
+    };
+  }
   function removeById(id){
     let i=state.bench.findIndex(u=>u&&u.id===id);if(i>=0){const u=state.bench[i];state.bench[i]=null;return {u,location:'bench',index:i}}
     i=state.board.findIndex(u=>u&&u.id===id);if(i>=0){const u=state.board[i];state.board[i]=null;return {u,location:'board',index:i}}return null;
@@ -603,21 +635,12 @@
   }
   function placeSelected(i){
     if(state.battle||i<21||!state.selected)return;
-    const f=findUnit(state.selected.id);if(!f)return;
-    const target=state.board[i];
-    if(f.location==='bench'){
-      if(target){state.bench[f.index]=target;state.board[i]=f.u;state.selected={id:f.u.id,location:'board',index:i}}
-      else{if(fieldCount()>=state.level){toast('Seu nível permite apenas '+state.level+' Pokémon no campo.');return}state.bench[f.index]=null;state.board[i]=f.u;state.selected={id:f.u.id,location:'board',index:i}}
-    }else{
-      if(target){state.board[f.index]=target;state.board[i]=f.u}else{state.board[f.index]=null;state.board[i]=f.u}state.selected={id:f.u.id,location:'board',index:i}
-    }
-    render();
+    moveUnitTo(state.selected.id,'board',i);
   }
   function returnToBench(i){
     if(state.battle||state.gameOver||!state.selected||i<0||i>=state.bench.length||state.bench[i])return;
     const f=findUnit(state.selected.id);if(!f||f.location!=='board')return;
-    state.board[f.index]=null;state.bench[i]=f.u;
-    state.selected={id:f.u.id,location:'bench',index:i};render();
+    moveUnitTo(state.selected.id,'bench',i);
   }
   function sellSelected(){
     if(state.battle||state.gameOver||!state.selected)return;const f=findUnit(state.selected.id);if(!f)return;const val=unitPrice(f.u.line,f.u.stage);state.inventory.push(...(f.u.items||[]));clearItemSelection();removeById(f.u.id);state.gold+=val;log('Vendido por '+val+' ouro.');state.selected=null;render();
