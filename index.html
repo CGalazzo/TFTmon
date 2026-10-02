@@ -148,7 +148,7 @@
       const read=paths=>Promise.all(paths.map(p=>fetch(p,{cache:'force-cache'}).then(r=>{if(!r.ok)throw new Error('asset '+p);return r.text()}))).then(parts=>parts.join('').replace(/\s/g,''));
       const [bg,logo]=await Promise.all([
         read(['assets/tftmon-bg-1.b64','assets/tftmon-bg-2.b64','assets/tftmon-bg-3.b64']),
-        read(['assets/tftmon-logo-1.b64','assets/tftmon-logo-2.b64'])
+        read(['assets/tftmon-logo-1.b64','assets/tftmon-logo-2.b64','assets/tftmon-logo-3.b64','assets/tftmon-logo-4.b64','assets/tftmon-logo-5.b64','assets/tftmon-logo-6.b64','assets/tftmon-logo-7.b64'])
       ]);
       const root=document.documentElement.style,bgUrl='url("data:image/webp;base64,'+bg+'")',logoUrl='url("data:image/webp;base64,'+logo+'")';
       root.setProperty('--start-bg-image',bgUrl);root.setProperty('--game-bg-image',bgUrl);root.setProperty('--logo-image',logoUrl);
@@ -156,6 +156,8 @@
       return true;
     }catch(e){return false}
   }
+  loadVisualAssets();
+
   const TYPE_INFO = {
     Fire:{icon:'🔥',levels:[3,5],desc:['+15% ATK','+30% ATK; habilidades queimam 6% HP em 3s']},
     Water:{icon:'💧',levels:[3,5],desc:['+20% HP','+35% HP; cura 2% HP a cada 3s']},
