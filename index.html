@@ -3519,10 +3519,10 @@
     const preview=state.battle?null:ensureEnemyPreview();
     if(bossKey){
       const d=BOSS_DEFS[bossKey];el.classList.add('boss');
-      el.innerHTML='<b>👑 Etapa '+state.round+' • '+(d.count>1?d.count+'× ':'')+d.name+'</b> • formação visível no tabuleiro';el.title='Boss: vitória = 2 componentes; remover pelo menos 50% do HP = 1 componente.';
+      el.innerHTML='<b>👑 Etapa '+state.round+' • '+(d.count>1?d.count+'× ':'')+d.name+'</b>';el.title='Boss: vitória = 2 componentes; remover pelo menos 50% do HP = 1 componente.';
     }else{
       const count=preview?.units?.length||difficultyProfile(state.round).count;el.classList.remove('boss');
-      el.innerHTML='<b>Etapa '+state.round+'</b> • '+count+' inimigo'+(count===1?'':'s')+' • formação visível no tabuleiro';el.title='A composição e as posições inimigas ficam travadas durante a preparação.';
+      el.innerHTML='<b>Etapa '+state.round+'</b> • '+count+' inimigo'+(count===1?'':'s');el.title='A composição e as posições inimigas ficam travadas durante a preparação.';
     }
   }
   function renderBattleTimer(forceSeconds=null){
