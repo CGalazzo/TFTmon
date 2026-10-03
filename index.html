@@ -2768,6 +2768,70 @@
     }
     #gameApp .battle-timer.urgent b{color:#ffb08d}
 
+
+    /* ===== TFTMON LOCKED ENEMY FORMATION PREVIEW ===== */
+    #gameApp .enemy-preview-token{
+      position:absolute;
+      inset:3px;
+      z-index:3;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      user-select:none;
+      opacity:.9;
+      filter:saturate(.92);
+    }
+    #gameApp .enemy-preview-token::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:8px;
+      width:70%;
+      height:18%;
+      transform:translateX(-50%);
+      border-radius:50%;
+      border:1px solid #ff9d785e;
+      background:radial-gradient(ellipse,#ff815d24 0,#b83d2910 45%,transparent 74%);
+      box-shadow:0 0 9px #ff70402b;
+      z-index:-1;
+    }
+    #gameApp .enemy-preview-token img{
+      width:96%;
+      height:88%;
+      object-fit:contain;
+      object-position:center bottom;
+      image-rendering:pixelated;
+      transform:translateY(-4px) scaleX(-1);
+      filter:drop-shadow(0 5px 4px #0008);
+    }
+    #gameApp .enemy-preview-name{
+      position:absolute;
+      left:50%;
+      bottom:-1px;
+      max-width:96%;
+      transform:translateX(-50%);
+      padding:1px 4px;
+      border-radius:5px;
+      background:#160d0bcf;
+      color:#ffe8df;
+      font-size:9px;
+      line-height:1.15;
+      font-weight:900;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      box-shadow:0 1px 4px #0007;
+    }
+    #gameApp .enemy-preview-token.boss-preview img{
+      width:108%;
+      height:94%;
+    }
+    @media(max-width:700px){
+      #gameApp .enemy-preview-name{font-size:7px;padding:1px 3px}
+      #gameApp .enemy-preview-token img{width:100%;height:90%}
+    }
+
   </style>
 </head>
 <body>
@@ -3024,7 +3088,7 @@
 
   const state = {
     round:1,maxRounds:25,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,
-    bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss(),shopLocked:false,lastBattleSummary:null,runStats:{wins:0,losses:0,specialSeen:[],specialBought:[]}
+    bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,enemyPreview:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss(),shopLocked:false,lastBattleSummary:null,runStats:{wins:0,losses:0,specialSeen:[],specialBought:[]}
   };
 
   const $ = s => document.querySelector(s);
@@ -3223,11 +3287,21 @@
     d.onclick=e=>{e.stopPropagation();if(state.battle)return;state.selected={id:u.id,location,index};render()};
     return d;
   }
+  function createEnemyPreviewToken(c){
+    const d=document.createElement('div');d.className='enemy-preview-token'+(c.boss?' boss-preview':'');
+    d.innerHTML='<img src="'+SPRITE(c.dex)+'" alt="'+c.name+'"><div class="enemy-preview-name">'+c.name+'</div>';
+    d.title=c.name;return d;
+  }
   function renderBoard(){
     els.board.classList.toggle('in-battle',!!state.battle);els.board.innerHTML='';
+    const preview=!state.battle&&!state.gameOver?ensureEnemyPreview():null;
     for(let i=0;i<42;i++){
       const cell=document.createElement('div');cell.className='cell '+(i<21?'enemy-zone':'player-zone');cell.dataset.i=i;
       if(i>=21){cell.onclick=()=>placeSelected(i);setDropZone(cell,'board',i)}
+      if(i<21&&preview){
+        const enemy=preview.units.find(x=>!x.dead&&x.x===i%7&&x.y===Math.floor(i/7));
+        if(enemy)cell.appendChild(createEnemyPreviewToken(enemy));
+      }
       const u=state.board[i]; if(u&&!state.battle)cell.appendChild(createToken(u,'board',i));
       els.board.appendChild(cell);
     }
@@ -3442,13 +3516,13 @@
   function renderBattlePreview(){
     const el=$('#nextBattlePreview'),bossKey=bossKeyForRound(state.round,state.legendaryBoss);el.dataset.boss=bossKey||'';
     if(state.gameOver){el.textContent='Partida encerrada.';el.classList.remove('boss');el.dataset.boss='';return}
+    const preview=state.battle?null:ensureEnemyPreview();
     if(bossKey){
       const d=BOSS_DEFS[bossKey];el.classList.add('boss');
-      el.innerHTML='<b>👑 Etapa '+state.round+' • '+(d.count>1?d.count+'× ':'')+d.name+'</b>';el.title='Boss: vitória = 2 componentes; remover pelo menos 50% do HP = 1 componente.';
+      el.innerHTML='<b>👑 Etapa '+state.round+' • '+(d.count>1?d.count+'× ':'')+d.name+'</b> • formação visível no tabuleiro';el.title='Boss: vitória = 2 componentes; remover pelo menos 50% do HP = 1 componente.';
     }else{
-      const p=difficultyProfile(state.round);el.classList.remove('boss');
-      const synergy=p.synergy>=5?'Sinergia 5':p.synergy>=3?'Sinergia 3':'Composição simples';
-      el.innerHTML='<b>Etapa '+state.round+'</b> • '+p.count+' inimigo'+(p.count===1?'':'s')+' • '+synergy;el.title='Preview da próxima batalha.';
+      const count=preview?.units?.length||difficultyProfile(state.round).count;el.classList.remove('boss');
+      el.innerHTML='<b>Etapa '+state.round+'</b> • '+count+' inimigo'+(count===1?'':'s')+' • formação visível no tabuleiro';el.title='A composição e as posições inimigas ficam travadas durante a preparação.';
     }
   }
   function renderBattleTimer(forceSeconds=null){
@@ -3514,16 +3588,24 @@
       effects:{},rootUntil:0,hasCast:false,nextRegenAt:3000,summoned:false,boss:true,bossKey:key,dead:false,itemBonus:{atk:0,hp:0,def:0,speed:0,power:0,regen:0,shield:0,basicLeech:0,abilityLeech:0,manaOnAttack:0}};
   }
   function generateBossEnemy(key){const d=BOSS_DEFS[key];return Array.from({length:d.count},(_,i)=>makeBossCombatant(key,i))}
+  function ensureEnemyPreview(){
+    const bossKey=bossKeyForRound(state.round,state.legendaryBoss);
+    if(state.enemyPreview&&state.enemyPreview.round===state.round&&state.enemyPreview.bossKey===bossKey)return state.enemyPreview;
+    const units=bossKey?generateBossEnemy(bossKey):generateEnemy();
+    state.enemyPreview={round:state.round,bossKey,units};
+    return state.enemyPreview;
+  }
   function startBattle(){
     if(state.battle||state.gameOver||fieldCount()===0)return;
     if(state.rewardChoices){$('#itemRewards').scrollIntoView?.({behavior:'smooth',block:'center'});toast('Escolha seu pacote de componentes antes da batalha.');return}
     if(state.pendingCombine){$('#itemPreview').scrollIntoView?.({behavior:'smooth',block:'center'});toast('Confirme ou cancele a combinação antes da batalha.');return}
     clearItemSelection();state.selected=null;state.battle=true;
     const player=[];state.board.forEach((u,i)=>{if(u)player.push(makeCombatant(u,'player',i%7,Math.floor(i/7)))});
-    const bossKey=bossKeyForRound(state.round,state.legendaryBoss),enemy=bossKey?generateBossEnemy(bossKey):generateEnemy(),pb=synergyBonuses(player),eb=synergyBonuses(enemy);
+    const preview=ensureEnemyPreview(),bossKey=preview.bossKey,enemy=preview.units,pb=synergyBonuses(player),eb=synergyBonuses(enemy);
     for(const c of player)applyBonus(c,pb);for(const c of enemy)applyBonus(c,eb);
     const battleStart=Date.now();
     state.combat={units:[...player,...enemy],ticks:0,elapsedMs:0,timer:null,timeoutId:null,startedAt:battleStart,deadline:battleStart+COMBAT_LIMIT_MS,bossKey,bossInitialHp:enemy.filter(c=>c.boss).reduce((s,c)=>s+c.maxHp,0),enemyInitialHp:enemy.reduce((s,c)=>s+c.maxHp,0)};
+    state.enemyPreview=null;
     if(pb.Electric===2)summonZapdos('player');
     if(!bossKey&&eb.Electric===2)summonZapdos('enemy');
     if(pb.Dragon===2)log('🐉 Ascensão Dracônica ativada! Seus 4 Dragons despertaram poder máximo.','win');
@@ -3883,7 +3965,7 @@
     state.xp+=2;levelCheck();
     if(state.hp<=0){state.hp=0;state.gameOver=true;toast('Fim de jogo na etapa '+state.round+'.');log('☠️ Sua jornada terminou.','loss');render();showFinalSummary();return}
     if(state.round>=state.maxRounds){state.gameOver=true;toast(win?'🏆 Você venceu o TFTmon!':'Fim da jornada.');log(win?'🏆 TFTmon concluído!':'Jornada concluída.');render();showFinalSummary();return}
-    state.round++;prepareItemRewards();rollShop(true);render();
+    state.round++;state.enemyPreview=null;prepareItemRewards();rollShop(true);render();
   }
   function openRules(){$('#rulesModal').classList.add('open')}
   function closeRules(){$('#rulesModal').classList.remove('open')}
@@ -3895,7 +3977,7 @@
     $('#startScreen').style.display='none';$('#gameApp').classList.remove('game-hidden');render();
   }
   function reset(){
-    clearInterval(state.combat?.timer);clearTimeout(state.combat?.timeoutId);closeFinalSummary();Object.assign(state,{round:1,maxRounds:25,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss(),shopLocked:false,lastBattleSummary:null,runStats:{wins:0,losses:0,specialSeen:[],specialBought:[]}});
+    clearInterval(state.combat?.timer);clearTimeout(state.combat?.timeoutId);closeFinalSummary();Object.assign(state,{round:1,maxRounds:25,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,enemyPreview:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss(),shopLocked:false,lastBattleSummary:null,runStats:{wins:0,losses:0,specialSeen:[],specialBought:[]}});
     els.log.innerHTML='';prepareItemRewards();rollShop(true);log('Bem-vindo ao TFTmon. Nível máximo 9 e Pokémon especiais 4★ liberados a partir do nível 6.');render();
   }
   $('#rerollBtn').onclick=()=>rollShop(false);$('#xpBtn').onclick=buyXP;$('#sellBtn').onclick=sellSelected;$('#battleBtn').onclick=()=>{if(state.gameOver)reset();else startBattle()};$('#lockShopBtn').onclick=toggleShopLock;$('#shopInfoBtn').onclick=openShopInfo;$('#rulesBtn').onclick=openRules;$('#backpackBtn').onclick=openBackpack;$('#historyBtn').onclick=openHistory;$('#startGameBtn').onclick=startGame;$('#startRulesBtn').onclick=openRules;
