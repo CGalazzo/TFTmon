@@ -3592,13 +3592,44 @@
     log('⚡ '+(side==='player'?'Seu time':'O rival')+' invocou Zapdos com 5 linhas Elétricas!');
   }
   function dist(a,b){return Math.abs(a.x-b.x)+Math.abs(a.y-b.y)}
+  function roleHas(c,role){return String(c?.role||'').split('/').includes(role)}
   function nearest(c,foes){return foes.filter(x=>!x.dead).slice().sort((a,b)=>dist(c,a)-dist(c,b)||a.hp-b.hp)[0]}
+  function combatRange(c){
+    if(roleHas(c,'Suporte'))return 5;
+    if(roleHas(c,'Mago'))return 4;
+    return c.range;
+  }
+  function targetForRole(c,foes){
+    const live=foes.filter(x=>!x.dead);if(!live.length)return null;
+    if(roleHas(c,'Assassino')){
+      return live.slice().sort((a,b)=>a.maxHp-b.maxHp||a.hp-b.hp||dist(c,a)-dist(c,b))[0];
+    }
+    if(roleHas(c,'Tanque')&&c.lastAttackerCid){
+      const aggressor=live.find(x=>x.cid===c.lastAttackerCid);if(aggressor)return aggressor;
+    }
+    return nearest(c,live);
+  }
+  function nearestAlly(c,allies){
+    return allies.filter(x=>!x.dead&&x!==c).slice().sort((a,b)=>dist(c,a)-dist(c,b)||a.hp-b.hp)[0]||null;
+  }
   function occupied(x,y,ignore){return state.combat.units.some(c=>!c.dead&&c!==ignore&&c.x===x&&c.y===y)}
   function moveToward(c,t){
-    if(c.rootUntil>(state.combat?.elapsedMs||0))return;
+    if(c.rootUntil>(state.combat?.elapsedMs||0)||!t)return;
     const opts=[];const dx=t.x-c.x,dy=t.y-c.y;if(dx)opts.push([c.x+Math.sign(dx),c.y]);if(dy)opts.push([c.x,c.y+Math.sign(dy)]);
     if(dy)opts.push([c.x+1,c.y],[c.x-1,c.y]);if(dx)opts.push([c.x,c.y+1],[c.x,c.y-1]);
     for(const [x,y] of opts){if(x>=0&&x<7&&y>=0&&y<6&&!occupied(x,y,c)){c.x=x;c.y=y;return}}
+  }
+  function moveSupport(c,allies,target){
+    if(c.rootUntil>(state.combat?.elapsedMs||0))return;
+    const anchor=nearestAlly(c,allies);
+    if(!anchor){moveToward(c,target);return}
+    if(dist(c,anchor)>1){moveToward(c,anchor);return}
+    if(!target||dist(c,target)<=5)return;
+    const steps=[[1,0],[-1,0],[0,1],[0,-1]]
+      .map(([dx,dy])=>({x:c.x+dx,y:c.y+dy}))
+      .filter(p=>p.x>=0&&p.x<7&&p.y>=0&&p.y<6&&!occupied(p.x,p.y,c)&&dist(p,anchor)<=2)
+      .sort((a,b)=>dist(a,target)-dist(b,target)||dist(a,anchor)-dist(b,anchor));
+    const next=steps[0];if(next&&dist(next,target)<dist(c,target)){c.x=next.x;c.y=next.y}
   }
   function fxTypeFor(c,kind=''){
     if(kind==='heal')return 'heal';if(kind==='shield')return 'shield';if(kind==='blizzard')return 'ice';if(kind==='meteorMash')return 'steel';
@@ -3713,6 +3744,7 @@
   // Types activate traits only: no effectiveness, resistance or type immunity multipliers.
   function damage(att,t,amount,kind='ability'){
     if(t.dead)return;
+    if(att?.cid&&att.side!==t.side)t.lastAttackerCid=att.cid;
     if(kind==='basic'&&Math.random()<(t.bonus?.dodge||0)){fxFloat(t,'ESQUIVA','dodge');fxRing(t,'flying');return}
     const shieldBefore=t.shield||0,dealt=takeDamage(t,Math.max(1,Math.round(amount-t.def*.32)));t.mana=Math.min(100,t.mana+12);
     if(dealt>0)fxFloat(t,'-'+Math.round(dealt),'damage');else if(shieldBefore>(t.shield||0))fxFloat(t,'ESCUDO','shield');
@@ -3729,7 +3761,7 @@
   function cast(c,foes,allies){
     const a=c.ability,now=state.combat?.elapsedMs||0;
     let t=a.kind==='dragonRush'?foes.filter(x=>!x.dead).slice().sort((x,y)=>dist(c,y)-dist(c,x))[0]:
-      a.kind==='shadowBall'?foes.filter(x=>!x.dead).slice().sort((x,y)=>(x.hp/x.maxHp)-(y.hp/y.maxHp))[0]:nearest(c,foes);
+      a.kind==='shadowBall'?foes.filter(x=>!x.dead).slice().sort((x,y)=>(x.hp/x.maxHp)-(y.hp/y.maxHp))[0]:targetForRole(c,foes);
     if(!t)return;
     c.mana=0;flash(c.cid,'cast');const power=c.bonus?.power||1;
     if(c.bonus?.root&&!c.hasCast){applyRoot(t,1500);fxRing(t,'grass')}
@@ -3784,7 +3816,12 @@
       let actionSpeed=c.speed*(1-(c.sandSlow||0));if(c.chillUntil>state.combat.elapsedMs)actionSpeed*=1-(c.chill||0);if(c.speedBoostUntil>state.combat.elapsedMs)actionSpeed*=1+(c.speedBoost||0);
       c.meter+=actionSpeed/3.2;if(c.meter<100)continue;c.meter-=100;
       const foes=c.side==='player'?aliveE:aliveP,allies=c.side==='player'?aliveP:aliveE;if(!foes.length)continue;
-      const t=nearest(c,foes);if(!t)continue;if(c.mana>=100)cast(c,foes,allies);else if(dist(c,t)<=c.range)normalAttack(c,t);else moveToward(c,t);
+      const t=targetForRole(c,foes);if(!t)continue;
+      const range=combatRange(c);
+      if(c.mana>=100)cast(c,foes,allies);
+      else if(dist(c,t)<=range)normalAttack(c,t);
+      else if(roleHas(c,'Suporte'))moveSupport(c,allies,t);
+      else moveToward(c,t);
     }
     renderCombat();
   }
