@@ -2407,6 +2407,63 @@
       }
     }
 
+
+    /* ===== TFTMON SHOP ECONOMY HUD — gold and XP beside shop title ===== */
+    #gameApp .shop-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+      flex-wrap:wrap;
+    }
+    #gameApp .shop-title-block{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-width:150px;
+    }
+    #gameApp .shop-title-block h2{
+      margin:0;
+    }
+    #gameApp .shop-title-block #shopOddsText{
+      margin-top:4px;
+    }
+    #gameApp .shop-economy-stats{
+      display:flex;
+      align-items:stretch;
+      gap:8px;
+      margin-right:auto;
+    }
+    #gameApp .shop-economy-stats .shop-stat{
+      min-width:88px;
+      padding:7px 10px;
+      border-radius:11px;
+    }
+    #gameApp .shop-economy-stats .shop-xp-stat{
+      min-width:104px;
+    }
+    #gameApp .shop-economy-stats .shop-stat b{
+      font-size:18px;
+    }
+    #gameApp .shop-economy-stats .shop-stat span{
+      font-size:11px;
+    }
+    @media(max-width:900px){
+      #gameApp .shop-head{
+        align-items:flex-start;
+      }
+      #gameApp .shop-economy-stats{
+        order:2;
+        width:100%;
+        margin-right:0;
+      }
+      #gameApp .shop-actions{
+        order:3;
+        width:100%;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2436,8 +2493,6 @@
     <div class="stats">
       <div class="stat"><span>Rodada</span><b id="roundStat">1/25</b></div>
       <div class="stat"><span>HP</span><b id="hpStat">100</b></div>
-      <div class="stat"><span>Ouro</span><b id="goldStat">10</b></div>
-      <div class="stat"><span>Nível</span><b id="levelStat">2</b><small id="xpStat">0/8 XP</small><div class="progress" id="xpProgress" role="progressbar" aria-label="Experiência para o próximo nível" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i id="xpFill" style="width:0%"></i></div></div>
       <div class="stat"><span>Campo</span><b id="fieldStat">0/2</b></div>
     </div>
   </header>
@@ -2479,8 +2534,12 @@
   </div>
 
   <section class="panel shop">
-    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
-      <div><h2 style="margin:0">Loja Pokémon</h2><div class="subtitle" id="shopOddsText" style="margin-top:4px"></div></div>
+    <div class="shop-head">
+      <div class="shop-title-block"><h2>Loja Pokémon</h2><div class="subtitle" id="shopOddsText"></div></div>
+      <div class="shop-economy-stats">
+        <div class="stat shop-stat"><span>Ouro</span><b id="goldStat">10</b></div>
+        <div class="stat shop-stat shop-xp-stat"><span>Nível</span><b id="levelStat">2</b><small id="xpStat">0/8 XP</small><div class="progress" id="xpProgress" role="progressbar" aria-label="Experiência para o próximo nível" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i id="xpFill" style="width:0%"></i></div></div>
+      </div>
       <div class="shop-actions"><button class="btn" id="shopInfoBtn">Chances da loja</button><button class="btn" id="lockShopBtn">🔓 Travar loja</button><button class="btn" id="rerollBtn">Reroll • 2 ouro</button></div>
     </div>
     <div id="shop" class="shop-grid"></div>
