@@ -2154,6 +2154,134 @@
     #typeModalTitle{display:flex;align-items:center;gap:9px}
     #typeModalTitle .type-art{width:38px;height:38px;padding:3px;box-sizing:border-box;background-origin:content-box;background-clip:content-box}
 
+
+    /* ===== TFTMON SYNERGIES — approved card layout ===== */
+    #gameApp #synergies{
+      display:flex;
+      flex-direction:column;
+      gap:7px;
+      margin-top:9px;
+    }
+    #gameApp .synergy{
+      position:relative;
+      display:grid;
+      grid-template-columns:48px minmax(0,1fr) 22px;
+      align-items:center;
+      gap:8px;
+      width:100%;
+      min-height:66px;
+      margin:0;
+      padding:7px 8px;
+      overflow:visible;
+      border:1px solid rgba(94,190,230,.22);
+      border-radius:10px;
+      background:linear-gradient(180deg,rgba(8,31,47,.84),rgba(6,23,36,.78));
+      box-shadow:inset 2px 0 0 rgba(64,207,239,.35),inset 0 1px 0 rgba(255,255,255,.04);
+      transition:transform .16s,border-color .16s,background .16s;
+    }
+    #gameApp .synergy::before{display:none}
+    #gameApp .synergy:hover{
+      transform:translateX(1px);
+      border-color:rgba(92,211,245,.42);
+      background:linear-gradient(180deg,rgba(9,38,57,.91),rgba(7,27,41,.86));
+      box-shadow:inset 2px 0 0 rgba(76,218,250,.5),inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    #gameApp .synergy.active{
+      border-color:rgba(228,192,71,.38);
+      background:linear-gradient(180deg,rgba(14,43,54,.91),rgba(18,38,28,.86));
+      box-shadow:inset 2px 0 0 rgba(242,203,77,.58),inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    #gameApp .synergy-iconbox{
+      width:48px;
+      height:48px;
+      display:grid;
+      place-items:center;
+      border-radius:10px;
+      border:1px solid rgba(82,190,230,.34);
+      background:linear-gradient(180deg,rgba(7,31,48,.94),rgba(5,22,34,.94));
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+      overflow:hidden;
+    }
+    #gameApp .synergy .type-art{
+      --art-size:38px;
+      width:38px!important;
+      height:38px!important;
+      min-width:38px;
+      padding:0!important;
+      margin:0!important;
+      box-sizing:border-box;
+      background-image:var(--option-a-icons)!important;
+      background-repeat:no-repeat!important;
+      background-size:500% 400%!important;
+      background-origin:border-box!important;
+      background-clip:border-box!important;
+      flex:none;
+      transform:none!important;
+      filter:none!important;
+    }
+    #gameApp .synergy.active .type-art{transform:none!important}
+    #gameApp .synergy-copy{
+      min-width:0;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:flex-start;
+      gap:1px;
+      text-align:left;
+      line-height:1.08;
+    }
+    #gameApp .synergy-copy b{
+      display:block;
+      margin:0 0 2px;
+      font-size:14px;
+      font-weight:900;
+      color:#f5fbff;
+      white-space:nowrap;
+    }
+    #gameApp .synergy-copy small{
+      display:block;
+      margin:0;
+      font-size:10px;
+      line-height:1.15;
+      font-weight:700;
+      color:#b8d2e2;
+      white-space:nowrap;
+    }
+    #gameApp .synergy-next{
+      display:block;
+      margin-top:1px;
+      font-size:13px;
+      line-height:1;
+      font-weight:900;
+      color:#d8ebf5;
+    }
+    #gameApp .synergy-count{
+      align-self:center;
+      justify-self:end;
+      min-width:18px;
+      padding:0;
+      text-align:right;
+      font-size:18px;
+      line-height:1;
+      font-weight:1000;
+      color:#fff;
+      text-shadow:none;
+    }
+    @media(max-width:1240px){
+      #gameApp .synergy{
+        grid-template-columns:44px minmax(0,1fr) 18px;
+        min-height:62px;
+        gap:7px;
+        padding:6px 7px;
+      }
+      #gameApp .synergy-iconbox{width:44px;height:44px}
+      #gameApp .synergy .type-art{width:35px!important;height:35px!important;min-width:35px}
+      #gameApp .synergy-copy b{font-size:13px}
+      #gameApp .synergy-copy small{font-size:9px}
+      #gameApp .synergy-next{font-size:12px}
+      #gameApp .synergy-count{font-size:17px}
+    }
+
   </style>
 </head>
 <body>
@@ -2639,7 +2767,7 @@
       const next=tier>=inf.levels.length?'MAX':inf.levels[tier];
       d.title='Clique para ver Pokémon disponíveis e bônus de '+inf.levels.join('/')+'.';
       d.setAttribute('aria-label',t+': '+c[t]+' linhas ativas. Abrir detalhes.');
-      d.innerHTML=typeArt(t)+'<span class="synergy-copy"><b>'+t+'</b><br><small>'+c[t]+' linhas • '+(tier?inf.desc[tier-1]:'próximo: '+next)+'</small></span><strong>'+c[t]+'</strong>';
+      d.innerHTML='<span class="synergy-iconbox">'+typeArt(t)+'</span><span class="synergy-copy"><b>'+t+'</b><small>'+c[t]+' linhas • próximo:</small><span class="synergy-next">'+next+'</span></span><strong class="synergy-count">'+c[t]+'</strong>';
       d.onclick=()=>openTypeInfo(t);els.synergies.appendChild(d);
     });
   }
