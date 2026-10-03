@@ -944,6 +944,217 @@
       #gameApp .fighter img{width:92%;height:80%}
     }
 
+
+    /* ===== TFTMON SCENARIO HUD — approved immersive panel pass ===== */
+    #gameApp .panel{
+      border:0;
+      border-radius:0;
+      background:transparent;
+      box-shadow:none;
+    }
+
+    /* Main arena no longer sits inside a blue rectangle. */
+    #gameApp .center{
+      position:relative;
+      overflow:visible;
+      padding:10px 8px 13px;
+      border:0;
+      border-radius:0;
+      background:
+        radial-gradient(ellipse at 50% 47%,#0acfff12 0,transparent 58%),
+        linear-gradient(90deg,transparent,#0209123d 16%,#02091252 50%,#0209123d 84%,transparent);
+      box-shadow:none;
+    }
+    #gameApp .center::before{
+      content:"";
+      position:absolute;
+      z-index:-1;
+      inset:-24px -34px -18px;
+      pointer-events:none;
+      background:
+        radial-gradient(ellipse at 50% 42%,#0cdfff0d,transparent 56%),
+        radial-gradient(ellipse at 50% 82%,#0009,transparent 66%);
+      filter:blur(9px);
+    }
+
+    /* Side information fades into the scene instead of using framed panels. */
+    #gameApp .side-left,#gameApp .side-right{
+      border:0;
+      border-radius:0;
+      box-shadow:none;
+      backdrop-filter:blur(2px);
+      -webkit-backdrop-filter:blur(2px);
+    }
+    #gameApp .side-left{
+      background:
+        radial-gradient(ellipse at 0 22%,#13d9ff0d,transparent 62%),
+        linear-gradient(90deg,#030b13b8 0,#06111d91 48%,transparent 100%);
+    }
+    #gameApp .side-right{
+      background:
+        radial-gradient(ellipse at 100% 20%,#ffc0440d,transparent 62%),
+        linear-gradient(270deg,#030b13b8 0,#06111d91 48%,transparent 100%);
+    }
+    #gameApp .side-left::before,#gameApp .side-right::before{
+      left:5%;
+      right:5%;
+      height:1px;
+      opacity:.55;
+      filter:blur(.2px);
+    }
+    #gameApp .side-left h2,#gameApp .side-right h2{
+      padding-bottom:7px;
+      margin-bottom:7px;
+      border-bottom:1px solid #ffffff0e;
+    }
+
+    /* Synergies become floating HUD strips. */
+    #gameApp .synergy{
+      margin:4px 0;
+      padding:9px 9px 9px 11px;
+      border:0;
+      border-radius:4px 12px 12px 4px;
+      background:linear-gradient(90deg,#07131fc9 0,#07131f79 70%,transparent 100%);
+      box-shadow:none;
+    }
+    #gameApp .synergy::before{
+      width:2px;
+      background:#427085;
+      box-shadow:0 0 7px #28dfff24;
+    }
+    #gameApp .synergy:hover{
+      border:0;
+      background:linear-gradient(90deg,#0b2533dc 0,#09202ca1 68%,transparent 100%);
+      box-shadow:none;
+    }
+    #gameApp .synergy.active{
+      border:0;
+      background:linear-gradient(90deg,#183126d6 0,#1426179d 68%,transparent 100%);
+      box-shadow:inset 18px 0 28px #f5c5420b;
+    }
+    #gameApp .synergy.active::before{
+      width:3px;
+      background:linear-gradient(180deg,var(--ui-gold),var(--ui-cyan));
+      box-shadow:0 0 10px #f5c54255;
+    }
+
+    /* Selected Pokémon behaves like a projected card rather than a framed box. */
+    #gameApp .side-right .selected-box{
+      border:0;
+      border-radius:4px 14px 14px 4px;
+      background:
+        radial-gradient(circle at 32% 8%,#27dfff16,transparent 42%),
+        linear-gradient(90deg,#06111dc7 0,#07152292 68%,transparent 100%);
+      box-shadow:inset 2px 0 #ffc54a4d;
+    }
+    #gameApp .detail-row{
+      border:0;
+      border-radius:7px;
+      background:linear-gradient(90deg,#020912b8,#06111d70);
+      box-shadow:inset 2px 0 #27cfff1c;
+    }
+
+    /* Preparation controls float under the arena. */
+    #gameApp .controls{
+      border:0;
+      border-radius:0;
+      background:linear-gradient(90deg,transparent,#020912a8 15%,#020912bd 50%,#020912a8 85%,transparent);
+      box-shadow:none;
+      padding:9px 18px;
+    }
+
+    /* Shop becomes an integrated lower dock with fading edges. */
+    #gameApp .shop{
+      position:relative;
+      isolation:isolate;
+      margin-top:10px;
+      padding:14px 18px 17px;
+      border:0;
+      border-radius:0;
+      background:
+        radial-gradient(ellipse at 50% 0,#23dfff12 0,transparent 50%),
+        linear-gradient(90deg,transparent 0,#020a12bd 10%,#06111ddb 28%,#06111ddb 72%,#020a12bd 90%,transparent 100%);
+      box-shadow:none;
+    }
+    #gameApp .shop::before{
+      content:"";
+      position:absolute;
+      z-index:-1;
+      left:7%;
+      right:7%;
+      top:0;
+      height:1px;
+      background:linear-gradient(90deg,transparent,#2bdfff87,#ffe26a7a,transparent);
+      box-shadow:0 0 12px #23dfff33;
+    }
+    #gameApp .shop::after{
+      content:"";
+      position:absolute;
+      z-index:-1;
+      left:10%;
+      right:10%;
+      bottom:-8px;
+      height:22px;
+      background:radial-gradient(ellipse,#000a,transparent 68%);
+      filter:blur(7px);
+      pointer-events:none;
+    }
+
+    /* Pokémon offers keep contrast, but lose the blue framed-card look. */
+    #gameApp .card{
+      border:0;
+      border-radius:8px 8px 13px 13px;
+      clip-path:polygon(7% 0,93% 0,100% 8%,100% 100%,0 100%,0 8%);
+      background:
+        radial-gradient(circle at 50% 27%,#22dfff14,transparent 43%),
+        linear-gradient(180deg,#102638e8,#06111de8);
+      box-shadow:0 10px 20px #0008,inset 0 1px #ffffff12,inset 0 -2px #0009;
+    }
+    #gameApp .card::before{
+      left:14%;
+      right:14%;
+      height:1px;
+      opacity:.65;
+    }
+    #gameApp .card:hover{
+      border:0;
+      transform:translateY(-3px);
+      background:
+        radial-gradient(circle at 50% 27%,#38e5ff20,transparent 46%),
+        linear-gradient(180deg,#153046ef,#07131eef);
+      box-shadow:0 14px 27px #000a,0 0 15px #22dfff13,inset 0 1px #ffffff1b;
+    }
+    #gameApp .card.rarity-1{border:0;box-shadow:0 10px 20px #0008,inset 0 2px #aeb8c25c}
+    #gameApp .card.rarity-2{border:0;box-shadow:0 10px 20px #0008,inset 0 2px #58c9788a,inset 0 0 20px #38c9820c}
+    #gameApp .card.rarity-3{border:0;box-shadow:0 10px 20px #0008,inset 0 2px #55a8ff9c,inset 0 0 22px #3f9eff10}
+    #gameApp .card.rarity-4{
+      border:0;
+      box-shadow:0 0 21px #ffd65a32,0 11px 23px #0009,inset 0 2px #ffd65ac7,inset 0 0 25px #ffd65a12;
+    }
+
+    /* Preview/summary remain readable, but their edges dissolve into the arena. */
+    #gameApp .battle-preview,#gameApp .battle-summary{
+      border-left:0;
+      border-right:0;
+      border-radius:7px;
+      background:linear-gradient(90deg,transparent,#06131fdf 12%,#0a2231e6 50%,#06131fdf 88%,transparent);
+      box-shadow:none;
+    }
+    #gameApp .battle-preview.boss{
+      background:linear-gradient(90deg,transparent,#201308d9 12%,#42270ce3 50%,#201308d9 88%,transparent);
+      box-shadow:0 0 20px #ff8b1d16;
+    }
+
+    @media(max-width:1050px){
+      #gameApp .side-left,#gameApp .side-right{
+        background:linear-gradient(180deg,#030b1399,#06111d6b 72%,transparent);
+        border-radius:12px;
+      }
+      #gameApp .shop{
+        background:linear-gradient(180deg,#04101bc9,#06111ddb 82%,transparent);
+      }
+    }
+
   </style>
 </head>
 <body>
