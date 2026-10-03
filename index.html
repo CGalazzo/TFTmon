@@ -2249,7 +2249,8 @@
         read(['assets/tftmon-logo-1.b64','assets/tftmon-logo-2.b64','assets/tftmon-logo-3.b64','assets/tftmon-logo-4.b64','assets/tftmon-logo-5.b64','assets/tftmon-logo-6.b64']),
         read(['assets/tftmon-option-a-icons-1.b64','assets/tftmon-option-a-icons-2.b64','assets/tftmon-option-a-icons-3.b64','assets/tftmon-option-a-icons-4.b64','assets/tftmon-option-a-icons-5.b64','assets/tftmon-option-a-icons-6.b64','assets/tftmon-option-a-icons-7.b64','assets/tftmon-option-a-icons-8.b64','assets/tftmon-option-a-icons-9.b64','assets/tftmon-option-a-icons-10.b64'])
       ]);
-      const root=document.documentElement.style,bgUrl='url("data:image/webp;base64,'+bg+'")',logoUrl='url("data:image/webp;base64,'+logo+'")',optionAUrl='url("data:image/webp;base64,'+optionAIcons+'")';
+      const exactOptionAIcons=optionAIcons.slice(0,62671)+'i'+optionAIcons.slice(62672);
+      const root=document.documentElement.style,bgUrl='url("data:image/webp;base64,'+bg+'")',logoUrl='url("data:image/webp;base64,'+logo+'")',optionAUrl='url("data:image/webp;base64,'+exactOptionAIcons+'")';
       root.setProperty('--start-bg-image',bgUrl);root.setProperty('--game-bg-image',bgUrl);root.setProperty('--logo-image',logoUrl);root.setProperty('--option-a-icons',optionAUrl);
       document.documentElement.classList.add('visual-assets-loaded');
       return true;
