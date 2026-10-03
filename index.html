@@ -1712,6 +1712,53 @@
       100%{transform:translateY(-7px) scaleX(-1) scale(1)}
     }
 
+
+    /* ===== TFTMON BACKPACK PLACEMENT ===== */
+    #gameApp .backpack-side-btn{
+      width:100%;
+      margin-top:12px;
+      min-height:58px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border:0;
+      border-radius:10px;
+      background:
+        radial-gradient(circle at 20% 50%,#ffd65a18,transparent 35%),
+        linear-gradient(90deg,#0d2536dc,#0b1d2aa8 72%,transparent);
+      box-shadow:inset 2px 0 #f5c5428c,0 8px 18px #0004;
+      color:#f6fbff;
+    }
+    #gameApp .backpack-side-btn:hover:not(:disabled){
+      transform:translateY(-1px);
+      border:0;
+      background:
+        radial-gradient(circle at 20% 50%,#ffd65a25,transparent 38%),
+        linear-gradient(90deg,#123247ea,#0e2636bd 72%,transparent);
+      box-shadow:inset 3px 0 #ffd85a,0 10px 22px #0005,0 0 14px #ffd85a18;
+    }
+    #gameApp .backpack-icon{
+      display:inline-grid;
+      place-items:center;
+      font-size:30px;
+      line-height:1;
+      filter:drop-shadow(0 3px 4px #0008) drop-shadow(0 0 6px #ffd45a38);
+      transform:translateY(-1px);
+    }
+    #gameApp .backpack-label{
+      font-size:14px;
+      font-weight:900;
+      letter-spacing:.03em;
+    }
+    @media(max-width:1050px){
+      #gameApp .backpack-side-btn{grid-column:1/-1;max-width:260px;justify-self:start}
+    }
+    @media(max-width:700px){
+      #gameApp .backpack-side-btn{max-width:none;min-height:54px}
+      #gameApp .backpack-icon{font-size:28px}
+    }
+
   </style>
 </head>
 <body>
@@ -1748,7 +1795,6 @@
   </header>
   <div class="utility-bar">
     <button class="btn" id="rulesBtn">? Regras</button>
-    <button class="btn" id="backpackBtn">🎒 Mochila</button>
     <button class="btn" id="historyBtn">📜 Histórico</button>
   </div>
 
@@ -1756,6 +1802,10 @@
     <aside class="panel side-left">
       <h2>Sinergias</h2>
       <div id="synergies"></div>
+      <button class="btn backpack-side-btn" id="backpackBtn" aria-label="Abrir mochila">
+        <span class="backpack-icon" aria-hidden="true">🎒</span>
+        <span class="backpack-label">Mochila</span>
+      </button>
     </aside>
 
     <main class="panel center">
