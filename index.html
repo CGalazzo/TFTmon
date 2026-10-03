@@ -1759,6 +1759,249 @@
       #gameApp .backpack-icon{font-size:28px}
     }
 
+
+    /* ===== TFTMON VISUAL POLISH — icons, inventory and HUD only ===== */
+    #gameApp .stat{
+      position:relative;
+      padding-left:38px;
+      min-height:54px;
+      display:grid;
+      align-content:center;
+    }
+    #gameApp .stat-icon{
+      position:absolute;
+      left:10px;
+      top:50%;
+      width:22px;
+      height:22px;
+      transform:translateY(-50%);
+      display:grid;
+      place-items:center;
+      border-radius:7px;
+      font-style:normal;
+      font-size:14px;
+      line-height:1;
+      border:1px solid #ffffff22;
+      background:linear-gradient(180deg,#ffffff18,#00000020);
+      box-shadow:inset 0 1px #ffffff24,0 4px 10px #0005;
+      text-shadow:0 0 8px currentColor;
+    }
+    #gameApp .stat-round{color:#72dfff}
+    #gameApp .stat-hp{color:#ff7080}
+    #gameApp .stat-gold{color:#ffd65a}
+    #gameApp .stat-level{color:#d2a0ff}
+    #gameApp .stat-field{color:#71e0ae}
+
+    .item-art,.type-art{
+      --art-size:52px;
+      width:var(--art-size);
+      height:var(--art-size);
+      flex:0 0 var(--art-size);
+      display:inline-grid;
+      place-items:center;
+      vertical-align:middle;
+      filter:drop-shadow(0 5px 6px #0008);
+    }
+    .item-art.compact,.item-icons .item-art,.equipment-chip .item-art,.recipe-icons .item-art,.recipe-result .item-art{
+      --art-size:30px;
+      filter:drop-shadow(0 3px 4px #0007);
+    }
+    .item-art svg,.type-art svg{width:100%;height:100%;overflow:visible}
+    .item-art .art-bg{
+      fill:#0b1b2a;
+      stroke:#5c8199;
+      stroke-width:1.5;
+    }
+    .item-complete .item-art .art-bg,.recipe-result .item-art .art-bg{
+      fill:#241d0b;
+      stroke:#dcb94b;
+    }
+    .type-art{--art-size:36px;filter:drop-shadow(0 3px 5px #0008)}
+    .type-art .art-bg{fill:#071723;stroke:#44748b;stroke-width:1.5}
+    .synergy.active .type-art .art-bg{fill:#2a220b;stroke:#ffdc63;stroke-width:2}
+
+    #gameApp .synergy{
+      grid-template-columns:auto 1fr auto;
+      display:grid;
+      gap:9px;
+      align-items:center;
+      padding:8px 9px;
+    }
+    #gameApp .synergy-copy{min-width:0}
+    #gameApp .synergy-copy b{font-size:13px}
+    #gameApp .synergy-copy small{display:block;line-height:1.25}
+
+    .items-modal-card{
+      width:min(1020px,96vw);
+      background:
+        radial-gradient(circle at 15% 0,#1edcff13,transparent 34%),
+        radial-gradient(circle at 85% 0,#ffd35a0d,transparent 30%),
+        linear-gradient(180deg,#0d2234f5,#071522f7);
+      border-color:#3d7895;
+    }
+    .items-modal-card .type-modal-head{
+      padding-bottom:12px;
+      border-bottom:1px solid #ffffff14;
+    }
+    .item-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(205px,1fr));
+      gap:10px;
+      margin:14px 0;
+    }
+    .item-button{
+      max-width:none;
+      min-height:76px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px;
+      text-align:left;
+      border-color:#31546d;
+      background:
+        radial-gradient(circle at 18% 50%,#29dfff0d,transparent 34%),
+        linear-gradient(180deg,#10283a,#091927);
+      box-shadow:inset 0 1px #ffffff10,0 7px 14px #0004;
+    }
+    .item-button:hover:not(:disabled){
+      border-color:#5dcde9;
+      box-shadow:inset 0 1px #ffffff18,0 9px 18px #0006,0 0 13px #2adfff13;
+    }
+    .item-button.item-complete{
+      background:
+        radial-gradient(circle at 18% 50%,#ffca4615,transparent 38%),
+        linear-gradient(180deg,#2c2716,#161b20);
+      border-color:#8c7634;
+    }
+    .item-button.chosen{
+      outline:2px solid #ffe16a;
+      box-shadow:0 0 18px #ffd94f32,inset 0 1px #ffffff18;
+    }
+    .item-copy{min-width:0;display:block}
+    .item-copy b{display:block;font-size:13px;color:#f7fbff;margin-bottom:3px}
+    .item-copy small{font-size:11px;line-height:1.35;margin:0;color:#a9c9d9}
+
+    .item-slots{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:10px;
+    }
+    .item-slot{
+      min-height:104px;
+      border:1px dashed #47708a;
+      border-radius:13px;
+      padding:9px;
+      background:linear-gradient(180deg,#0b1d2b,#07131e);
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:7px;
+    }
+    .item-slot:empty::before{content:"Espaço livre";color:#67869a;text-align:center}
+    .item-slot .item-button{min-height:68px}
+    .item-slot>.btn:not(.item-button){padding:6px 9px;font-size:11px}
+
+    .item-preview,.reward-box{
+      background:
+        radial-gradient(circle at 10% 0,#ffd85a12,transparent 36%),
+        linear-gradient(180deg,#152b3f,#0a1927);
+      border-color:#9e8031;
+      box-shadow:inset 0 1px #ffffff0c;
+    }
+    .combine-visual{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:9px;
+      color:#ffe16a;
+      font-size:18px;
+    }
+    .combine-visual>.item-art:last-child{--art-size:46px}
+    .reward-item-option{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      min-height:62px;
+    }
+    .reward-item-option>span:not(.item-art){font-size:11px}
+
+    .recipe-table{
+      margin-top:9px;
+      background:#07131d;
+      border-radius:12px;
+      overflow:hidden;
+    }
+    .recipe-table th{
+      background:#10283a;
+      color:#dcefff;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+    .recipe-table td{vertical-align:middle}
+    .recipe-icons,.recipe-result{
+      display:flex;
+      align-items:center;
+      gap:5px;
+      margin-bottom:4px;
+    }
+    .recipe-icons b{color:#ffd85a}
+    .recipe-result b{font-size:12px}
+
+    .equipment-chip-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:7px;
+    }
+    .equipment-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      padding:3px 7px 3px 3px;
+      border-radius:999px;
+      background:#0a2130;
+      border:1px solid #31566e;
+      color:#d9edf7;
+      font-size:10px;
+    }
+    .no-equip{color:#7891a2}
+    .item-icons{
+      top:1px;
+      right:1px;
+      display:flex;
+      gap:1px;
+      padding:2px;
+      background:#04101ad9;
+      border:1px solid #ffffff14;
+      border-radius:8px;
+      z-index:8;
+    }
+    .item-icons .item-art{--art-size:20px}
+
+    #gameApp .selected-box{
+      background:
+        radial-gradient(circle at 18% 0,#26dfff18,transparent 38%),
+        linear-gradient(180deg,#0b2232,#071522);
+    }
+    #gameApp .selected-box .row>img{
+      width:76px;
+      height:76px;
+      filter:drop-shadow(0 8px 8px #0008);
+    }
+
+    @media(max-width:700px){
+      #gameApp .stat{padding-left:32px}
+      #gameApp .stat-icon{left:7px;width:20px;height:20px;font-size:12px}
+      .item-grid{grid-template-columns:1fr 1fr}
+      .item-slots{grid-template-columns:1fr}
+      .item-art{--art-size:45px}
+    }
+    @media(max-width:470px){
+      .item-grid{grid-template-columns:1fr}
+    }
+
   </style>
 </head>
 <body>
@@ -1786,11 +2029,11 @@
   <header class="topbar">
     <div class="brand"><div class="brand-logo" aria-label="Logo TFTmon"></div><div><h1>TFTmon</h1><div class="subtitle">Auto-battler fan-made • 25 etapas • raridades • 4★ especiais • bosses</div></div></div>
     <div class="stats">
-      <div class="stat"><span>Rodada</span><b id="roundStat">1/25</b></div>
-      <div class="stat"><span>HP</span><b id="hpStat">100</b></div>
-      <div class="stat"><span>Ouro</span><b id="goldStat">10</b></div>
-      <div class="stat"><span>Nível</span><b id="levelStat">2</b><small id="xpStat">0/8 XP</small><div class="progress" id="xpProgress" role="progressbar" aria-label="Experiência para o próximo nível" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i id="xpFill" style="width:0%"></i></div></div>
-      <div class="stat"><span>Campo</span><b id="fieldStat">0/2</b></div>
+      <div class="stat"><i class="stat-icon stat-round" aria-hidden="true">◫</i><span>Rodada</span><b id="roundStat">1/25</b></div>
+      <div class="stat"><i class="stat-icon stat-hp" aria-hidden="true">♥</i><span>HP</span><b id="hpStat">100</b></div>
+      <div class="stat"><i class="stat-icon stat-gold" aria-hidden="true">◆</i><span>Ouro</span><b id="goldStat">10</b></div>
+      <div class="stat"><i class="stat-icon stat-level" aria-hidden="true">★</i><span>Nível</span><b id="levelStat">2</b><small id="xpStat">0/8 XP</small><div class="progress" id="xpProgress" role="progressbar" aria-label="Experiência para o próximo nível" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i id="xpFill" style="width:0%"></i></div></div>
+      <div class="stat"><i class="stat-icon stat-field" aria-hidden="true">⬡</i><span>Campo</span><b id="fieldStat">0/2</b></div>
     </div>
   </header>
   <div class="utility-bar">
@@ -1918,6 +2161,51 @@
   const COMPONENTS=Object.keys(ITEM_DEFS).filter(k=>ITEM_DEFS[k].component);
   const recipeKey=(a,b)=>[a,b].sort().join('+');
   const ITEM_RECIPES=Object.fromEntries(Object.entries(ITEM_DEFS).filter(([,d])=>d.recipe).map(([k,d])=>[recipeKey(...d.recipe),k]));
+
+  const ITEM_ART = {
+    claw:'<path d="M15 31c3-10 7-17 13-22 1 8-1 16-7 23l-2 5z" fill="#f4dfb4"/><path d="M24 34c4-9 8-15 14-19-1 8-4 15-10 21z" fill="#ffe8b9"/><path d="M12 35c2-8 4-13 8-18 1 7 0 13-4 19z" fill="#d9bf8b"/>',
+    feather:'<path d="M12 36C15 20 25 10 39 8c-3 14-12 25-28 30" fill="#dff7ff"/><path d="M14 35 35 12" stroke="#74cfff" stroke-width="3" stroke-linecap="round"/><path d="m19 29-7-3m13-4-8-4m15-3-6-4" stroke="#8ee9ff" stroke-width="2" stroke-linecap="round"/>',
+    crystal:'<path d="m24 7 12 10-5 22H17l-5-22z" fill="#9a5bff"/><path d="m24 7 3 32M12 17l15 4 9-4M17 39l10-18" stroke="#e7c9ff" stroke-width="2" opacity=".8"/><path d="m24 11 7 6-3 5-9-2z" fill="#f5e7ff" opacity=".75"/>',
+    shell:'<path d="M24 8c9 3 15 10 15 18 0 8-7 13-15 14-8-1-15-6-15-14 0-8 6-15 15-18Z" fill="#7fa6bd"/><path d="M24 12v24M13 23h22M16 15l16 17M32 15 16 32" stroke="#d9edf6" stroke-width="2" opacity=".85"/>',
+    seed:'<path d="M24 10c10 6 13 14 8 22-5 8-14 7-18 1-5-7-1-17 10-23Z" fill="#67d36a"/><path d="M16 33c5-8 10-12 18-17" stroke="#d8ff9b" stroke-width="2.5" stroke-linecap="round"/><path d="M26 12c2 5 2 9 0 14" stroke="#2d8b45" stroke-width="2"/>',
+    muscle:'<path d="M10 20h7v9h-7zm21 0h7v9h-7z" fill="#e8c04f"/><path d="M16 17h5v15h-5zm11 0h5v15h-5z" fill="#c84444"/><path d="M21 20h6v9h-6z" fill="#f0e7cf"/>',
+    scarf:'<path d="M13 10h22v11c0 7-5 11-11 11S13 28 13 21Z" fill="#69bfff"/><path d="M21 31 16 42l7-4 4 4 3-11" fill="#2c82ca"/><path d="M16 16h16" stroke="#d8f4ff" stroke-width="3"/>',
+    glasses:'<circle cx="16" cy="24" r="8" fill="none" stroke="#b88cff" stroke-width="4"/><circle cx="32" cy="24" r="8" fill="none" stroke="#b88cff" stroke-width="4"/><path d="M24 24h-1M8 22l-3-2m35 2 3-2" stroke="#e6d7ff" stroke-width="3" stroke-linecap="round"/>',
+    metal:'<path d="M9 14 18 7h16l6 9-4 24H12z" fill="#9fb7c6"/><path d="m14 18 10-7 10 7-3 17H17z" fill="#dce8ee"/><path d="M18 22h12M16 28h16" stroke="#718b9c" stroke-width="2"/>',
+    leftovers:'<path d="M24 13c-5-5-11-2-12 4-2 11 6 22 12 23 6-1 14-12 12-23-1-6-7-9-12-4Z" fill="#e5534b"/><path d="M24 13c1-4 4-6 7-7" stroke="#7ad66f" stroke-width="3" stroke-linecap="round"/><path d="M20 10c2 0 4 1 5 3" stroke="#5c9f48" stroke-width="3"/>',
+    quickClaw:'<path d="M10 32c5-12 11-20 21-25-2 9-6 18-13 26z" fill="#f8e7b0"/><path d="M23 33c4-9 8-15 15-19-1 8-5 16-10 21z" fill="#ffe7aa"/><path d="M8 37c8-3 16-4 27-2" stroke="#65d8ff" stroke-width="3" stroke-linecap="round"/>',
+    orb:'<circle cx="24" cy="24" r="15" fill="#d8444e"/><circle cx="20" cy="19" r="7" fill="#ff9a9f" opacity=".75"/><circle cx="24" cy="24" r="18" fill="none" stroke="#ffcf65" stroke-width="2" opacity=".7"/>',
+    combatBand:'<path d="M8 19h32v12H8z" fill="#d44444"/><path d="m17 19 7 6 7-6v12l-7-6-7 6z" fill="#f2dc8a"/><path d="M5 21h5v8H5zm33 0h5v8h-5z" fill="#7c2525"/>',
+    fang:'<path d="M14 9c3 6 8 9 13 11-2 8-6 15-12 20 1-9-2-18-1-31Z" fill="#f4e7c5"/><path d="M28 13c3 5 6 7 10 9-2 7-5 12-10 17 1-8-1-16 0-26Z" fill="#d7c7a8"/><path d="M15 12c3 4 6 6 10 7" stroke="#ff7b6f" stroke-width="2"/>',
+    amulet:'<path d="M14 12c5-5 15-5 20 0l-3 8H17z" fill="#e6be4f"/><circle cx="24" cy="29" r="9" fill="#46cfff"/><path d="M24 24v10m-5-5h10" stroke="#e6fbff" stroke-width="2.5" stroke-linecap="round"/>',
+    cloak:'<path d="M16 9c4 3 12 3 16 0l5 30-13-5-13 5z" fill="#4969a8"/><path d="M24 12v22" stroke="#8fb8ff" stroke-width="3"/><path d="M17 16h14" stroke="#cfe2ff" stroke-width="2"/>',
+    vigor:'<path d="M11 18c8-8 18-8 26 0l-4 20-9-6-9 6z" fill="#e7b54d"/><path d="M16 18c5 4 11 4 16 0" stroke="#fff0a5" stroke-width="3"/><circle cx="24" cy="25" r="5" fill="#69d977"/>',
+    barrier:'<path d="m24 7 14 6-3 18-11 10-11-10-3-18z" fill="#4ebef2" opacity=".85"/><path d="m24 11 10 5-3 13-7 7-7-7-3-13z" fill="#b9f4ff" opacity=".6"/><path d="M24 14v18M16 23h16" stroke="#fff" stroke-width="2" opacity=".75"/>',
+    bell:'<path d="M14 30c3-3 4-8 4-13 0-5 3-8 6-8s6 3 6 8c0 5 1 10 4 13z" fill="#e8bd4c"/><path d="M11 30h26" stroke="#fff0a0" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="35" r="4" fill="#c9852e"/><path d="M24 7V4" stroke="#fff0a0" stroke-width="3"/>',
+    vest:'<path d="M13 10 20 7l4 8 4-8 7 3 4 28H9z" fill="#d7a23e"/><path d="M20 15 16 36m12-21 4 21" stroke="#ffdc75" stroke-width="3"/><path d="M17 24h14" stroke="#8d5c23" stroke-width="2"/>'
+  };
+  const TYPE_ART = {
+    Fire:'<path d="M25 6c2 8-6 10-3 17 2-4 5-5 8-7 5 8 2 20-7 24-8-1-14-6-14-14 0-7 4-12 8-17 1 6 3 8 5 10-1-6 1-9 3-13Z" fill="#ff7b2f"/>',
+    Water:'<path d="M24 6C18 15 11 21 11 29c0 8 6 13 13 13s13-5 13-13c0-8-7-14-13-23Z" fill="#49caff"/><path d="M18 31c2 4 6 5 10 3" stroke="#dff9ff" stroke-width="3" stroke-linecap="round"/>',
+    Electric:'<path d="m27 5-14 22h10l-3 16 15-24H25z" fill="#ffe34d"/>',
+    Grass:'<path d="M9 31C11 16 22 8 39 8c-1 18-11 29-27 30" fill="#6ed260"/><path d="M13 35 33 13" stroke="#d9ff94" stroke-width="3" stroke-linecap="round"/>',
+    Psychic:'<circle cx="24" cy="24" r="14" fill="none" stroke="#d169ff" stroke-width="4"/><circle cx="24" cy="24" r="7" fill="#e9b0ff"/><path d="M8 24h7m18 0h7M24 8v7m0 18v7" stroke="#ffb5f2" stroke-width="2"/>',
+    Flying:'<path d="M8 29c9-14 19-20 32-18-5 4-8 8-10 12 4-2 7-3 10-2-7 10-17 15-30 14" fill="#c9f5ff"/><path d="M12 32c7-2 14-6 21-13" stroke="#6fdcff" stroke-width="3"/>',
+    Poison:'<path d="M13 20c0-7 5-12 11-12s11 5 11 12c0 5-3 8-6 10v7h-3v-5h-4v5h-3v-7c-3-2-6-5-6-10Z" fill="#a94fdb"/><circle cx="20" cy="20" r="2.5" fill="#fff"/><circle cx="28" cy="20" r="2.5" fill="#fff"/>',
+    Ground:'<path d="m7 37 10-17 7 9 6-14 11 22z" fill="#c99354"/><path d="M11 37h29" stroke="#f0c17a" stroke-width="3"/>',
+    Dragon:'<path d="M9 31c4-12 9-18 17-23-1 5 0 9 3 12 3-4 6-6 10-7-2 8-6 14-12 18 4 0 7 1 10 4-8 5-18 5-28-4Z" fill="#55d8ff"/><path d="M18 30c5-4 9-9 13-16" stroke="#ffe16a" stroke-width="3" stroke-linecap="round"/>'
+  };
+  function artFrame(body,cls,label){
+    return '<span class="'+cls+'" title="'+label+'"><svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="21" class="art-bg"/>'+body+'</svg></span>';
+  }
+  function itemArt(key,compact=false){
+    const d=ITEM_DEFS[key],body=ITEM_ART[key]||ITEM_ART.crystal;
+    return artFrame(body,'item-art'+(compact?' compact':'')+' item-art-'+key,d?.name||key);
+  }
+  function typeArt(type){
+    return artFrame(TYPE_ART[type]||TYPE_ART.Psychic,'type-art type-art-'+type.toLowerCase(),type);
+  }
+
   const LINES = {
     bulbasaur:{cost:2,role:'Suporte',types:[['Grass','Poison'],['Grass','Poison'],['Grass','Poison']],base:[105,16,8,1,86],ability:{name:'Chicote de Vinha',kind:'heal',power:.42},stages:[['Bulbasaur',1],['Ivysaur',2],['Venusaur',3]]},
     charmander:{cost:2,role:'Atacante',types:[['Fire'],['Fire'],['Fire','Flying']],base:[82,22,5,1,100],ability:{name:'Lança-Chamas',kind:'blast',power:1.55},stages:[['Charmander',4],['Charmeleon',5],['Charizard',6]]},
@@ -2114,7 +2402,7 @@
   function itemButton(item){
     const d=ITEM_DEFS[item.key],button=document.createElement('button');
     button.className='btn item-button'+(!d.component?' item-complete':'')+(state.selectedItem===item.id||state.pendingCombine?.includes(item.id)?' chosen':'');
-    button.innerHTML=d.icon+' '+d.name+'<small>'+d.desc+'</small>';button.disabled=!canManageItems();button.onclick=()=>selectItem(item.id);return button;
+    button.innerHTML=itemArt(item.key)+'<span class="item-copy"><b>'+d.name+'</b><small>'+d.desc+'</small></span>';button.disabled=!canManageItems();button.onclick=()=>selectItem(item.id);return button;
   }
   function renderItems(){
     const inventory=$('#itemInventory');inventory.innerHTML='';
@@ -2133,7 +2421,7 @@
     const preview=$('#itemPreview');preview.innerHTML='';const plan=combinationPlan();
     if(plan){
       const box=document.createElement('div');box.className='item-preview';const d=ITEM_DEFS[plan.key];
-      box.innerHTML='<b>'+ITEM_DEFS[plan.a.item.key].name+' + '+ITEM_DEFS[plan.b.item.key].name+' → '+d.icon+' '+d.name+'</b><p>'+d.desc+'</p><p>Destino: '+(plan.target?stageData(plan.target).name:'mochila')+'. Os componentes serão consumidos; o equipamento não pode ser desfeito.</p>';
+      box.innerHTML='<div class="combine-visual">'+itemArt(plan.a.item.key,true)+'<span>+</span>'+itemArt(plan.b.item.key,true)+'<span>→</span>'+itemArt(plan.key)+'</div><b>'+ITEM_DEFS[plan.a.item.key].name+' + '+ITEM_DEFS[plan.b.item.key].name+' → '+d.name+'</b><p>'+d.desc+'</p><p>Destino: '+(plan.target?stageData(plan.target).name:'mochila')+'. Os componentes serão consumidos; o equipamento não pode ser desfeito.</p>';
       const yes=document.createElement('button');yes.className='btn primary';yes.textContent='Confirmar combinação';yes.disabled=!canManageItems();yes.onclick=confirmCombine;
       const no=document.createElement('button');no.className='btn';no.textContent='Cancelar';no.onclick=cancelCombine;box.appendChild(yes);box.appendChild(no);preview.appendChild(box);
     }else if(selected){preview.textContent='Selecionado: '+ITEM_DEFS[selected.item.key].name+(ITEM_DEFS[selected.item.key].component?'. Clique em outro componente para ver a combinação.':'');}
@@ -2141,9 +2429,9 @@
     if(state.rewardChoices){
       const box=document.createElement('div');box.className='reward-box';box.innerHTML='<b>Rodada '+state.rewardChoices.round+' — escolha 1 pacote antes de batalhar</b>';
       const options=document.createElement('div');options.className='reward-options';
-      state.rewardChoices.options.forEach((pair,i)=>{const button=document.createElement('button');button.className='btn';button.textContent=pair.map(k=>ITEM_DEFS[k].icon+' '+ITEM_DEFS[k].name).join(' + ');button.disabled=!canManageItems();button.onclick=()=>chooseItemReward(i);options.appendChild(button)});box.appendChild(options);rewards.appendChild(box);
+      state.rewardChoices.options.forEach((pair,i)=>{const button=document.createElement('button');button.className='btn reward-item-option';button.innerHTML=pair.map(k=>itemArt(k,true)+'<span>'+ITEM_DEFS[k].name+'</span>').join('<b>+</b>');button.disabled=!canManageItems();button.onclick=()=>chooseItemReward(i);options.appendChild(button)});box.appendChild(options);rewards.appendChild(box);
     }
-    $('#itemRecipes').innerHTML='<table class="recipe-table"><thead><tr><th>Componentes</th><th>Equipamento</th><th>Efeito total</th></tr></thead><tbody>'+Object.values(ITEM_DEFS).filter(d=>d.recipe).map(d=>'<tr><td>'+d.recipe.map(k=>ITEM_DEFS[k].name).join(' + ')+'</td><td>'+d.icon+' '+d.name+'</td><td>'+d.desc+'</td></tr>').join('')+'</tbody></table>';
+    $('#itemRecipes').innerHTML='<table class="recipe-table"><thead><tr><th>Componentes</th><th>Equipamento</th><th>Efeito total</th></tr></thead><tbody>'+Object.entries(ITEM_DEFS).filter(([,d])=>d.recipe).map(([key,d])=>'<tr><td><span class="recipe-icons">'+d.recipe.map(k=>itemArt(k,true)).join('<b>+</b>')+'</span>'+d.recipe.map(k=>ITEM_DEFS[k].name).join(' + ')+'</td><td><span class="recipe-result">'+itemArt(key,true)+'<b>'+d.name+'</b></span></td><td>'+d.desc+'</td></tr>').join('')+'</tbody></table>';
   }
   function xpNeed(){return state.level>=9?999:state.level*4;}
   function fieldCount(){return state.board.filter(Boolean).length}
@@ -2192,14 +2480,14 @@
       const next=tier>=inf.levels.length?'MAX':inf.levels[tier];
       d.title='Clique para ver Pokémon disponíveis e bônus de '+inf.levels.join('/')+'.';
       d.setAttribute('aria-label',t+': '+c[t]+' linhas ativas. Abrir detalhes.');
-      d.innerHTML='<span><b>'+inf.icon+' '+t+'</b><br><small>'+c[t]+' linhas • '+(tier?inf.desc[tier-1]:'próximo: '+next)+'</small></span><strong>'+c[t]+'</strong>';
+      d.innerHTML=typeArt(t)+'<span class="synergy-copy"><b>'+t+'</b><br><small>'+c[t]+' linhas • '+(tier?inf.desc[tier-1]:'próximo: '+next)+'</small></span><strong>'+c[t]+'</strong>';
       d.onclick=()=>openTypeInfo(t);els.synergies.appendChild(d);
     });
   }
   function createToken(u,location,index){
     const p=stageData(u),d=document.createElement('div');d.className='token'+(p.special?' special-token':'')+(state.selected&&state.selected.id===u.id?' selected':'');
     d.innerHTML='<img src="'+SPRITE(p.dex)+'" alt="'+p.name+'"><div class="mini">'+(p.special?'<span class="special-stars">★★★★</span> ':'')+p.name+(u.stage?' • E'+(u.stage+1):'')+'</div>';
-    if((u.items||[]).length){const icons=document.createElement('span');icons.className='item-icons';icons.textContent=u.items.map(i=>ITEM_DEFS[i.key].icon).join('');d.appendChild(icons)}
+    if((u.items||[]).length){const icons=document.createElement('span');icons.className='item-icons';icons.innerHTML=u.items.map(i=>itemArt(i.key,true)).join('');d.appendChild(icons)}
     d.draggable=!state.battle&&!state.gameOver;
     d.ondragstart=e=>{
       if(state.battle||state.gameOver){e.preventDefault();return}
@@ -2414,7 +2702,7 @@
       '<div class="detail-grid"><div class="detail-row"><b>Raridade</b><br>'+rarityName(f.u)+'</div><div class="detail-row"><b>Estágio</b><br>'+stageLabel+'</div><div class="detail-row"><b>Habilidade</b><br>'+p.ability.name+'</div><div class="detail-row"><b>Venda</b><br>'+val+' ouro</div></div>'+
       '<div class="detail-row" style="margin-top:7px"><b>O que a habilidade faz</b><br>'+abilityDescription(p)+'</div>'+
       (p.passive?'<div class="detail-row" style="margin-top:7px"><b>Passiva especial</b><br>'+passiveDescription(p)+'</div>':'')+
-      '<div class="equipment-mini"><b>Equipamentos ('+items.length+'/3):</b> '+(items.length?items.map(i=>ITEM_DEFS[i.key].icon+' '+ITEM_DEFS[i.key].name).join(' • '):'nenhum')+'</div>';
+      '<div class="equipment-mini"><b>Equipamentos ('+items.length+'/3):</b>'+(items.length?'<div class="equipment-chip-row">'+items.map(i=>'<span class="equipment-chip">'+itemArt(i.key,true)+'<span>'+ITEM_DEFS[i.key].name+'</span></span>').join('')+'</div>':' <span class="no-equip">nenhum</span>')+'</div>';
   }
   function renderStats(){
     $('#roundStat').textContent=state.round+'/'+state.maxRounds;$('#hpStat').textContent=Math.max(0,state.hp);$('#goldStat').textContent=state.gold;$('#levelStat').textContent=state.level;$('#fieldStat').textContent=fieldCount()+'/'+state.level;
