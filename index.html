@@ -8,7 +8,7 @@
     :root{
       --bg:#07111f;--panel:#0e1b2d;--panel2:#13243b;--line:#28415f;--text:#f7fbff;
       --muted:#9fb3c8;--accent:#f5c542;--good:#66e29b;--bad:#ff6b6b;--blue:#5bb7ff;
-      --cell:clamp(58px,6.6vw,90px);--game-bg-image:none;--start-bg-image:none;--logo-image:none;--hero-image:none
+      --cell:clamp(62px,7vw,96px);--game-bg-image:none;--start-bg-image:none;--logo-image:none;--hero-image:none
     }
     *{box-sizing:border-box}
     body{margin:0;background-image:var(--game-bg-image),radial-gradient(circle at top,#18314c 0,#07111f 52%,#050b13 100%);background-size:cover;background-attachment:fixed;color:var(--text);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;font-size:15px;font-weight:700;min-height:100vh}
@@ -52,7 +52,7 @@
       --ui-orange:#ff7a18;
       --ui-border:#2b6f99;
       --ui-shadow:0 18px 55px #0009;
-      max-width:1680px;
+      max-width:1760px;
       padding:14px 18px 28px;
     }
     #gameApp::before{
@@ -126,7 +126,7 @@
     }
 
     #gameApp .layout{
-      grid-template-columns:225px minmax(700px,1fr) 245px;
+      grid-template-columns:215px minmax(750px,1fr) 235px;
       gap:12px;
       margin-top:10px;
       align-items:start;
@@ -497,8 +497,8 @@
     }
 
     @media(max-width:1240px){
-      #gameApp .layout{grid-template-columns:205px minmax(620px,1fr) 225px}
-      #gameApp{--cell:clamp(54px,6.65vw,82px)}
+      #gameApp .layout{grid-template-columns:195px minmax(660px,1fr) 215px}
+      #gameApp{--cell:clamp(56px,6.9vw,86px)}
     }
     @media(max-width:1050px){
       #gameApp .layout{grid-template-columns:1fr}
@@ -545,7 +545,7 @@
       --arena-enemy-soft:#ffc15f;
       --arena-frame:#1ab8e5;
       gap:6px;
-      padding:18px;
+      padding:20px;
       border:0;
       border-radius:23px;
       background:
