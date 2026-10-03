@@ -1517,6 +1517,20 @@
       .fx-impact{width:42px;height:42px}
     }
 
+
+    #gameApp .fighter.moving img{animation:combatMovePlayer .24s ease-in-out}
+    #gameApp .fighter.enemy.moving img{animation:combatMoveEnemy .24s ease-in-out}
+    @keyframes combatMovePlayer{
+      0%{transform:translateY(-7px) scale(1)}
+      50%{transform:translateY(-14px) scale(1.055)}
+      100%{transform:translateY(-7px) scale(1)}
+    }
+    @keyframes combatMoveEnemy{
+      0%{transform:translateY(-7px) scaleX(-1) scale(1)}
+      50%{transform:translateY(-14px) scaleX(-1) scale(1.055)}
+      100%{transform:translateY(-7px) scaleX(-1) scale(1)}
+    }
+
   </style>
 </head>
 <body>
@@ -2335,7 +2349,7 @@
   function fxPoint(c){
     if(!COMBAT_FX_ENABLED||!c)return null;
     const layer=$('#fxLayer'),cells=els.board?.querySelectorAll?.('.cell');if(!layer||!cells?.length)return null;
-    const cell=cells[Math.max(0,Math.min(41,c.y*7+c.x))];if(!cell)return null;
+    const cell=cells[Math.max(0,Math.min(41,c.y*7+c.x))];if(!cell||typeof layer.getBoundingClientRect!=='function'||typeof cell.getBoundingClientRect!=='function')return null;
     const lr=layer.getBoundingClientRect(),r=cell.getBoundingClientRect();
     return {x:r.left-lr.left+r.width/2,y:r.top-lr.top+r.height/2};
   }
@@ -2409,14 +2423,15 @@
   }
   function heal(t,amount){
     if(t.dead)return;
-    const reduction=t.effects.poison?.antiHeal||0;
+    const before=t.hp,reduction=t.effects.poison?.antiHeal||0;
     t.hp=Math.min(t.maxHp,t.hp+Math.max(0,Math.round(amount*(1-reduction))));
+    const gained=Math.max(0,Math.round(t.hp-before));if(gained>0&&state.battle)fxFloat(t,'+'+gained,'heal');
   }
   function processEffects(c,now){
     for(const kind of ['poison','burn']){
       const effect=c.effects[kind];if(!effect)continue;
       while(effect.nextAt<=effect.expiresAt&&now>=effect.nextAt&&!c.dead){
-        takeDamage(c,c.maxHp*effect.rate);effect.nextAt+=1000;
+        const dot=takeDamage(c,c.maxHp*effect.rate);if(dot>0){fxFloat(c,'-'+Math.round(dot),'damage');fxImpact(c,kind==='burn'?'fire':'poison')}effect.nextAt+=1000;
       }
       if(now>=effect.expiresAt)delete c.effects[kind];
       if(c.dead)return;
@@ -2429,8 +2444,10 @@
   // Types activate traits only: no effectiveness, resistance or type immunity multipliers.
   function damage(att,t,amount,kind='ability'){
     if(t.dead)return;
-    if(kind==='basic'&&Math.random()<(t.bonus?.dodge||0))return;
-    const dealt=takeDamage(t,Math.max(1,Math.round(amount-t.def*.32)));t.mana=Math.min(100,t.mana+12);
+    if(kind==='basic'&&Math.random()<(t.bonus?.dodge||0)){fxFloat(t,'ESQUIVA','dodge');fxRing(t,'flying');return}
+    const shieldBefore=t.shield||0,dealt=takeDamage(t,Math.max(1,Math.round(amount-t.def*.32)));t.mana=Math.min(100,t.mana+12);
+    if(dealt>0)fxFloat(t,'-'+Math.round(dealt),'damage');else if(shieldBefore>(t.shield||0))fxFloat(t,'ESCUDO','shield');
+    if(t.dead)fxAoe(t,fxTypeFor(att),40);
     if(kind==='basic'&&dealt>0&&t.roughSkin&&!att.dead)takeDamage(att,Math.max(1,Math.round(dealt*t.roughSkin)));
     const leech=kind==='basic'?att.bonus?.basicLeech:att.bonus?.abilityLeech;if(leech&&dealt>0)heal(att,dealt*leech);
     if(kind==='basic'&&att.bonus?.poison)applyDot(t,'poison',att.bonus.poison,att.bonus.antiHeal);
@@ -2438,7 +2455,7 @@
     flash(t.cid,'hit');
   }
   function normalAttack(c,t){
-    damage(c,t,c.atk*(.90+Math.random()*.2),'basic');c.mana=Math.min(100,c.mana+34+(c.bonus?.manaOnAttack||0));
+    fxBasicAttack(c,t);damage(c,t,c.atk*(.90+Math.random()*.2),'basic');c.mana=Math.min(100,c.mana+34+(c.bonus?.manaOnAttack||0));
   }
   function cast(c,foes,allies){
     const a=c.ability,now=state.combat?.elapsedMs||0;
@@ -2446,28 +2463,43 @@
       a.kind==='shadowBall'?foes.filter(x=>!x.dead).slice().sort((x,y)=>(x.hp/x.maxHp)-(y.hp/y.maxHp))[0]:nearest(c,foes);
     if(!t)return;
     c.mana=0;flash(c.cid,'cast');const power=c.bonus?.power||1;
-    if(c.bonus?.root&&!c.hasCast)applyRoot(t,1500);
+    if(c.bonus?.root&&!c.hasCast){applyRoot(t,1500);fxRing(t,'grass')}
     c.hasCast=true;
-    if(a.kind==='blast'){damage(c,t,c.atk*a.power*power);foes.filter(x=>!x.dead&&x!==t&&dist(x,t)<=1).slice(0,2).forEach(x=>damage(c,x,c.atk*a.power*.45*power))}
-    else if(a.kind==='multi'){foes.filter(x=>!x.dead).sort((x,y)=>dist(c,x)-dist(c,y)).slice(0,3).forEach((x,i)=>damage(c,x,c.atk*a.power*(i?0.68:1)*power))}
-    else if(a.kind==='stun'){damage(c,t,c.atk*a.power*power);applyStun(t,2)}
-    else if(a.kind==='heal'){const a1=allies.filter(x=>!x.dead).sort((x,y)=>(x.hp/x.maxHp)-(y.hp/y.maxHp))[0];if(a1)heal(a1,c.maxHp*a.power*power);damage(c,t,c.atk*.7*power)}
-    else if(a.kind==='shield'){c.shield+=Math.round(c.maxHp*a.power*power);damage(c,t,c.atk*.8*power)}
+    if(a.kind==='blast'){
+      const splash=foes.filter(x=>!x.dead&&x!==t&&dist(x,t)<=1).slice(0,2);fxAbility(c,[t,...splash],a.kind,a.name);
+      damage(c,t,c.atk*a.power*power);splash.forEach(x=>damage(c,x,c.atk*a.power*.45*power))
+    }
+    else if(a.kind==='multi'){
+      const hit=foes.filter(x=>!x.dead).sort((x,y)=>dist(c,x)-dist(c,y)).slice(0,3);fxAbility(c,hit,a.kind,a.name);
+      hit.forEach((x,i)=>damage(c,x,c.atk*a.power*(i?0.68:1)*power))
+    }
+    else if(a.kind==='stun'){fxAbility(c,t,a.kind,a.name);damage(c,t,c.atk*a.power*power);applyStun(t,2);fxRing(t,'electric',90)}
+    else if(a.kind==='heal'){
+      const a1=allies.filter(x=>!x.dead).sort((x,y)=>(x.hp/x.maxHp)-(y.hp/y.maxHp))[0];fxAbility(c,a1?[a1]:[],a.kind,a.name);fxProjectile(c,t,fxTypeFor(c),70);
+      if(a1)heal(a1,c.maxHp*a.power*power);damage(c,t,c.atk*.7*power)
+    }
+    else if(a.kind==='shield'){
+      const gain=Math.round(c.maxHp*a.power*power);fxAbility(c,t,a.kind,a.name);c.shield+=gain;fxFloat(c,'+'+gain+' ESCUDO','shield');damage(c,t,c.atk*.8*power)
+    }
     else if(a.kind==='dragonRush'){
-      damage(c,t,c.atk*a.power*power);foes.filter(x=>!x.dead&&x!==t&&dist(x,t)<=1).slice(0,2).forEach(x=>damage(c,x,c.atk*a.power*.40*power));
+      const splash=foes.filter(x=>!x.dead&&x!==t&&dist(x,t)<=1).slice(0,2);fxAbility(c,[t,...splash],a.kind,a.name);
+      damage(c,t,c.atk*a.power*power);splash.forEach(x=>damage(c,x,c.atk*a.power*.40*power));
       c.speedBoost=Math.max(c.speedBoost||0,a.speedBoost||0);c.speedBoostUntil=Math.max(c.speedBoostUntil||0,now+(a.duration||2000));
     }
     else if(a.kind==='quake'){
-      const hit=foes.filter(x=>!x.dead&&dist(c,x)<=a.radius+1);(hit.length?hit:[t]).forEach(x=>{damage(c,x,c.atk*a.power*power);applyStun(x,a.stun||1)});
+      const hit=foes.filter(x=>!x.dead&&dist(c,x)<=a.radius+1),targets=hit.length?hit:[t];fxAbility(c,targets,a.kind,a.name);
+      targets.forEach(x=>{damage(c,x,c.atk*a.power*power);applyStun(x,a.stun||1)});
     }
     else if(a.kind==='shadowBall'){
-      damage(c,t,c.atk*a.power*power);if(t.dead)c.mana=Math.min(100,c.mana+(a.manaRefund||0));
+      fxAbility(c,t,a.kind,a.name);damage(c,t,c.atk*a.power*power);if(t.dead)c.mana=Math.min(100,c.mana+(a.manaRefund||0));
     }
     else if(a.kind==='blizzard'){
-      foes.filter(x=>!x.dead).sort((x,y)=>dist(c,x)-dist(c,y)).slice(0,4).forEach(x=>{damage(c,x,c.atk*a.power*power);x.chill=Math.max(x.chill||0,a.chill||0);x.chillUntil=Math.max(x.chillUntil||0,now+(a.duration||3000))});
+      const hit=foes.filter(x=>!x.dead).sort((x,y)=>dist(c,x)-dist(c,y)).slice(0,4);fxAbility(c,hit,a.kind,a.name);
+      hit.forEach(x=>{damage(c,x,c.atk*a.power*power);x.chill=Math.max(x.chill||0,a.chill||0);x.chillUntil=Math.max(x.chillUntil||0,now+(a.duration||3000))});
     }
     else if(a.kind==='meteorMash'){
-      const hit=[t,...foes.filter(x=>!x.dead&&x!==t&&dist(x,t)<=1).slice(0,2)];hit.forEach(x=>damage(c,x,c.atk*a.power*power));c.shield+=Math.round(c.maxHp*(a.shieldPerHit||0)*hit.length);
+      const hit=[t,...foes.filter(x=>!x.dead&&x!==t&&dist(x,t)<=1).slice(0,2)];fxAbility(c,hit,a.kind,a.name);hit.forEach(x=>damage(c,x,c.atk*a.power*power));
+      const gain=Math.round(c.maxHp*(a.shieldPerHit||0)*hit.length);c.shield+=gain;if(gain)fxFloat(c,'+'+gain+' ESCUDO','shield')
     }
   }
   function flash(cid,cls){const e=document.querySelector('[data-cid="'+cid+'"]');if(!e)return;e.classList.remove(cls);void e.offsetWidth;e.classList.add(cls);setTimeout(()=>e.classList.remove(cls),360)}
@@ -2503,9 +2535,10 @@
       d.classList.toggle('has-shield',(c.shield||0)>0);d.classList.toggle('status-burn',!!c.effects.burn);d.classList.toggle('status-poison',!!c.effects.poison);
       d.classList.toggle('status-root',c.rootUntil>state.combat.elapsedMs);d.classList.toggle('status-chill',c.chillUntil>state.combat.elapsedMs);d.classList.toggle('status-stun',(c.stun||0)>0);
       d.title=c.name+' • HP '+Math.ceil(c.hp)+'/'+c.maxHp+' • Escudo '+Math.ceil(c.shield)+(c.effects.poison?' • Veneno':'')+(c.effects.burn?' • Queimadura':'')+(c.rootUntil>state.combat.elapsedMs?' • Enraizado':'');
-      d.style.left=(ox+c.x*sx)+'px';d.style.top=(oy+c.y*sy)+'px';
+      if(d.dataset.fxX!==undefined&&(Number(d.dataset.fxX)!==c.x||Number(d.dataset.fxY)!==c.y)){d.classList.add('moving');setTimeout(()=>d.classList.remove('moving'),250)}
+      d.dataset.fxX=String(c.x);d.dataset.fxY=String(c.y);d.style.left=(ox+c.x*sx)+'px';d.style.top=(oy+c.y*sy)+'px';
       const hp=Math.max(0,Math.round(c.hp/c.maxHp*100));d.querySelector('.hp i').style.width=hp+'%';d.querySelector('.mana i').style.width=Math.min(100,c.mana)+'%';
-      const img=d.querySelector('img');const src=SPRITE(c.dex);if(img.getAttribute('src')!==src)img.src=src;
+      const img=d.querySelector('img');img.src=SPRITE(c.dex);
       d.querySelector('.label').textContent=c.name+(c.summoned?' ⚡':'');
     });
     layer.querySelectorAll('.fighter').forEach(d=>{if(!known.has(d.dataset.cid))d.remove()});
