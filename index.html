@@ -3546,6 +3546,94 @@
       #gameApp .shop-economy-stats .shop-xp-stat.hud-stat{min-width:92px!important}
     }
 
+
+    /* ===== TFTMON EVOLUTION + BOSS SPRITE SCALE — visual only ===== */
+    #gameApp .cell.unit-stage-0{z-index:3!important}
+    #gameApp .cell.unit-stage-1{z-index:4!important}
+    #gameApp .cell.unit-stage-2{z-index:5!important}
+    #gameApp .cell.preview-occupied{z-index:4!important}
+    #gameApp .cell.preview-boss-cell{z-index:12!important}
+
+    #gameApp .cell .token img{
+      width:108%!important;
+      height:100%!important;
+      max-width:none!important;
+      object-fit:contain!important;
+      object-position:center bottom!important;
+      transform-origin:50% 86%!important;
+      transform:translateY(-7px) scale(var(--sprite-scale,1.18))!important;
+      filter:drop-shadow(0 8px 5px #000b)!important;
+    }
+
+    #gameApp .enemy-preview-token{
+      overflow:visible!important;
+    }
+    #gameApp .enemy-preview-token img{
+      width:104%!important;
+      height:100%!important;
+      max-width:none!important;
+      object-fit:contain!important;
+      object-position:center bottom!important;
+      transform-origin:50% 86%!important;
+      transform:translateY(-3px) scaleX(-1) scale(var(--sprite-scale,1.18))!important;
+      filter:drop-shadow(0 7px 5px #000a)!important;
+    }
+    #gameApp .enemy-preview-token.boss-preview img{
+      width:104%!important;
+      height:100%!important;
+    }
+
+    #gameApp .fighter{
+      overflow:visible!important;
+    }
+    #gameApp .fighter-sprite{
+      position:absolute;
+      z-index:2;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+      transform-origin:50% 86%;
+      transform:scale(var(--sprite-scale,1.18));
+    }
+    #gameApp .fighter-sprite img{
+      position:relative!important;
+      z-index:2!important;
+      width:106%!important;
+      height:96%!important;
+      max-width:none!important;
+      object-fit:contain!important;
+      object-position:center bottom!important;
+    }
+    #gameApp .fighter .hp,
+    #gameApp .fighter .mana,
+    #gameApp .fighter .label{z-index:20!important}
+
+    /* Boss floor marker stays on one cell; only the Pokémon sprite grows. */
+    #gameApp .fighter.boss-fighter::before{
+      width:92%!important;
+      height:27%!important;
+      opacity:.95;
+    }
+
+    @media(max-width:820px){
+      #gameApp .cell .token img{
+        width:106%!important;
+        height:98%!important;
+        transform:translateY(-5px) scale(var(--sprite-scale,1.18))!important;
+      }
+      #gameApp .enemy-preview-token img{
+        width:102%!important;
+        height:100%!important;
+        transform:translateY(-2px) scaleX(-1) scale(var(--sprite-scale,1.18))!important;
+      }
+      #gameApp .fighter-sprite img{
+        width:104%!important;
+        height:96%!important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -3994,8 +4082,21 @@
       d.onclick=()=>openTypeInfo(t);els.synergies.appendChild(d);
     });
   }
+  function spriteScaleForStage(stage=0){
+    const s=Math.max(0,Math.min(2,Number(stage)||0));
+    return [1.18,1.36,1.54][s];
+  }
+  function spriteScaleForCombat(c){
+    const thirdStage=spriteScaleForStage(2);
+    if(c?.boss){
+      const factor={onix:2,tauros:1,raikou:1.4,entei:1.4,suicune:1.4,mewtwo:1.6}[c.bossKey]||1.25;
+      return thirdStage*factor;
+    }
+    return spriteScaleForStage(c?.stage||0);
+  }
   function createToken(u,location,index){
     const p=stageData(u),d=document.createElement('div');d.className='token'+(p.special?' special-token':'')+(state.selected&&state.selected.id===u.id?' selected':'');
+    d.style.setProperty('--sprite-scale',String(spriteScaleForStage(u.stage)));
     d.innerHTML='<img src="'+SPRITE(p.dex)+'" alt="'+p.name+'"><div class="mini">'+(p.special?'<span class="special-stars">★★★★</span> ':'')+p.name+(u.stage?' • E'+(u.stage+1):'')+'</div>';
     d.draggable=!state.battle&&!state.gameOver;
     d.ondragstart=e=>{
@@ -4009,6 +4110,7 @@
   }
   function createEnemyPreviewToken(c){
     const d=document.createElement('div');d.className='enemy-preview-token'+(c.boss?' boss-preview':'');
+    d.style.setProperty('--sprite-scale',String(spriteScaleForCombat(c)));
     d.innerHTML='<img src="'+SPRITE(c.dex)+'" alt="'+c.name+'"><div class="enemy-preview-name">'+c.name+'</div>';
     d.title=c.name;return d;
   }
@@ -4023,9 +4125,16 @@
       if(i>=21){cell.onclick=()=>placeSelected(i);setDropZone(cell,'board',i)}
       if(i<21&&preview){
         const enemy=preview.units.find(x=>!x.dead&&x.x===i%7&&x.y===Math.floor(i/7));
-        if(enemy)cell.appendChild(createEnemyPreviewToken(enemy));
+        if(enemy){
+          cell.classList.add('preview-occupied');
+          if(enemy.boss)cell.classList.add('preview-boss-cell');
+          cell.appendChild(createEnemyPreviewToken(enemy));
+        }
       }
-      const u=state.board[i]; if(u&&!state.battle)cell.appendChild(createToken(u,'board',i));
+      const u=state.board[i]; if(u&&!state.battle){
+        cell.classList.add('unit-stage-'+Math.max(0,Math.min(2,u.stage||0)));
+        cell.appendChild(createToken(u,'board',i));
+      }
       els.board.appendChild(cell);
     }
     const bl=document.createElement('div');bl.className='battle-layer';bl.id='battleLayer';els.board.appendChild(bl);
@@ -4639,10 +4748,13 @@
       if(c.dead&&c.hp<=0){if(d&&!d.classList.contains('dead')){d.classList.add('dead');setTimeout(()=>d.remove?.(),320)}return}
       if(!d){
         d=document.createElement('div');d.className='fighter '+c.side;d.dataset.cid=c.cid;
-        d.innerHTML='<div class="hp"><i></i></div><div class="mana"><i></i></div><img><div class="status-fx"><i class="s1"></i><i class="s2"></i></div><div class="label"></div>';
+        d.innerHTML='<div class="hp"><i></i></div><div class="mana"><i></i></div><div class="fighter-sprite"><img></div><div class="status-fx"><i class="s1"></i><i class="s2"></i></div><div class="label"></div>';
         layer.appendChild(d)
       }
       d.classList.toggle('player',c.side==='player');d.classList.toggle('enemy',c.side==='enemy');
+      d.style.setProperty('--sprite-scale',String(spriteScaleForCombat(c)));
+      d.style.zIndex=String(c.boss?12:3+Math.max(0,Math.min(2,c.stage||0)));
+      d.classList.toggle('boss-fighter',!!c.boss);
       d.classList.toggle('dragon-ascended',!!c.dragonAscension);d.classList.toggle('dragon-resurgence',c.dragonResurgenceUntil>state.combat.elapsedMs);
       d.classList.toggle('has-shield',(c.shield||0)>0);d.classList.toggle('status-burn',!!c.effects.burn);d.classList.toggle('status-poison',!!c.effects.poison);
       d.classList.toggle('status-root',c.rootUntil>state.combat.elapsedMs);d.classList.toggle('status-chill',c.chillUntil>state.combat.elapsedMs);d.classList.toggle('status-stun',(c.stun||0)>0);
