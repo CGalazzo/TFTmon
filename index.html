@@ -1358,6 +1358,165 @@
       }
     }
 
+
+    /* ===== TFTMON COMBAT MOTION + VFX — visual-only layer ===== */
+    .battle-layer{z-index:6}
+    .fx-layer{position:absolute;inset:8px;pointer-events:none;z-index:12;overflow:visible}
+    #gameApp .fighter{
+      will-change:left,top,transform;
+      transition:left .22s cubic-bezier(.2,.75,.25,1),top .22s cubic-bezier(.2,.75,.25,1),opacity .28s,transform .22s;
+    }
+    #gameApp .fighter img{transform-origin:50% 82%;will-change:transform,filter}
+    #gameApp .fighter.player:not(.hit):not(.cast):not(.attack) img{animation:combatIdlePlayer 1.35s ease-in-out infinite}
+    #gameApp .fighter.enemy:not(.hit):not(.cast):not(.attack) img{animation:combatIdleEnemy 1.35s ease-in-out infinite}
+    #gameApp .fighter.attack{z-index:8}
+    #gameApp .fighter.attack img{animation:basicStrikePlayer .23s ease-out}
+    #gameApp .fighter.enemy.attack img{animation:basicStrikeEnemy .23s ease-out}
+    #gameApp .fighter.cast img{animation:abilityChargePlayer .38s ease-out}
+    #gameApp .fighter.enemy.cast img{animation:abilityChargeEnemy .38s ease-out}
+    #gameApp .fighter.hit img{animation:combatHit .24s ease-out}
+    #gameApp .fighter.dead{opacity:0;transform:scale(.4) translateY(10px);filter:brightness(1.7) saturate(.2)}
+    @keyframes combatIdlePlayer{
+      0%,100%{transform:translateY(-7px) scale(1)}
+      50%{transform:translateY(-11px) scale(1.018)}
+    }
+    @keyframes combatIdleEnemy{
+      0%,100%{transform:translateY(-7px) scaleX(-1) scale(1)}
+      50%{transform:translateY(-11px) scaleX(-1) scale(1.018)}
+    }
+    @keyframes basicStrikePlayer{
+      0%,100%{transform:translateY(-7px) scale(1)}
+      48%{transform:translateY(-9px) translateX(8px) scale(1.09)}
+    }
+    @keyframes basicStrikeEnemy{
+      0%,100%{transform:translateY(-7px) scaleX(-1) scale(1)}
+      48%{transform:translateY(-9px) translateX(-8px) scaleX(-1) scale(1.09)}
+    }
+    @keyframes abilityChargePlayer{
+      0%,100%{transform:translateY(-7px) scale(1)}
+      45%{transform:translateY(-13px) scale(1.14);filter:drop-shadow(0 0 14px #fff) brightness(1.5)}
+    }
+    @keyframes abilityChargeEnemy{
+      0%,100%{transform:translateY(-7px) scaleX(-1) scale(1)}
+      45%{transform:translateY(-13px) scaleX(-1) scale(1.14);filter:drop-shadow(0 0 14px #fff) brightness(1.5)}
+    }
+    @keyframes combatHit{
+      0%,100%{filter:drop-shadow(0 8px 5px #000b)}
+      30%{filter:brightness(2.2) drop-shadow(0 0 9px #fff)}
+      55%{filter:brightness(1.35) drop-shadow(0 0 12px #ff624d)}
+    }
+
+    .fighter.has-shield::after{
+      content:"";
+      position:absolute;z-index:3;left:8%;right:8%;top:7%;bottom:8%;
+      border:2px solid #78e8ff8a;border-radius:50%;
+      box-shadow:0 0 12px #37dbff7a,inset 0 0 14px #37dbff25;
+      animation:shieldBreath 1.1s ease-in-out infinite;pointer-events:none
+    }
+    @keyframes shieldBreath{50%{opacity:.55;transform:scale(1.035)}}
+
+    .fighter .status-fx{position:absolute;z-index:5;left:50%;bottom:8px;transform:translateX(-50%);width:88%;height:34%;pointer-events:none}
+    .fighter .status-fx i{position:absolute;display:block;border-radius:50%;opacity:.9}
+    .fighter.status-burn .status-fx .s1,.fighter.status-burn .status-fx .s2{
+      width:7px;height:10px;bottom:0;background:radial-gradient(circle at 50% 70%,#fff49a,#ff8a22 48%,#ff3b16 72%,transparent 74%);
+      animation:burnParticle .62s ease-out infinite
+    }
+    .fighter.status-burn .status-fx .s1{left:26%}.fighter.status-burn .status-fx .s2{right:25%;animation-delay:.23s}
+    @keyframes burnParticle{0%{transform:translateY(4px) scale(.7);opacity:0}30%{opacity:1}100%{transform:translateY(-22px) scale(1.15);opacity:0}}
+    .fighter.status-poison .status-fx .s1,.fighter.status-poison .status-fx .s2{
+      width:7px;height:7px;bottom:2px;background:#b357ff;box-shadow:0 0 7px #9b45ff;
+      animation:poisonBubble .9s ease-out infinite
+    }
+    .fighter.status-poison .status-fx .s1{left:28%}.fighter.status-poison .status-fx .s2{right:27%;animation-delay:.36s}
+    @keyframes poisonBubble{0%{transform:translateY(2px) scale(.5);opacity:0}30%{opacity:.95}100%{transform:translateY(-24px) scale(1.3);opacity:0}}
+    .fighter.status-root .status-fx{border-bottom:3px solid #70d458;border-radius:50%;box-shadow:0 3px 8px #57c94388}
+    .fighter.status-chill img{filter:drop-shadow(0 8px 5px #000b) drop-shadow(0 0 8px #83eaff)}
+    .fighter.status-stun .status-fx::before{
+      content:"✦  ✦";position:absolute;left:50%;top:-38px;transform:translateX(-50%);
+      color:#ffe66e;text-shadow:0 0 7px #ffd62e;white-space:nowrap;animation:stunOrbit .8s linear infinite
+    }
+    @keyframes stunOrbit{50%{transform:translateX(-50%) rotate(8deg) scale(1.08)}}
+
+    .fx-projectile{
+      position:absolute;height:8px;border-radius:999px;transform-origin:0 50%;
+      background:linear-gradient(90deg,#fff,var(--fx-main),transparent);
+      box-shadow:0 0 8px var(--fx-main),0 0 18px var(--fx-glow);
+      animation:projectileTravel .28s ease-in forwards
+    }
+    .fx-projectile::after{
+      content:"";position:absolute;right:-5px;top:50%;width:15px;height:15px;transform:translateY(-50%);
+      border-radius:50%;background:radial-gradient(circle,#fff 0 18%,var(--fx-main) 35%,var(--fx-glow) 58%,transparent 72%);
+      box-shadow:0 0 13px var(--fx-main)
+    }
+    @keyframes projectileTravel{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+
+    .fx-impact{
+      position:absolute;width:54px;height:54px;border-radius:50%;
+      transform:translate(-50%,-50%) scale(.25);opacity:0;
+      background:radial-gradient(circle,#fff 0 8%,var(--fx-main) 20%,var(--fx-glow) 45%,transparent 70%);
+      box-shadow:0 0 20px var(--fx-main);
+      animation:impactBurst .38s ease-out forwards
+    }
+    @keyframes impactBurst{20%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.55)}}
+
+    .fx-ring{
+      position:absolute;width:52px;height:22px;border:3px solid var(--fx-main);border-radius:50%;
+      transform:translate(-50%,-50%) scale(.25);opacity:.9;box-shadow:0 0 12px var(--fx-glow);
+      animation:ringBurst .5s ease-out forwards
+    }
+    @keyframes ringBurst{100%{width:120px;height:54px;opacity:0;transform:translate(-50%,-50%) scale(1)}}
+
+    .fx-aoe{
+      position:absolute;width:70px;height:34px;border:2px solid var(--fx-main);border-radius:50%;
+      transform:translate(-50%,-50%) scale(.2);opacity:0;background:radial-gradient(ellipse,var(--fx-glow),transparent 66%);
+      box-shadow:0 0 20px var(--fx-main);animation:aoePulse .58s ease-out forwards
+    }
+    @keyframes aoePulse{18%{opacity:.95}100%{width:190px;height:90px;opacity:0;transform:translate(-50%,-50%) scale(1)}}
+
+    .fx-float{
+      position:absolute;z-index:4;transform:translate(-50%,-50%);
+      font-weight:1000;font-size:15px;line-height:1;color:#fff;
+      text-shadow:0 2px 3px #000,0 0 7px currentColor;
+      animation:floatNumber .78s ease-out forwards;white-space:nowrap
+    }
+    .fx-float.damage{color:#fff0e9}.fx-float.heal{color:#75f3a7}.fx-float.shield{color:#7feaff}.fx-float.dodge{color:#ffe475;font-size:12px}
+    @keyframes floatNumber{0%{opacity:0;transform:translate(-50%,-20%) scale(.8)}18%{opacity:1;transform:translate(-50%,-60%) scale(1.1)}100%{opacity:0;transform:translate(-50%,-165%) scale(.92)}}
+
+    .fx-title{
+      position:absolute;z-index:5;transform:translate(-50%,-50%);
+      padding:4px 9px;border-radius:999px;background:#07111de6;border:1px solid var(--fx-main);
+      color:#fff;font-size:11px;font-weight:900;letter-spacing:.04em;
+      box-shadow:0 0 13px var(--fx-glow);text-shadow:0 1px 2px #000;
+      animation:abilityTitle .72s ease-out forwards;white-space:nowrap
+    }
+    @keyframes abilityTitle{0%{opacity:0;transform:translate(-50%,10%) scale(.85)}20%{opacity:1;transform:translate(-50%,-45%) scale(1)}100%{opacity:0;transform:translate(-50%,-130%) scale(.96)}}
+
+    .fx-screen-flash{
+      position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(circle,var(--fx-glow),transparent 68%);
+      animation:screenFlash .42s ease-out forwards
+    }
+    @keyframes screenFlash{0%{opacity:0}22%{opacity:.58}100%{opacity:0}}
+
+    .fx-type-fire{--fx-main:#ff692e;--fx-glow:#ffb12f88}
+    .fx-type-water{--fx-main:#41c9ff;--fx-glow:#48e6ff78}
+    .fx-type-electric{--fx-main:#ffe64f;--fx-glow:#75eaff8c}
+    .fx-type-grass{--fx-main:#77df62;--fx-glow:#b6ff7180}
+    .fx-type-psychic{--fx-main:#d869ff;--fx-glow:#ff72e688}
+    .fx-type-poison{--fx-main:#9e58e8;--fx-glow:#c65cff80}
+    .fx-type-ground,.fx-type-rock{--fx-main:#d49a55;--fx-glow:#ffca7180}
+    .fx-type-flying{--fx-main:#c9f4ff;--fx-glow:#77dcff78}
+    .fx-type-dragon{--fx-main:#ffc941;--fx-glow:#39dbff88}
+    .fx-type-ice{--fx-main:#a6f6ff;--fx-glow:#6cdfff8c}
+    .fx-type-steel{--fx-main:#d8e8f0;--fx-glow:#65dfff78}
+    .fx-type-heal{--fx-main:#65f2a0;--fx-glow:#8cffbc80}
+    .fx-type-shield{--fx-main:#75eaff;--fx-glow:#5cbcff80}
+    .fx-type-normal{--fx-main:#f2f4f7;--fx-glow:#a7c8df60}
+
+    @media(max-width:700px){
+      .fx-float{font-size:12px}.fx-title{font-size:9px;padding:3px 7px}
+      .fx-impact{width:42px;height:42px}
+    }
+
   </style>
 </head>
 <body>
@@ -1463,6 +1622,7 @@
 (() => {
   const SPRITE = d => 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + d + '.png';
   const COMBAT_TICK_MS = 260;
+  const COMBAT_FX_ENABLED = true; // visual-only layer; set false to disable movement/VFX without changing combat logic
   async function loadVisualAssets(){
     try{
       const read=paths=>Promise.all(paths.map(p=>fetch(p,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('asset '+p);return r.text()}))).then(parts=>parts.join('').replace(/\s/g,''));
@@ -1814,6 +1974,7 @@
       els.board.appendChild(cell);
     }
     const bl=document.createElement('div');bl.className='battle-layer';bl.id='battleLayer';els.board.appendChild(bl);
+    const fx=document.createElement('div');fx.className='fx-layer';fx.id='fxLayer';els.board.appendChild(fx);
     if(state.battle&&state.combat)renderCombat();
   }
   function renderBench(){
@@ -2166,6 +2327,66 @@
     if(dy)opts.push([c.x+1,c.y],[c.x-1,c.y]);if(dx)opts.push([c.x,c.y+1],[c.x,c.y-1]);
     for(const [x,y] of opts){if(x>=0&&x<7&&y>=0&&y<6&&!occupied(x,y,c)){c.x=x;c.y=y;return}}
   }
+  function fxTypeFor(c,kind=''){
+    if(kind==='heal')return 'heal';if(kind==='shield')return 'shield';if(kind==='blizzard')return 'ice';if(kind==='meteorMash')return 'steel';
+    if(kind==='quake')return 'ground';if(kind==='shadowBall')return 'psychic';if(kind==='dragonRush')return 'dragon';
+    return String(c?.types?.[0]||'Normal').toLowerCase();
+  }
+  function fxPoint(c){
+    if(!COMBAT_FX_ENABLED||!c)return null;
+    const layer=$('#fxLayer'),cells=els.board?.querySelectorAll?.('.cell');if(!layer||!cells?.length)return null;
+    const cell=cells[Math.max(0,Math.min(41,c.y*7+c.x))];if(!cell)return null;
+    const lr=layer.getBoundingClientRect(),r=cell.getBoundingClientRect();
+    return {x:r.left-lr.left+r.width/2,y:r.top-lr.top+r.height/2};
+  }
+  function fxNode(cls,type='normal'){
+    if(!COMBAT_FX_ENABLED)return null;
+    const layer=$('#fxLayer');if(!layer)return null;
+    const e=document.createElement('div');e.className=cls+' fx-type-'+type;layer.appendChild(e);return e;
+  }
+  function fxRemove(e,ms=800){if(e)setTimeout(()=>e.remove?.(),ms)}
+  function fxImpact(t,type='normal',delay=0){
+    if(!COMBAT_FX_ENABLED)return;setTimeout(()=>{const p=fxPoint(t),e=fxNode('fx-impact',type);if(!p||!e)return;e.style.left=p.x+'px';e.style.top=p.y+'px';fxRemove(e,460)},delay)
+  }
+  function fxRing(t,type='normal',delay=0){
+    if(!COMBAT_FX_ENABLED)return;setTimeout(()=>{const p=fxPoint(t),e=fxNode('fx-ring',type);if(!p||!e)return;e.style.left=p.x+'px';e.style.top=p.y+'px';fxRemove(e,620)},delay)
+  }
+  function fxAoe(t,type='normal',delay=0){
+    if(!COMBAT_FX_ENABLED)return;setTimeout(()=>{const p=fxPoint(t),e=fxNode('fx-aoe',type);if(!p||!e)return;e.style.left=p.x+'px';e.style.top=p.y+'px';fxRemove(e,700)},delay)
+  }
+  function fxProjectile(a,t,type='normal',delay=0){
+    if(!COMBAT_FX_ENABLED)return;setTimeout(()=>{const p1=fxPoint(a),p2=fxPoint(t);if(!p1||!p2)return;
+      const e=fxNode('fx-projectile',type);if(!e)return;const dx=p2.x-p1.x,dy=p2.y-p1.y,len=Math.hypot(dx,dy),ang=Math.atan2(dy,dx)*180/Math.PI;
+      e.style.left=p1.x+'px';e.style.top=p1.y+'px';e.style.width=Math.max(16,len)+'px';e.style.transform='rotate('+ang+'deg)';fxRemove(e,380);fxImpact(t,type,210)
+    },delay)
+  }
+  function fxFloat(t,text,cls='damage',delay=0){
+    if(!COMBAT_FX_ENABLED)return;setTimeout(()=>{const p=fxPoint(t),e=fxNode('fx-float '+cls,'normal');if(!p||!e)return;e.textContent=text;e.style.left=p.x+'px';e.style.top=(p.y-10)+'px';fxRemove(e,900)},delay)
+  }
+  function fxTitle(c,text,type='normal'){
+    if(!COMBAT_FX_ENABLED||!text)return;const p=fxPoint(c),e=fxNode('fx-title',type);if(!p||!e)return;e.textContent=text;e.style.left=p.x+'px';e.style.top=(p.y-20)+'px';fxRemove(e,820)
+  }
+  function fxScreen(type='normal'){
+    if(!COMBAT_FX_ENABLED)return;const e=fxNode('fx-screen-flash',type);fxRemove(e,520)
+  }
+  function fxAttackMotion(c){
+    if(!COMBAT_FX_ENABLED)return;flash(c.cid,'attack')
+  }
+  function fxBasicAttack(c,t){
+    if(!COMBAT_FX_ENABLED)return;fxAttackMotion(c);const type=fxTypeFor(c);
+    if((c.range||1)>1)fxProjectile(c,t,type);else fxImpact(t,type,80)
+  }
+  function fxAbility(c,targets,kind,name){
+    if(!COMBAT_FX_ENABLED)return;const list=(Array.isArray(targets)?targets:[targets]).filter(Boolean),type=fxTypeFor(c,kind);
+    fxTitle(c,name,type);fxScreen(type);
+    if(kind==='quake'){fxAoe(c,type);list.forEach((t,i)=>fxImpact(t,type,90+i*45));return}
+    if(kind==='blizzard'){list.forEach((t,i)=>{fxAoe(t,type,i*45);fxImpact(t,type,100+i*50)});return}
+    if(kind==='dragonRush'||kind==='meteorMash'){fxAttackMotion(c);list.forEach((t,i)=>fxImpact(t,type,80+i*55));return}
+    if(kind==='heal'){list.forEach((t,i)=>fxRing(t,'heal',i*50));return}
+    if(kind==='shield'){fxRing(c,'shield');list.forEach((t,i)=>fxImpact(t,type,90+i*45));return}
+    list.forEach((t,i)=>fxProjectile(c,t,type,i*55))
+  }
+
   function takeDamage(t,amount){
     const now=state.combat?.elapsedMs||0;if(t.intangibleUntil>now)return 0;
     const before=t.hp;let raw=Math.max(0,amount);
@@ -2266,16 +2487,28 @@
     renderCombat();
   }
   function renderCombat(){
-    const layer=$('#battleLayer');if(!layer||!state.combat)return;layer.innerHTML='';
-    const gap=4;
+    const layer=$('#battleLayer');if(!layer||!state.combat)return;
+    const cells=els.board.querySelectorAll('.cell'),sx=cells.length>1?cells[1].offsetLeft-cells[0].offsetLeft:60,sy=cells.length>7?cells[7].offsetTop-cells[0].offsetTop:60;
+    const ox=cells.length?cells[0].offsetLeft-layer.offsetLeft:0,oy=cells.length?cells[0].offsetTop-layer.offsetTop:0,known=new Set();
     state.combat.units.forEach(c=>{
-      if(c.dead&&c.hp<=0)return;const d=document.createElement('div');d.className='fighter '+c.side+(c.dragonAscension?' dragon-ascended':'')+(c.dragonResurgenceUntil>state.combat.elapsedMs?' dragon-resurgence':'');d.dataset.cid=c.cid;
+      known.add(c.cid);let d=layer.querySelector('[data-cid="'+c.cid+'"]');
+      if(c.dead&&c.hp<=0){if(d&&!d.classList.contains('dead')){d.classList.add('dead');setTimeout(()=>d.remove?.(),320)}return}
+      if(!d){
+        d=document.createElement('div');d.className='fighter '+c.side;d.dataset.cid=c.cid;
+        d.innerHTML='<div class="hp"><i></i></div><div class="mana"><i></i></div><img><div class="status-fx"><i class="s1"></i><i class="s2"></i></div><div class="label"></div>';
+        layer.appendChild(d)
+      }
+      d.classList.toggle('player',c.side==='player');d.classList.toggle('enemy',c.side==='enemy');
+      d.classList.toggle('dragon-ascended',!!c.dragonAscension);d.classList.toggle('dragon-resurgence',c.dragonResurgenceUntil>state.combat.elapsedMs);
+      d.classList.toggle('has-shield',(c.shield||0)>0);d.classList.toggle('status-burn',!!c.effects.burn);d.classList.toggle('status-poison',!!c.effects.poison);
+      d.classList.toggle('status-root',c.rootUntil>state.combat.elapsedMs);d.classList.toggle('status-chill',c.chillUntil>state.combat.elapsedMs);d.classList.toggle('status-stun',(c.stun||0)>0);
       d.title=c.name+' • HP '+Math.ceil(c.hp)+'/'+c.maxHp+' • Escudo '+Math.ceil(c.shield)+(c.effects.poison?' • Veneno':'')+(c.effects.burn?' • Queimadura':'')+(c.rootUntil>state.combat.elapsedMs?' • Enraizado':'');
-      const cells=els.board.querySelectorAll('.cell'),sx=cells.length>1?cells[1].offsetLeft-cells[0].offsetLeft:60,sy=cells.length>7?cells[7].offsetTop-cells[0].offsetTop:60;
-      const ox=cells.length?cells[0].offsetLeft-layer.offsetLeft:0,oy=cells.length?cells[0].offsetTop-layer.offsetTop:0;
       d.style.left=(ox+c.x*sx)+'px';d.style.top=(oy+c.y*sy)+'px';
-      const hp=Math.max(0,Math.round(c.hp/c.maxHp*100));d.innerHTML='<div class="hp"><i style="width:'+hp+'%"></i></div><div class="mana"><i style="width:'+Math.min(100,c.mana)+'%"></i></div><img src="'+SPRITE(c.dex)+'"><div class="label">'+c.name+(c.summoned?' ⚡':'')+'</div>';layer.appendChild(d)
+      const hp=Math.max(0,Math.round(c.hp/c.maxHp*100));d.querySelector('.hp i').style.width=hp+'%';d.querySelector('.mana i').style.width=Math.min(100,c.mana)+'%';
+      const img=d.querySelector('img');const src=SPRITE(c.dex);if(img.getAttribute('src')!==src)img.src=src;
+      d.querySelector('.label').textContent=c.name+(c.summoned?' ⚡':'');
     });
+    layer.querySelectorAll('.fighter').forEach(d=>{if(!known.has(d.dataset.cid))d.remove()});
   }
   function updateStreak(win){
     const result=win?'win':'loss';
