@@ -518,6 +518,421 @@
       #gameApp .card img{width:82px;height:82px}
     }
 
+
+    /* ===== TFTMON ARENA 2.0 — graphical layer only ===== */
+    @keyframes arenaEnergyFlow{
+      0%{background-position:0 50%}
+      100%{background-position:200% 50%}
+    }
+    @keyframes arenaBattlePulse{
+      0%{filter:brightness(1)}
+      35%{filter:brightness(1.22)}
+      100%{filter:brightness(1)}
+    }
+    @keyframes unitPlatformPulse{
+      0%,100%{opacity:.72;transform:translateX(-50%) scale(1)}
+      50%{opacity:1;transform:translateX(-50%) scale(1.07)}
+    }
+    @keyframes legendaryPlatformPulse{
+      0%,100%{box-shadow:0 0 10px #ffd84a7a,0 0 20px #1bdfff2b,inset 0 0 8px #fff3}
+      50%{box-shadow:0 0 18px #ffd84ad0,0 0 30px #1bdfff55,inset 0 0 12px #fff6}
+    }
+
+    #gameApp .board{
+      --arena-player:#22dfff;
+      --arena-player-soft:#8af1ff;
+      --arena-enemy:#ff7d2c;
+      --arena-enemy-soft:#ffc15f;
+      --arena-frame:#1ab8e5;
+      gap:5px;
+      padding:16px;
+      border:0;
+      border-radius:23px;
+      background:
+        linear-gradient(90deg,transparent 0 8%,#15d7ff0b 18%,transparent 31% 69%,#ff7d2709 82%,transparent 92%),
+        radial-gradient(ellipse at 50% 101%,#20dfff2e 0,transparent 47%),
+        radial-gradient(ellipse at 50% -1%,#ff722226 0,transparent 45%),
+        repeating-linear-gradient(0deg,#ffffff025 0 1px,transparent 1px 22px),
+        repeating-linear-gradient(90deg,#ffffff018 0 1px,transparent 1px 22px),
+        linear-gradient(180deg,#101c29 0 49.2%,#092334 50.8% 100%);
+      box-shadow:
+        0 30px 65px #000c,
+        0 0 0 4px #030a11,
+        0 0 0 6px #16364b,
+        0 0 0 8px #07121d,
+        0 0 28px #13cfff22,
+        inset 0 0 75px #000b,
+        inset 0 2px #8ceeff25,
+        inset 0 -4px 20px #0008;
+    }
+    #gameApp .board::before{
+      content:"✦";
+      z-index:0;
+      top:50%;
+      left:50%;
+      width:122px;
+      height:122px;
+      display:grid;
+      place-items:center;
+      transform:translate(-50%,-50%) rotate(45deg);
+      font-size:80px;
+      line-height:1;
+      letter-spacing:0;
+      color:#78eaff09;
+      border:2px solid #53e4ff08;
+      border-radius:24px;
+      text-shadow:0 0 28px #24dcff0f;
+      background:radial-gradient(circle,#28dfff06,transparent 67%);
+      white-space:normal;
+    }
+    #gameApp .board::after{
+      z-index:4;
+      left:13px;
+      right:13px;
+      top:50%;
+      height:3px;
+      transform:translateY(-1.5px);
+      border-radius:99px;
+      background:
+        linear-gradient(90deg,
+          transparent 0%,
+          var(--arena-player) 18%,
+          #d7fbff 42%,
+          #fff 50%,
+          #fff0bd 58%,
+          var(--arena-enemy) 82%,
+          transparent 100%);
+      background-size:200% 100%;
+      box-shadow:
+        0 0 7px #fff8,
+        0 0 15px #20dfff77,
+        0 0 19px #ff7d2b55;
+      animation:arenaEnergyFlow 4.2s linear infinite;
+    }
+    #gameApp .board.in-battle{animation:arenaBattlePulse .75s ease-out}
+    #gameApp .board.in-battle .cell::before{
+      opacity:.52;
+      filter:saturate(.82) brightness(.78);
+    }
+
+    /* Rectangular hit boxes stay intact; only the visible plate is beveled. */
+    #gameApp .cell{
+      isolation:isolate;
+      overflow:visible;
+      border:0;
+      border-radius:0;
+      background:transparent;
+      box-shadow:none;
+    }
+    #gameApp .cell::before{
+      content:"";
+      position:absolute;
+      inset:2px 1px 5px;
+      z-index:0;
+      pointer-events:none;
+      clip-path:polygon(10% 0,90% 0,100% 12%,100% 82%,90% 100%,10% 100%,0 82%,0 12%);
+      border-radius:7px;
+      background:
+        linear-gradient(145deg,#ffffff18 0 7%,transparent 8% 75%,#0008 76%),
+        linear-gradient(180deg,#18384d,#091723);
+      box-shadow:
+        inset 0 1px #ffffff28,
+        inset 0 -6px 10px #0007,
+        0 4px 0 #06101a,
+        0 7px 10px #0007;
+      transition:transform .14s,filter .14s,box-shadow .14s,background .14s;
+    }
+    #gameApp .cell::after{
+      content:"";
+      position:absolute;
+      left:15%;
+      right:15%;
+      bottom:7px;
+      height:2px;
+      z-index:1;
+      pointer-events:none;
+      opacity:.5;
+      border-radius:99px;
+      background:currentColor;
+      box-shadow:0 0 8px currentColor;
+    }
+    #gameApp .cell.enemy-zone{color:var(--arena-enemy)}
+    #gameApp .cell.enemy-zone::before{
+      background:
+        linear-gradient(145deg,#ffd7af15 0 7%,transparent 8% 75%,#0009 76%),
+        linear-gradient(180deg,#35232a,#17131b);
+      box-shadow:
+        inset 0 1px #ffcea524,
+        inset 0 -6px 10px #0008,
+        0 4px 0 #160b0b,
+        0 7px 10px #0008;
+    }
+    #gameApp .cell.player-zone{color:var(--arena-player)}
+    #gameApp .cell.player-zone::before{
+      background:
+        linear-gradient(145deg,#b9f7ff17 0 7%,transparent 8% 75%,#0008 76%),
+        linear-gradient(180deg,#103a50,#081c29);
+      box-shadow:
+        inset 0 1px #a3f4ff24,
+        inset 0 -6px 10px #0008,
+        0 4px 0 #03121c,
+        0 7px 10px #0008;
+    }
+    #gameApp .cell:hover{
+      transform:none;
+      border:0;
+      box-shadow:none;
+    }
+    #gameApp .cell:hover::before{
+      transform:translateY(-2px);
+      filter:brightness(1.22);
+      box-shadow:
+        inset 0 1px #ffffff3b,
+        inset 0 -6px 10px #0007,
+        0 6px 0 #06101a,
+        0 10px 15px #0009,
+        0 0 13px currentColor;
+    }
+
+    /* Drag mode: valid side lights up; hovered enemy tile visibly rejects placement. */
+    #gameApp .board.dragging-active .player-zone::before{
+      filter:brightness(1.16);
+      box-shadow:
+        inset 0 0 13px #1ce6ff1f,
+        inset 0 1px #c6fbff48,
+        0 4px 0 #03121c,
+        0 0 10px #18dcff33;
+    }
+    #gameApp .board.dragging-active .enemy-zone::before{filter:saturate(.45) brightness(.62)}
+    #gameApp .board.dragging-active .enemy-zone:hover::before{
+      filter:saturate(1) brightness(.86);
+      box-shadow:inset 0 0 16px #ff43332f,0 0 13px #ff392e55;
+    }
+    #gameApp .board.dragging-active .enemy-zone:hover::after{
+      content:"×";
+      left:50%;
+      right:auto;
+      bottom:50%;
+      width:auto;
+      height:auto;
+      transform:translate(-50%,50%);
+      color:#ff564b;
+      background:none;
+      box-shadow:none;
+      opacity:.9;
+      font-size:28px;
+      line-height:1;
+      font-weight:1000;
+      text-shadow:0 0 10px #ff2c21;
+    }
+    #gameApp .cell.drag-over{
+      transform:none;
+      background:transparent;
+      box-shadow:none;
+      outline:none;
+    }
+    #gameApp .cell.drag-over::before{
+      transform:translateY(-3px) scale(1.035);
+      filter:brightness(1.35);
+      background:
+        radial-gradient(circle,#ffe87235,transparent 65%),
+        linear-gradient(180deg,#594c22,#18212a);
+      box-shadow:
+        inset 0 0 19px #ffe87538,
+        inset 0 1px #fff3b0,
+        0 6px 0 #1a1204,
+        0 10px 18px #000a,
+        0 0 20px #ffd84aa8;
+    }
+    #gameApp .cell.drag-over::after{color:#ffe46a;opacity:1;box-shadow:0 0 13px #ffd84a}
+
+    /* Preparation pieces become sprites standing on energy pedestals, not cards. */
+    #gameApp .cell .token{
+      inset:-3px 1px 1px;
+      overflow:visible;
+      border:0;
+      border-radius:0;
+      background:transparent;
+      box-shadow:none;
+    }
+    #gameApp .cell .token::before{
+      content:"";
+      position:absolute;
+      z-index:0;
+      left:50%;
+      bottom:10px;
+      width:70%;
+      height:22%;
+      transform:translateX(-50%);
+      border-radius:50%;
+      background:
+        radial-gradient(ellipse,#bffaff80 0 10%,#20ddff5c 35%,#0477a52a 58%,transparent 72%);
+      border:1px solid #5deaff80;
+      box-shadow:0 0 10px #22dfff88,0 0 20px #0eb9e839,inset 0 0 8px #d9fbff36;
+    }
+    #gameApp .cell .token::after{
+      content:"";
+      position:absolute;
+      z-index:0;
+      left:50%;
+      bottom:14px;
+      width:52%;
+      height:10%;
+      transform:translateX(-50%);
+      border-radius:50%;
+      border:1px solid #bdf8ff4f;
+      box-shadow:0 0 9px #21dfff70;
+    }
+    #gameApp .cell .token img{
+      position:relative;
+      z-index:2;
+      width:92%;
+      height:84%;
+      transform:translateY(-5px);
+      filter:drop-shadow(0 8px 5px #000b);
+    }
+    #gameApp .cell .token:hover{
+      transform:translateY(-3px);
+      border:0;
+      box-shadow:none;
+    }
+    #gameApp .cell .token:hover::before{animation:unitPlatformPulse .8s ease-in-out infinite}
+    #gameApp .cell .token.selected{
+      outline:0;
+      border:0;
+      box-shadow:none;
+    }
+    #gameApp .cell .token.selected::before{
+      background:radial-gradient(ellipse,#fff8bd9c 0 10%,#ffd64b82 35%,#b56a0b32 60%,transparent 74%);
+      border-color:#fff0a8;
+      box-shadow:0 0 13px #ffe26ccc,0 0 27px #ffb82b77,inset 0 0 9px #fff8c080;
+      animation:unitPlatformPulse .9s ease-in-out infinite;
+    }
+    #gameApp .cell .token.special-token::after{
+      border-color:#ffe889a8;
+      box-shadow:0 0 10px #ffd84a99,0 0 17px #18ddff33;
+      animation:legendaryPlatformPulse 1.5s ease-in-out infinite;
+    }
+    #gameApp .cell .token.dragging{
+      opacity:.72;
+      transform:translateY(-10px) scale(1.06);
+      box-shadow:none;
+    }
+    #gameApp .cell .token.dragging img{filter:drop-shadow(0 14px 8px #000d) drop-shadow(0 0 9px #5deaff88)}
+    #gameApp .cell .token .mini{
+      z-index:3;
+      bottom:-2px;
+      border-color:#327493;
+      background:#020a11ef;
+    }
+
+    /* Combat units use side-colored floor rings. */
+    #gameApp .fighter{z-index:2}
+    #gameApp .fighter::before{
+      content:"";
+      position:absolute;
+      z-index:0;
+      left:50%;
+      bottom:7px;
+      width:68%;
+      height:20%;
+      transform:translateX(-50%);
+      border-radius:50%;
+      border:1px solid #64eaff70;
+      background:radial-gradient(ellipse,#aef6ff65,#1bdcff42 42%,transparent 70%);
+      box-shadow:0 0 10px #1bdfff66,0 0 19px #1bdfff28;
+    }
+    #gameApp .fighter.enemy::before{
+      border-color:#ffb46a85;
+      background:radial-gradient(ellipse,#ffe0a75d,#ff7c3348 42%,transparent 70%);
+      box-shadow:0 0 10px #ff7b3b77,0 0 19px #ff5d242b;
+    }
+    #gameApp .fighter img{
+      position:relative;
+      z-index:2;
+      width:88%;
+      height:80%;
+      transform:translateY(-4px);
+    }
+    #gameApp .fighter.enemy img{transform:translateY(-4px) scaleX(-1)}
+    #gameApp .fighter .hp,#gameApp .fighter .mana,#gameApp .fighter .label{z-index:4}
+    #gameApp .fighter.dragon-ascended::before{
+      border-color:#ffe77e;
+      background:radial-gradient(ellipse,#fff9bf88,#ffc93f61 35%,#16dfff28 58%,transparent 72%);
+      box-shadow:0 0 15px #ffe169aa,0 0 27px #19dfff55;
+    }
+
+    /* Individual boss lighting — presentation only. */
+    #gameApp .battle-preview[data-boss="onix"] + .board{
+      --arena-enemy:#b6bec8;
+      --arena-enemy-soft:#edf1f5;
+      --arena-frame:#8995a0;
+      background:
+        radial-gradient(circle at 16% 15%,#b4bcc31a 0 2%,transparent 3%),
+        radial-gradient(circle at 82% 22%,#8b969f16 0 3%,transparent 4%),
+        linear-gradient(135deg,transparent 47%,#a7b0b718 48% 49%,transparent 50%),
+        linear-gradient(180deg,#25272a 0 49.2%,#18252a 50.8% 100%);
+      box-shadow:0 30px 65px #000c,0 0 0 4px #08090a,0 0 0 6px #606b72,0 0 0 8px #0b1012,inset 0 0 65px #000b,0 0 26px #bcc5cd22;
+    }
+    #gameApp .battle-preview[data-boss="tauros"] + .board{
+      --arena-enemy:#ff9c35;
+      --arena-enemy-soft:#ffd271;
+      background:
+        radial-gradient(ellipse at 50% -5%,#ff8b2e35,transparent 50%),
+        linear-gradient(180deg,#291c11 0 49.2%,#1d2924 50.8% 100%);
+      box-shadow:0 30px 65px #000c,0 0 0 4px #110a04,0 0 0 6px #7b4b1d,0 0 0 8px #160e07,inset 0 0 65px #120600aa,0 0 30px #ff862b30;
+    }
+    #gameApp .battle-preview[data-boss="raikou"] + .board{
+      --arena-enemy:#ffe44b;
+      --arena-enemy-soft:#fff6a6;
+      background:
+        linear-gradient(120deg,transparent 0 27%,#ffe82b18 28%,transparent 29% 55%,#6eeaff14 56%,transparent 57%),
+        radial-gradient(ellipse at 50% -5%,#ffe52b2e,transparent 48%),
+        linear-gradient(180deg,#262612 0 49.2%,#092532 50.8% 100%);
+      box-shadow:0 30px 65px #000c,0 0 0 4px #0c0c05,0 0 0 6px #8c8126,0 0 0 8px #0b1519,inset 0 0 65px #000b,0 0 32px #ffe73538;
+    }
+    #gameApp .battle-preview[data-boss="entei"] + .board{
+      --arena-enemy:#ff4d22;
+      --arena-enemy-soft:#ffb04b;
+      background:
+        radial-gradient(circle at 30% 0,#ffb02b2d,transparent 26%),
+        radial-gradient(circle at 70% 0,#ff3b1f2d,transparent 34%),
+        linear-gradient(180deg,#32120d 0 49.2%,#1d252a 50.8% 100%);
+      box-shadow:0 30px 65px #000c,0 0 0 4px #140603,0 0 0 6px #8f2f1e,0 0 0 8px #160807,inset 0 0 70px #260500a3,0 0 34px #ff492b38;
+    }
+    #gameApp .battle-preview[data-boss="suicune"] + .board{
+      --arena-enemy:#5be7ff;
+      --arena-enemy-soft:#d1fbff;
+      background:
+        radial-gradient(ellipse at 50% -5%,#65eeff31,transparent 48%),
+        linear-gradient(135deg,#d2fbff08 0 1px,transparent 1px 14px),
+        linear-gradient(180deg,#102b3b 0 49.2%,#09293b 50.8% 100%);
+      box-shadow:0 30px 65px #000c,0 0 0 4px #031017,0 0 0 6px #3186a3,0 0 0 8px #06151d,inset 0 0 70px #00121f9e,0 0 34px #5beaff35;
+    }
+    #gameApp .battle-preview[data-boss="mewtwo"] + .board{
+      --arena-enemy:#d56dff;
+      --arena-enemy-soft:#f3c8ff;
+      background:
+        radial-gradient(circle at 50% 18%,#d34fff31 0 5%,transparent 28%),
+        radial-gradient(circle at 18% 16%,#9a4dff19,transparent 27%),
+        radial-gradient(circle at 82% 16%,#f14dff16,transparent 27%),
+        linear-gradient(180deg,#28132f 0 49.2%,#111d33 50.8% 100%);
+      box-shadow:0 30px 65px #000c,0 0 0 4px #100514,0 0 0 6px #713b86,0 0 0 8px #100817,inset 0 0 75px #18001faa,0 0 40px #d05cff45;
+    }
+    #gameApp .battle-preview[data-boss="mewtwo"] + .board::before{
+      color:#e187ff14;
+      border-color:#e187ff13;
+      text-shadow:0 0 30px #d15cff3a;
+    }
+
+    @media(max-width:700px){
+      #gameApp .board{padding:9px;gap:2px;border-radius:17px}
+      #gameApp .board::before{display:grid;width:78px;height:78px;font-size:50px}
+      #gameApp .cell::before{inset:1px 0 3px}
+      #gameApp .cell .token img{width:96%;height:82%}
+      #gameApp .fighter img{width:92%;height:80%}
+    }
+
   </style>
 </head>
 <body>
@@ -958,15 +1373,15 @@
     d.draggable=!state.battle&&!state.gameOver;
     d.ondragstart=e=>{
       if(state.battle||state.gameOver){e.preventDefault();return}
-      draggingUnitId=u.id;state.selected={id:u.id,location,index};d.classList.add('dragging');
+      draggingUnitId=u.id;state.selected={id:u.id,location,index};d.classList.add('dragging');els.board.classList.add('dragging-active');
       if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(u.id))}
     };
-    d.ondragend=()=>{draggingUnitId=null;d.classList.remove('dragging')};
+    d.ondragend=()=>{draggingUnitId=null;d.classList.remove('dragging');els.board.classList.remove('dragging-active')};
     d.onclick=e=>{e.stopPropagation();if(state.battle)return;state.selected={id:u.id,location,index};render()};
     return d;
   }
   function renderBoard(){
-    els.board.innerHTML='';
+    els.board.classList.toggle('in-battle',!!state.battle);els.board.innerHTML='';
     for(let i=0;i<42;i++){
       const cell=document.createElement('div');cell.className='cell '+(i<21?'enemy-zone':'player-zone');cell.dataset.i=i;
       if(i>=21){cell.onclick=()=>placeSelected(i);setDropZone(cell,'board',i)}
@@ -1092,7 +1507,7 @@
     el.ondragleave=()=>el.classList.remove('drag-over');
     el.ondrop=e=>{
       e.preventDefault();el.classList.remove('drag-over');
-      const raw=e.dataTransfer?.getData?.('text/plain'),id=raw?Number(raw):draggingUnitId;draggingUnitId=null;
+      const raw=e.dataTransfer?.getData?.('text/plain'),id=raw?Number(raw):draggingUnitId;draggingUnitId=null;els.board.classList.remove('dragging-active');
       if(Number.isFinite(id))moveUnitTo(id,destination,index);
     };
   }
@@ -1181,8 +1596,8 @@
     $('#phaseText').textContent=state.gameOver?'FIM DE JOGO':state.battle?(bossKey?'BATALHA DE BOSS — '+BOSS_DEFS[bossKey].name:'BATALHA AUTOMÁTICA'):(bossKey?'PREPARAÇÃO — BOSS: '+BOSS_DEFS[bossKey].name:'PREPARAÇÃO');
   }
   function renderBattlePreview(){
-    const el=$('#nextBattlePreview'),bossKey=bossKeyForRound(state.round,state.legendaryBoss);
-    if(state.gameOver){el.textContent='Partida encerrada.';el.classList.remove('boss');return}
+    const el=$('#nextBattlePreview'),bossKey=bossKeyForRound(state.round,state.legendaryBoss);el.dataset.boss=bossKey||'';
+    if(state.gameOver){el.textContent='Partida encerrada.';el.classList.remove('boss');el.dataset.boss='';return}
     if(bossKey){
       const d=BOSS_DEFS[bossKey];el.classList.add('boss');
       el.innerHTML='<b>👑 Etapa '+state.round+' • '+(d.count>1?d.count+'× ':'')+d.name+'</b>';el.title='Boss: vitória = 2 componentes; remover pelo menos 50% do HP = 1 componente.';
