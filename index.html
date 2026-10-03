@@ -2366,6 +2366,47 @@
     #gameApp .item-copy{width:100%}
     #gameApp .equipment-chip{padding:5px 9px}
 
+
+    /* ===== TFTMON SYNERGY ICONS — individual transparent PNGs ===== */
+    #gameApp .synergy{
+      grid-template-columns:48px minmax(0,1fr) 22px!important;
+      gap:8px!important;
+      align-items:center!important;
+    }
+    #gameApp .synergy-iconbox{
+      display:grid!important;
+      width:46px!important;
+      height:46px!important;
+      place-items:center!important;
+      padding:3px!important;
+      box-sizing:border-box!important;
+      overflow:hidden!important;
+      border-radius:10px!important;
+      border:1px solid rgba(82,190,230,.34)!important;
+      background:linear-gradient(180deg,rgba(7,31,48,.94),rgba(5,22,34,.94))!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important;
+    }
+    #gameApp .synergy-icon{
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      object-position:center;
+      pointer-events:none;
+      user-select:none;
+    }
+    @media(max-width:1240px){
+      #gameApp .synergy{
+        grid-template-columns:44px minmax(0,1fr) 18px!important;
+        gap:7px!important;
+      }
+      #gameApp .synergy-iconbox{
+        width:42px!important;
+        height:42px!important;
+        padding:3px!important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2800,7 +2841,7 @@
       const next=tier>=inf.levels.length?'MAX':inf.levels[tier];
       d.title='Clique para ver Pokémon disponíveis e bônus de '+inf.levels.join('/')+'.';
       d.setAttribute('aria-label',t+': '+c[t]+' linhas ativas. Abrir detalhes.');
-      d.innerHTML='<span class="synergy-copy"><b>'+t+'</b><small>'+c[t]+' linhas • próximo:</small><span class="synergy-next">'+next+'</span></span><strong class="synergy-count">'+c[t]+'</strong>';
+      d.innerHTML='<span class="synergy-iconbox"><img class="synergy-icon" src="assets/synergies/'+t.toLowerCase()+'.png" alt="" aria-hidden="true"></span><span class="synergy-copy"><b>'+t+'</b><small>'+c[t]+' linhas • próximo:</small><span class="synergy-next">'+next+'</span></span><strong class="synergy-count">'+c[t]+'</strong>';
       d.onclick=()=>openTypeInfo(t);els.synergies.appendChild(d);
     });
   }
