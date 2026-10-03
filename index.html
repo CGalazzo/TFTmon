@@ -2464,6 +2464,66 @@
       }
     }
 
+
+    /* ===== TFTMON HUD ICONS — individual transparent PNGs ===== */
+    #gameApp .hud-stat{
+      position:relative;
+      min-height:58px;
+      padding-left:48px!important;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
+    #gameApp .hud-sprite{
+      position:absolute;
+      left:7px;
+      top:50%;
+      width:34px;
+      height:34px;
+      transform:translateY(-50%);
+      object-fit:contain;
+      object-position:center;
+      pointer-events:none;
+      user-select:none;
+    }
+    #gameApp .hud-sprite-field{
+      left:4px;
+      width:40px;
+      height:36px;
+    }
+    #gameApp .hud-sprite-level{
+      width:36px;
+      height:36px;
+      left:6px;
+    }
+    #gameApp .shop-economy-stats .shop-stat.hud-stat{
+      min-width:112px;
+      padding-left:48px!important;
+    }
+    #gameApp .shop-economy-stats .shop-xp-stat.hud-stat{
+      min-width:128px;
+    }
+    @media(max-width:700px){
+      #gameApp .hud-stat{
+        min-height:54px;
+        padding-left:43px!important;
+      }
+      #gameApp .hud-sprite{
+        left:6px;
+        width:30px;
+        height:30px;
+      }
+      #gameApp .hud-sprite-field{
+        left:3px;
+        width:36px;
+        height:32px;
+      }
+      #gameApp .hud-sprite-level{
+        width:32px;
+        height:32px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -2491,9 +2551,9 @@
   <header class="topbar">
     <div class="brand"><div class="brand-logo" aria-label="Logo TFTmon"></div><div><h1>TFTmon</h1><div class="subtitle">Auto-battler fan-made • 25 etapas • raridades • 4★ especiais • bosses</div></div></div>
     <div class="stats">
-      <div class="stat"><span>Rodada</span><b id="roundStat">1/25</b></div>
-      <div class="stat"><span>HP</span><b id="hpStat">100</b></div>
-      <div class="stat"><span>Campo</span><b id="fieldStat">0/2</b></div>
+      <div class="stat hud-stat"><img class="hud-sprite hud-sprite-round" src="assets/hud/round.png" alt="" aria-hidden="true"><span>Rodada</span><b id="roundStat">1/25</b></div>
+      <div class="stat hud-stat"><img class="hud-sprite hud-sprite-hp" src="assets/hud/hp.png" alt="" aria-hidden="true"><span>HP</span><b id="hpStat">100</b></div>
+      <div class="stat hud-stat hud-stat-field"><img class="hud-sprite hud-sprite-field" src="assets/hud/field.png" alt="" aria-hidden="true"><span>Campo</span><b id="fieldStat">0/2</b></div>
     </div>
   </header>
   <div class="utility-bar">
@@ -2537,8 +2597,8 @@
     <div class="shop-head">
       <div class="shop-title-block"><h2>Loja Pokémon</h2><div class="subtitle" id="shopOddsText"></div></div>
       <div class="shop-economy-stats">
-        <div class="stat shop-stat"><span>Ouro</span><b id="goldStat">10</b></div>
-        <div class="stat shop-stat shop-xp-stat"><span>Nível</span><b id="levelStat">2</b><small id="xpStat">0/8 XP</small><div class="progress" id="xpProgress" role="progressbar" aria-label="Experiência para o próximo nível" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i id="xpFill" style="width:0%"></i></div></div>
+        <div class="stat shop-stat hud-stat"><img class="hud-sprite hud-sprite-gold" src="assets/hud/gold.png" alt="" aria-hidden="true"><span>Ouro</span><b id="goldStat">10</b></div>
+        <div class="stat shop-stat shop-xp-stat hud-stat"><img class="hud-sprite hud-sprite-level" src="assets/hud/level.png" alt="" aria-hidden="true"><span>Nível</span><b id="levelStat">2</b><small id="xpStat">0/8 XP</small><div class="progress" id="xpProgress" role="progressbar" aria-label="Experiência para o próximo nível" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i id="xpFill" style="width:0%"></i></div></div>
       </div>
       <div class="shop-actions"><button class="btn" id="shopInfoBtn">Chances da loja</button><button class="btn" id="lockShopBtn">🔓 Travar loja</button><button class="btn" id="rerollBtn">Reroll • 2 ouro</button></div>
     </div>
