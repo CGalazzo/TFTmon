@@ -3634,6 +3634,20 @@
       }
     }
 
+
+    /* ===== TFTMON MOBILE SPRITE BOOST — mobile only ===== */
+    @media(max-width:820px){
+      #gameApp .cell .token img{
+        transform:translateY(-5px) scale(var(--sprite-scale,1.18)) scale(var(--mobile-sprite-boost,1))!important;
+      }
+      #gameApp .enemy-preview-token img{
+        transform:translateY(-2px) scaleX(-1) scale(var(--sprite-scale,1.18)) scale(var(--mobile-sprite-boost,1))!important;
+      }
+      #gameApp .fighter-sprite{
+        transform:scale(var(--sprite-scale,1.18)) scale(var(--mobile-sprite-boost,1))!important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -4086,6 +4100,10 @@
     const s=Math.max(0,Math.min(2,Number(stage)||0));
     return [1.18,1.36,1.54][s];
   }
+  function mobileSpriteBoostForStage(stage=0){
+    const s=Math.max(0,Math.min(2,Number(stage)||0));
+    return [1.35,1.45,1.55][s];
+  }
   function spriteScaleForCombat(c){
     const thirdStage=spriteScaleForStage(2);
     if(c?.boss){
@@ -4097,6 +4115,7 @@
   function createToken(u,location,index){
     const p=stageData(u),d=document.createElement('div');d.className='token'+(p.special?' special-token':'')+(state.selected&&state.selected.id===u.id?' selected':'');
     d.style.setProperty('--sprite-scale',String(spriteScaleForStage(u.stage)));
+    d.style.setProperty('--mobile-sprite-boost',String(mobileSpriteBoostForStage(u.stage)));
     d.innerHTML='<img src="'+SPRITE(p.dex)+'" alt="'+p.name+'"><div class="mini">'+(p.special?'<span class="special-stars">★★★★</span> ':'')+p.name+(u.stage?' • E'+(u.stage+1):'')+'</div>';
     d.draggable=!state.battle&&!state.gameOver;
     d.ondragstart=e=>{
@@ -4111,6 +4130,7 @@
   function createEnemyPreviewToken(c){
     const d=document.createElement('div');d.className='enemy-preview-token'+(c.boss?' boss-preview':'');
     d.style.setProperty('--sprite-scale',String(spriteScaleForCombat(c)));
+    d.style.setProperty('--mobile-sprite-boost',String(c.boss?mobileSpriteBoostForStage(2):mobileSpriteBoostForStage(c.stage||0)));
     d.innerHTML='<img src="'+SPRITE(c.dex)+'" alt="'+c.name+'"><div class="enemy-preview-name">'+c.name+'</div>';
     d.title=c.name;return d;
   }
@@ -4753,6 +4773,7 @@
       }
       d.classList.toggle('player',c.side==='player');d.classList.toggle('enemy',c.side==='enemy');
       d.style.setProperty('--sprite-scale',String(spriteScaleForCombat(c)));
+      d.style.setProperty('--mobile-sprite-boost',String(c.boss?mobileSpriteBoostForStage(2):mobileSpriteBoostForStage(c.stage||0)));
       d.style.zIndex=String(c.boss?12:3+Math.max(0,Math.min(2,c.stage||0)));
       d.classList.toggle('boss-fighter',!!c.boss);
       d.classList.toggle('dragon-ascended',!!c.dragonAscension);d.classList.toggle('dragon-resurgence',c.dragonResurgenceUntil>state.combat.elapsedMs);
