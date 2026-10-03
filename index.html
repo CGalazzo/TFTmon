@@ -2070,6 +2070,68 @@
     #gameApp .synergy .type-art{--art-size:40px}
     #gameApp .synergy.active .type-art{transform:scale(1.04)}
 
+
+    /* ===== TFTMON OPTION A — exact approved extracted artwork ===== */
+    .oa-icon{
+      display:inline-block;
+      flex:0 0 auto;
+      background-image:var(--option-a-icons);
+      background-repeat:no-repeat;
+      background-size:500% 400%;
+      background-color:transparent!important;
+      filter:none!important;
+      box-shadow:none!important;
+      text-shadow:none!important;
+    }
+    .oa-fire{background-position:0% 0%}
+    .oa-water{background-position:25% 0%}
+    .oa-electric{background-position:50% 0%}
+    .oa-grass{background-position:75% 0%}
+    .oa-psychic{background-position:100% 0%}
+    .oa-flying{background-position:0% 33.333333%}
+    .oa-poison{background-position:25% 33.333333%}
+    .oa-ground{background-position:50% 33.333333%}
+    .oa-dragon{background-position:75% 33.333333%}
+    .oa-hp{background-position:100% 33.333333%}
+    .oa-gold{background-position:0% 66.666667%}
+    .oa-level{background-position:25% 66.666667%}
+    .oa-field{background-position:50% 66.666667%}
+    .oa-round{background-position:75% 66.666667%}
+    .oa-claw{background-position:100% 66.666667%}
+    .oa-feather{background-position:0% 100%}
+    .oa-crystal{background-position:25% 100%}
+    .oa-shell{background-position:50% 100%}
+    .oa-seed{background-position:75% 100%}
+    #gameApp .synergy .type-art{
+      --art-size:44px;
+      width:var(--art-size);
+      height:var(--art-size);
+      transform:none;
+    }
+    #gameApp .synergy.active .type-art{transform:scale(1.04)}
+    .item-art.oa-icon{
+      width:var(--art-size,52px);
+      height:var(--art-size,52px);
+    }
+    .item-art.oa-icon.compact,
+    .item-icons .item-art.oa-icon,
+    .equipment-chip .item-art.oa-icon,
+    .recipe-icons .item-art.oa-icon,
+    .recipe-result .item-art.oa-icon{
+      --art-size:30px;
+      width:var(--art-size);
+      height:var(--art-size);
+    }
+    .item-icons .item-art.oa-icon{--art-size:20px}
+    #gameApp .stat-icon.oa-icon{
+      width:32px;
+      height:32px;
+      border:0;
+      background-color:transparent;
+    }
+    #typeModalTitle{display:flex;align-items:center;gap:9px}
+    #typeModalTitle .type-art{width:38px;height:38px}
+
   </style>
 </head>
 <body>
@@ -2097,11 +2159,11 @@
   <header class="topbar">
     <div class="brand"><div class="brand-logo" aria-label="Logo TFTmon"></div><div><h1>TFTmon</h1><div class="subtitle">Auto-battler fan-made • 25 etapas • raridades • 4★ especiais • bosses</div></div></div>
     <div class="stats">
-      <div class="stat"><i class="stat-icon stat-round" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="17" fill="none" stroke="#234a79" stroke-width="8" stroke-dasharray="22 8"/><circle cx="24" cy="24" r="17" fill="none" stroke="#58e0c5" stroke-width="8" stroke-dasharray="14 80" transform="rotate(-85 24 24)"/></svg></i><span>Rodada</span><b id="roundStat">1/25</b></div>
-      <div class="stat"><i class="stat-icon stat-hp" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M24 42S7 32 7 19c0-7 5-11 11-11 3 0 5 1 6 4 2-3 4-4 7-4 6 0 11 4 11 11 0 13-18 23-18 23Z" fill="#f35b65"/><ellipse cx="16" cy="16" rx="4" ry="7" transform="rotate(35 16 16)" fill="#ffb0b3" opacity=".75"/></svg></i><span>HP</span><b id="hpStat">100</b></div>
-      <div class="stat"><i class="stat-icon stat-gold" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18" fill="#f6c64c"/><circle cx="24" cy="24" r="13" fill="#ffd96a" stroke="#b77a25" stroke-width="2"/><path d="m24 15 5 9-5 9-5-9Z" fill="#ba7b2d"/></svg></i><span>Ouro</span><b id="goldStat">10</b></div>
-      <div class="stat"><i class="stat-icon stat-level" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="m24 5 15 9v20l-15 9-15-9V14Z" fill="#10243d" stroke="#f3c85b" stroke-width="4"/><text x="24" y="29" text-anchor="middle" font-size="14" font-weight="900" fill="#fff">Lv</text><path d="m18 35 6-5 6 5" fill="none" stroke="#f3c85b" stroke-width="3" stroke-linecap="round"/></svg></i><span>Nível</span><b id="levelStat">2</b><small id="xpStat">0/8 XP</small><div class="progress" id="xpProgress" role="progressbar" aria-label="Experiência para o próximo nível" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i id="xpFill" style="width:0%"></i></div></div>
-      <div class="stat"><i class="stat-icon stat-field" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="m6 24 7-11h22l7 11-6 14H12Z" fill="#5aa65a"/><path d="M12 18h24l4 8H8Z" fill="#d6ccb0"/><path d="M15 20h18v5H15Z" fill="#b7ad91"/><path d="M14 38 9 28h8l4 10Zm20 0 5-10h-8l-4 10Z" fill="#405b7c"/></svg></i><span>Campo</span><b id="fieldStat">0/2</b></div>
+      <div class="stat"><i class="stat-icon oa-icon oa-round" aria-hidden="true"></i><span>Rodada</span><b id="roundStat">1/25</b></div>
+      <div class="stat"><i class="stat-icon oa-icon oa-hp" aria-hidden="true"></i><span>HP</span><b id="hpStat">100</b></div>
+      <div class="stat"><i class="stat-icon oa-icon oa-gold" aria-hidden="true"></i><span>Ouro</span><b id="goldStat">10</b></div>
+      <div class="stat"><i class="stat-icon oa-icon oa-level" aria-hidden="true"></i><span>Nível</span><b id="levelStat">2</b><small id="xpStat">0/8 XP</small><div class="progress" id="xpProgress" role="progressbar" aria-label="Experiência para o próximo nível" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><i id="xpFill" style="width:0%"></i></div></div>
+      <div class="stat"><i class="stat-icon oa-icon oa-field" aria-hidden="true"></i><span>Campo</span><b id="fieldStat">0/2</b></div>
     </div>
   </header>
   <div class="utility-bar">
@@ -2182,12 +2244,13 @@
   async function loadVisualAssets(){
     try{
       const read=paths=>Promise.all(paths.map(p=>fetch(p,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('asset '+p);return r.text()}))).then(parts=>parts.join('').replace(/\s/g,''));
-      const [bg,logo]=await Promise.all([
+      const [bg,logo,optionAIcons]=await Promise.all([
         read(['assets/tftmon-bg-1.b64','assets/tftmon-bg-2.b64','assets/tftmon-bg-3.b64']),
-        read(['assets/tftmon-logo-1.b64','assets/tftmon-logo-2.b64','assets/tftmon-logo-3.b64','assets/tftmon-logo-4.b64','assets/tftmon-logo-5.b64','assets/tftmon-logo-6.b64'])
+        read(['assets/tftmon-logo-1.b64','assets/tftmon-logo-2.b64','assets/tftmon-logo-3.b64','assets/tftmon-logo-4.b64','assets/tftmon-logo-5.b64','assets/tftmon-logo-6.b64']),
+        read(['assets/tftmon-option-a-icons-1.b64','assets/tftmon-option-a-icons-2.b64','assets/tftmon-option-a-icons-3.b64','assets/tftmon-option-a-icons-4.b64','assets/tftmon-option-a-icons-5.b64','assets/tftmon-option-a-icons-6.b64','assets/tftmon-option-a-icons-7.b64','assets/tftmon-option-a-icons-8.b64','assets/tftmon-option-a-icons-9.b64','assets/tftmon-option-a-icons-10.b64'])
       ]);
-      const root=document.documentElement.style,bgUrl='url("data:image/webp;base64,'+bg+'")',logoUrl='url("data:image/webp;base64,'+logo+'")';
-      root.setProperty('--start-bg-image',bgUrl);root.setProperty('--game-bg-image',bgUrl);root.setProperty('--logo-image',logoUrl);
+      const root=document.documentElement.style,bgUrl='url("data:image/webp;base64,'+bg+'")',logoUrl='url("data:image/webp;base64,'+logo+'")',optionAUrl='url("data:image/webp;base64,'+optionAIcons+'")';
+      root.setProperty('--start-bg-image',bgUrl);root.setProperty('--game-bg-image',bgUrl);root.setProperty('--logo-image',logoUrl);root.setProperty('--option-a-icons',optionAUrl);
       document.documentElement.classList.add('visual-assets-loaded');
       return true;
     }catch(e){return false}
@@ -2266,12 +2329,18 @@
   function artFrame(body,cls,label){
     return '<span class="'+cls+'" title="'+label+'"><svg viewBox="0 0 48 48" aria-hidden="true">'+body+'</svg></span>';
   }
+  const OPTION_A_ITEM_KEYS=new Set(['claw','feather','crystal','shell','seed']);
+  function optionAIcon(name,cls='',label=''){
+    return '<span class="oa-icon oa-'+name+(cls?' '+cls:'')+'" title="'+(label||name)+'" aria-hidden="true"></span>';
+  }
   function itemArt(key,compact=false){
-    const d=ITEM_DEFS[key],body=ITEM_ART[key]||ITEM_ART.crystal;
+    const d=ITEM_DEFS[key];
+    if(OPTION_A_ITEM_KEYS.has(key))return optionAIcon(key,'item-art'+(compact?' compact':''),d?.name||key);
+    const body=ITEM_ART[key]||ITEM_ART.crystal;
     return artFrame(body,'item-art'+(compact?' compact':'')+' item-art-'+key,d?.name||key);
   }
   function typeArt(type){
-    return artFrame(TYPE_ART[type]||TYPE_ART.Psychic,'type-art type-art-'+type.toLowerCase(),type);
+    return optionAIcon(type.toLowerCase(),'type-art',type);
   }
 
   const LINES = {
@@ -2534,7 +2603,7 @@
   function openTypeInfo(type){
     const inf=TYPE_INFO[type];if(!inf)return;
     const list=typeCatalog(type),active=activeCounts()[type]||0;
-    $('#typeModalTitle').textContent=inf.icon+' '+type;
+    $('#typeModalTitle').innerHTML=typeArt(type)+'<span>'+type+'</span>';
     $('#typeModalCurrent').textContent='Você tem '+active+' linha'+(active===1?'':'s')+' diferente'+(active===1?'':'s')+' dessa tipagem no campo.';
     $('#typeModalEffects').innerHTML=inf.levels.map((level,i)=>'<div class="type-effect"><strong>'+level+' linha'+(level===1?'':'s')+' diferente'+(level===1?'':'s')+'</strong><span>'+inf.desc[i]+'</span></div>').join('');
     $('#typeModalCount').textContent=list.length+' formas dessa tipagem podem aparecer na loja conforme seu nível e as chances de evolução.';
