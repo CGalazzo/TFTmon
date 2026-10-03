@@ -8,7 +8,7 @@
     :root{
       --bg:#07111f;--panel:#0e1b2d;--panel2:#13243b;--line:#28415f;--text:#f7fbff;
       --muted:#9fb3c8;--accent:#f5c542;--good:#66e29b;--bad:#ff6b6b;--blue:#5bb7ff;
-      --cell:clamp(62px,7vw,96px);--game-bg-image:none;--start-bg-image:none;--logo-image:none;--hero-image:none
+      --cell:clamp(62px,7vw,96px);--game-bg-image:none;--start-bg-image:none;--logo-image:none;--hero-image:none;--arena-image:none
     }
     *{box-sizing:border-box}
     body{margin:0;background-image:var(--game-bg-image),radial-gradient(circle at top,#18314c 0,#07111f 52%,#050b13 100%);background-size:cover;background-attachment:fixed;color:var(--text);font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;font-size:15px;font-weight:700;min-height:100vh}
@@ -3648,6 +3648,137 @@
       }
     }
 
+
+    /* ===== TFTMON APPROVED ARENA ART — real image base ===== */
+    #gameApp .arena-decor{display:none!important}
+
+    #gameApp .board,
+    #gameApp .battle-preview[data-boss] + .board{
+      width:min(100%,950px)!important;
+      max-width:950px!important;
+      aspect-ratio:950/590!important;
+      height:auto!important;
+      margin:6px auto 24px!important;
+      padding:6% 10.5% 14.6%!important;
+      grid-template-columns:repeat(7,minmax(0,1fr))!important;
+      grid-template-rows:repeat(6,minmax(0,1fr))!important;
+      gap:2px!important;
+      overflow:visible!important;
+      border:0!important;
+      border-radius:0!important;
+      background-color:transparent!important;
+      background-image:var(--arena-image),linear-gradient(180deg,#6b4e4a 0 49%,#315f72 51% 100%)!important;
+      background-size:100% 100%,100% 100%!important;
+      background-position:center,center!important;
+      background-repeat:no-repeat,no-repeat!important;
+      box-shadow:0 28px 50px #0009!important;
+    }
+
+    #gameApp .board::before,
+    #gameApp .board::after{display:none!important}
+
+    #gameApp .cell{
+      min-width:0!important;
+      min-height:0!important;
+      z-index:2!important;
+      overflow:visible!important;
+      border:0!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      border-radius:7px!important;
+    }
+    #gameApp .cell::before{
+      content:""!important;
+      position:absolute!important;
+      inset:2px!important;
+      z-index:0!important;
+      border-radius:7px!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      opacity:.42!important;
+      transition:opacity .14s,border-color .14s,background .14s,box-shadow .14s!important;
+    }
+    #gameApp .cell.enemy-zone::before{
+      border:1px solid rgba(255,153,135,.20)!important;
+    }
+    #gameApp .cell.player-zone::before{
+      border:1px solid rgba(73,213,255,.22)!important;
+    }
+    #gameApp .cell::after{
+      width:3px!important;
+      height:3px!important;
+      opacity:.08!important;
+    }
+    #gameApp .cell:hover::before{
+      opacity:.9!important;
+      border-color:currentColor!important;
+      background:rgba(255,255,255,.035)!important;
+      box-shadow:0 0 8px color-mix(in srgb,currentColor 18%,transparent)!important;
+    }
+
+    #gameApp .board.dragging-active .player-zone::before{
+      opacity:1!important;
+      border-color:#7deaffad!important;
+      background:#27d9ff0e!important;
+      box-shadow:inset 0 0 12px #29dfff14,0 0 8px #29ddff2b!important;
+    }
+    #gameApp .board.dragging-active .enemy-zone::before{
+      opacity:.14!important;
+      background:transparent!important;
+      box-shadow:none!important;
+      filter:none!important;
+    }
+    #gameApp .cell.drag-over::before{
+      opacity:1!important;
+      border-color:#ffe36ccf!important;
+      background:#ffd84c12!important;
+      box-shadow:inset 0 0 15px #ffd84c20,0 0 11px #ffd84c45!important;
+    }
+
+    /* Battle coordinate layer exactly matches the interactive 7x6 overlay. */
+    #gameApp .battle-layer,
+    #gameApp .fx-layer{
+      top:9.66%!important;
+      right:10.5%!important;
+      bottom:23.56%!important;
+      left:10.5%!important;
+      inset:auto!important;
+    }
+    #gameApp .fighter{
+      width:calc((100% - 12px)/7)!important;
+      height:calc((100% - 10px)/6)!important;
+    }
+
+    /* Keep preparation sprites above the artwork without changing their positions. */
+    #gameApp .enemy-preview-token,
+    #gameApp .cell .token{overflow:visible!important}
+
+    @media(max-width:820px){
+      #gameApp .board,
+      #gameApp .battle-preview[data-boss] + .board{
+        width:min(calc(100vw - 8px),950px)!important;
+        max-width:calc(100vw - 8px)!important;
+        aspect-ratio:950/590!important;
+        margin:4px auto 20px!important;
+        padding:6% 10.5% 14.6%!important;
+        gap:1px!important;
+        border-radius:0!important;
+      }
+      #gameApp .battle-layer,
+      #gameApp .fx-layer{
+        top:9.66%!important;
+        right:10.5%!important;
+        bottom:23.56%!important;
+        left:10.5%!important;
+        inset:auto!important;
+      }
+      #gameApp .fighter{
+        width:calc((100% - 6px)/7)!important;
+        height:calc((100% - 5px)/6)!important;
+      }
+      #gameApp .cell::before{inset:1px!important;border-radius:5px!important}
+    }
+
   </style>
 </head>
 <body>
@@ -3770,12 +3901,13 @@
   async function loadVisualAssets(){
     try{
       const read=paths=>Promise.all(paths.map(p=>fetch(p,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('asset '+p);return r.text()}))).then(parts=>parts.join('').replace(/\s/g,''));
-      const [bg,logo]=await Promise.all([
+      const [bg,logo,arena]=await Promise.all([
         read(['assets/tftmon-bg-1.b64','assets/tftmon-bg-2.b64','assets/tftmon-bg-3.b64']),
-        read(['assets/tftmon-logo-1.b64','assets/tftmon-logo-2.b64','assets/tftmon-logo-3.b64','assets/tftmon-logo-4.b64','assets/tftmon-logo-5.b64','assets/tftmon-logo-6.b64'])
+        read(['assets/tftmon-logo-1.b64','assets/tftmon-logo-2.b64','assets/tftmon-logo-3.b64','assets/tftmon-logo-4.b64','assets/tftmon-logo-5.b64','assets/tftmon-logo-6.b64']),
+        read(['assets/tftmon-arena-1.b64','assets/tftmon-arena-2.b64','assets/tftmon-arena-3.b64','assets/tftmon-arena-4.b64','assets/tftmon-arena-5.b64','assets/tftmon-arena-6.b64'])
       ]);
-      const root=document.documentElement.style,bgUrl='url("data:image/webp;base64,'+bg+'")',logoUrl='url("data:image/webp;base64,'+logo+'")';
-      root.setProperty('--start-bg-image',bgUrl);root.setProperty('--game-bg-image',bgUrl);root.setProperty('--logo-image',logoUrl);
+      const root=document.documentElement.style,bgUrl='url("data:image/webp;base64,'+bg+'")',logoUrl='url("data:image/webp;base64,'+logo+'")',arenaUrl='url("data:image/webp;base64,'+arena+'")';
+      root.setProperty('--start-bg-image',bgUrl);root.setProperty('--game-bg-image',bgUrl);root.setProperty('--logo-image',logoUrl);root.setProperty('--arena-image',arenaUrl);
       document.documentElement.classList.add('visual-assets-loaded');
       return true;
     }catch(e){return false}
