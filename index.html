@@ -3427,7 +3427,55 @@
       #gameApp .item-sprite.compact{width:24px;height:24px;flex-basis:24px}
     }
 
-  </style>
+  
+
+    /* ===== TFTMON POKEMON IDLE MOTION — visual only ===== */
+    @keyframes tftmonPokemonIdle{
+      0%,100%{translate:0 0;rotate:0deg}
+      35%{translate:0 var(--idle-lift,-2px);rotate:var(--idle-tilt-a,.4deg)}
+      70%{translate:0 var(--idle-settle,-.5px);rotate:var(--idle-tilt-b,-.3deg)}
+    }
+    #gameApp [data-idle-motion="attacker"]{
+      --idle-lift:-2px;--idle-settle:-.5px;--idle-tilt-a:.45deg;--idle-tilt-b:-.35deg;--idle-speed:2.2s;
+    }
+    #gameApp [data-idle-motion="tank"]{
+      --idle-lift:-1px;--idle-settle:-.25px;--idle-tilt-a:.16deg;--idle-tilt-b:-.12deg;--idle-speed:3s;
+    }
+    #gameApp [data-idle-motion="assassin"]{
+      --idle-lift:-2.5px;--idle-settle:-.6px;--idle-tilt-a:.75deg;--idle-tilt-b:-.65deg;--idle-speed:1.7s;
+    }
+    #gameApp [data-idle-motion="mage"]{
+      --idle-lift:-3px;--idle-settle:-.8px;--idle-tilt-a:.5deg;--idle-tilt-b:-.4deg;--idle-speed:2.45s;
+    }
+    #gameApp [data-idle-motion="support"]{
+      --idle-lift:-2px;--idle-settle:-.5px;--idle-tilt-a:.28deg;--idle-tilt-b:-.22deg;--idle-speed:2.7s;
+    }
+    #gameApp [data-idle-motion="flying"]{
+      --idle-lift:-5px;--idle-settle:-1.5px;--idle-tilt-a:.8deg;--idle-tilt-b:-.65deg;--idle-speed:2.35s;
+    }
+    #gameApp [data-idle-motion="boss"]{
+      --idle-lift:-1.25px;--idle-settle:-.3px;--idle-tilt-a:.14deg;--idle-tilt-b:-.12deg;--idle-speed:3.4s;
+    }
+    #gameApp .cell .token[data-idle-motion] img,
+    #gameApp .enemy-preview-token[data-idle-motion] img,
+    #gameApp .fighter[data-idle-motion] .fighter-sprite{
+      animation-name:tftmonPokemonIdle;
+      animation-duration:var(--idle-speed,2.2s);
+      animation-timing-function:ease-in-out;
+      animation-delay:var(--idle-delay,0s);
+      animation-iteration-count:infinite;
+      will-change:translate,rotate;
+    }
+    @media(prefers-reduced-motion:reduce){
+      #gameApp .cell .token[data-idle-motion] img,
+      #gameApp .enemy-preview-token[data-idle-motion] img,
+      #gameApp .fighter[data-idle-motion] .fighter-sprite{
+        animation:none!important;
+        translate:0 0!important;
+        rotate:0deg!important;
+      }
+    }
+</style>
 </head>
 <body>
 <section id="startScreen" class="start-screen">
@@ -3895,10 +3943,26 @@
     }
     return spriteScaleForStage(c?.stage||0);
   }
+  function idleMotionKind(p){
+    if(p?.boss)return 'boss';
+    if(Array.isArray(p?.types)&&p.types.includes('Flying'))return 'flying';
+    if(p?.role==='Tanque')return 'tank';
+    if(p?.role==='Assassino')return 'assassin';
+    if(p?.role==='Mago')return 'mage';
+    if(p?.role==='Suporte')return 'support';
+    return 'attacker';
+  }
+  function idleMotionDelay(seed){
+    const str=String(seed??0);let hash=0;
+    for(let i=0;i<str.length;i++)hash=(hash*31+str.charCodeAt(i))>>>0;
+    return '-'+((hash%9)*0.11).toFixed(2)+'s';
+  }
   function createToken(u,location,index){
     const p=stageData(u),d=document.createElement('div');d.className='token'+(p.special?' special-token':'')+(state.selected&&state.selected.id===u.id?' selected':'');
     d.style.setProperty('--sprite-scale',String(spriteScaleForStage(u.stage)));
     d.style.setProperty('--mobile-sprite-boost',String(mobileSpriteBoostForStage(u.stage)));
+    d.dataset.idleMotion=idleMotionKind(p);
+    d.style.setProperty('--idle-delay',idleMotionDelay(u.id));
     d.innerHTML='<img src="'+SPRITE(p.dex)+'" alt="'+p.name+'"><div class="mini">'+(p.special?'<span class="special-stars">★★★★</span> ':'')+p.name+(u.stage?' • E'+(u.stage+1):'')+'</div>';
     d.draggable=!state.battle&&!state.gameOver;
     d.ondragstart=e=>{
@@ -3914,6 +3978,8 @@
     const d=document.createElement('div');d.className='enemy-preview-token'+(c.boss?' boss-preview':'');
     d.style.setProperty('--sprite-scale',String(spriteScaleForCombat(c)));
     d.style.setProperty('--mobile-sprite-boost',String(c.boss?mobileSpriteBoostForStage(2):mobileSpriteBoostForStage(c.stage||0)));
+    d.dataset.idleMotion=idleMotionKind(c);
+    d.style.setProperty('--idle-delay',idleMotionDelay(c.cid||c.name+'-'+c.x+'-'+c.y));
     d.innerHTML='<img src="'+SPRITE(c.dex)+'" alt="'+c.name+'"><div class="enemy-preview-name">'+c.name+'</div>';
     d.title=c.name;return d;
   }
@@ -4554,6 +4620,8 @@
       d.classList.toggle('player',c.side==='player');d.classList.toggle('enemy',c.side==='enemy');
       d.style.setProperty('--sprite-scale',String(spriteScaleForCombat(c)));
       d.style.setProperty('--mobile-sprite-boost',String(c.boss?mobileSpriteBoostForStage(2):mobileSpriteBoostForStage(c.stage||0)));
+      d.dataset.idleMotion=idleMotionKind(c);
+      d.style.setProperty('--idle-delay',idleMotionDelay(c.cid));
       d.style.zIndex=String(c.boss?12:3+Math.max(0,Math.min(2,c.stage||0)));
       d.classList.toggle('boss-fighter',!!c.boss);
       d.classList.toggle('dragon-ascended',!!c.dragonAscension);d.classList.toggle('dragon-resurgence',c.dragonResurgenceUntil>state.combat.elapsedMs);
