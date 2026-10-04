@@ -3594,7 +3594,7 @@
     vest:{name:'Colete Protetor',icon:'🦺',recipe:['shell','seed'],stats:{def:.25,hp:.25},desc:'+25% de defesa e +25% de vida'}
   };
   const COMPONENTS=Object.keys(ITEM_DEFS).filter(k=>ITEM_DEFS[k].component);
-  const ITEM_SPRITES={claw:'assets/items/claw.png',feather:'assets/items/feather.png',crystal:'assets/items/crystal.png',shell:'assets/items/shell.png',seed:'assets/items/seed.png'};
+  const ITEM_SPRITES={claw:'assets/items/claw.png',feather:'assets/items/feather.png',crystal:'assets/items/crystal.png',shell:'assets/items/shell.png',seed:'assets/items/seed.png',muscle:'assets/items/muscle.png',scarf:'assets/items/scarf.png',glasses:'assets/items/glasses.png',metal:'assets/items/metal.png',leftovers:'assets/items/leftovers.png',quickClaw:'assets/items/quick-claw.png',orb:'assets/items/orb.png',combatBand:'assets/items/combat-band.png'};
   function itemSpriteHTML(key,cls=''){
     const src=ITEM_SPRITES[key];return src?'<img class="item-sprite '+cls+'" src="'+src+'" alt="" aria-hidden="true">':'';
   }
@@ -3816,7 +3816,7 @@
     const preview=$('#itemPreview');preview.innerHTML='';const plan=combinationPlan();
     if(plan){
       const box=document.createElement('div');box.className='item-preview';const d=ITEM_DEFS[plan.key];
-      box.innerHTML='<div class="combine-visual"><span class="combine-item">'+itemSpriteHTML(plan.a.item.key,'compact')+'<b>'+ITEM_DEFS[plan.a.item.key].name+'</b></span><span>+</span><span class="combine-item">'+itemSpriteHTML(plan.b.item.key,'compact')+'<b>'+ITEM_DEFS[plan.b.item.key].name+'</b></span><span>→</span><b>'+d.name+'</b></div><p>'+d.desc+'</p><p>Destino: '+(plan.target?stageData(plan.target).name:'mochila')+'. Os componentes serão consumidos; o equipamento não pode ser desfeito.</p>';
+      box.innerHTML='<div class="combine-visual"><span class="combine-item">'+itemSpriteHTML(plan.a.item.key,'compact')+'<b>'+ITEM_DEFS[plan.a.item.key].name+'</b></span><span>+</span><span class="combine-item">'+itemSpriteHTML(plan.b.item.key,'compact')+'<b>'+ITEM_DEFS[plan.b.item.key].name+'</b></span><span>→</span><span class="combine-item">'+itemSpriteHTML(plan.key,'compact')+'<b>'+d.name+'</b></span></div><p>'+d.desc+'</p><p>Destino: '+(plan.target?stageData(plan.target).name:'mochila')+'. Os componentes serão consumidos; o equipamento não pode ser desfeito.</p>';
       const yes=document.createElement('button');yes.className='btn primary';yes.textContent='Confirmar combinação';yes.disabled=!canManageItems();yes.onclick=confirmCombine;
       const no=document.createElement('button');no.className='btn';no.textContent='Cancelar';no.onclick=cancelCombine;box.appendChild(yes);box.appendChild(no);preview.appendChild(box);
     }else if(selected){preview.textContent='Selecionado: '+ITEM_DEFS[selected.item.key].name+(ITEM_DEFS[selected.item.key].component?'. Clique em outro componente para ver a combinação.':'');}
@@ -3826,7 +3826,7 @@
       const options=document.createElement('div');options.className='reward-options';
       state.rewardChoices.options.forEach((pair,i)=>{const button=document.createElement('button');button.className='btn reward-item-option';button.innerHTML=pair.map(k=>'<span class="reward-component">'+itemSpriteHTML(k,'compact')+'<span>'+ITEM_DEFS[k].name+'</span></span>').join('<span class="reward-plus">+</span>');button.disabled=!canManageItems();button.onclick=()=>chooseItemReward(i);options.appendChild(button)});box.appendChild(options);rewards.appendChild(box);
     }
-    $('#itemRecipes').innerHTML='<table class="recipe-table"><thead><tr><th>Componentes</th><th>Equipamento</th><th>Efeito total</th></tr></thead><tbody>'+Object.entries(ITEM_DEFS).filter(([,d])=>d.recipe).map(([key,d])=>'<tr><td><span class="recipe-components">'+d.recipe.map(k=>'<span class="recipe-component">'+itemSpriteHTML(k,'compact')+'<span>'+ITEM_DEFS[k].name+'</span></span>').join('<span class="recipe-plus">+</span>')+'</span></td><td><b>'+d.name+'</b></td><td>'+d.desc+'</td></tr>').join('')+'</tbody></table>';
+    $('#itemRecipes').innerHTML='<table class="recipe-table"><thead><tr><th>Componentes</th><th>Equipamento</th><th>Efeito total</th></tr></thead><tbody>'+Object.entries(ITEM_DEFS).filter(([,d])=>d.recipe).map(([key,d])=>'<tr><td><span class="recipe-components">'+d.recipe.map(k=>'<span class="recipe-component">'+itemSpriteHTML(k,'compact')+'<span>'+ITEM_DEFS[k].name+'</span></span>').join('<span class="recipe-plus">+</span>')+'</span></td><td><span class="recipe-component">'+itemSpriteHTML(key,'compact')+'<span><b>'+d.name+'</b></span></span></td><td>'+d.desc+'</td></tr>').join('')+'</tbody></table>';
   }
   function xpNeed(){return state.level>=9?999:state.level*4;}
   function fieldCount(){return state.board.filter(Boolean).length}
