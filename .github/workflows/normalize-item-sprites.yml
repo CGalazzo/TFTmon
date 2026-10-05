@@ -16,15 +16,34 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install Pillow
-        run: python3 -m pip install --quiet pillow
+      - name: Install image tools
+        run: python3 -m pip install --quiet pillow cairosvg
 
-      - name: Normalize only the 7 new sprites
+      - name: Rebuild fang and normalize only the 7 new sprites
         shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           from PIL import Image
+          import cairosvg
+
+          # Rebuild Presa Vital cleanly so the previously corrupted PNG is not reused.
+          svg = r'''<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+          <defs>
+            <radialGradient id="red" cx="50%" cy="50%" r="55%"><stop offset="0" stop-color="#ff6b57"/><stop offset="0.55" stop-color="#e92a37"/><stop offset="1" stop-color="#8e0f22"/></radialGradient>
+            <linearGradient id="ivory" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbea"/><stop offset="0.55" stop-color="#f1e7c7"/><stop offset="1" stop-color="#c7af83"/></linearGradient>
+            <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd46c"/><stop offset="1" stop-color="#b96b18"/></linearGradient>
+            <filter id="shadow"><feGaussianBlur stdDeviation="3"/></filter>
+          </defs>
+          <circle cx="128" cy="128" r="92" fill="url(#red)" opacity="0.28"/>
+          <path d="M55 160 C33 129 40 88 67 61 C53 90 63 104 81 111 C66 83 83 54 111 37 C95 68 104 86 124 94 C126 61 149 39 181 32 C158 56 159 79 177 96 C192 69 219 64 232 68 C205 81 199 103 206 120 C224 111 241 116 248 123 C220 127 208 144 205 162 C226 162 239 174 243 183 C214 174 194 184 184 202 C201 211 208 226 207 236 C181 216 155 216 135 226 C111 238 79 225 67 205 C89 214 105 206 112 192 C89 197 67 185 55 160Z" fill="url(#red)"/>
+          <path d="M111 58 C88 82 81 108 87 134 C93 161 111 184 135 199 C157 187 174 165 179 141 C184 115 176 89 155 66 C149 101 136 132 115 161 C119 127 116 92 111 58Z" fill="#241818" opacity="0.92"/>
+          <path d="M126 72 C112 96 109 123 114 150 C118 171 127 190 139 207 C158 181 170 155 174 129 C177 108 169 88 154 72 C153 112 143 147 124 178 C132 142 132 107 126 72Z" fill="url(#ivory)" stroke="#49352d" stroke-width="6" stroke-linejoin="round"/>
+          <path d="M103 79 L126 57 L155 69 L165 95 L143 108 L119 98 Z" fill="#2c2a32" stroke="#cc8b2d" stroke-width="6"/>
+          <path d="M126 68 L143 76 L136 93 L118 87 Z" fill="#e53935" stroke="url(#gold)" stroke-width="4"/>
+          <ellipse cx="128" cy="222" rx="62" ry="10" fill="#000" opacity="0.18" filter="url(#shadow)"/>
+          </svg>'''
+          cairosvg.svg2png(bytestring=svg.encode('utf-8'), write_to='assets/items/fang.png', output_width=256, output_height=256)
 
           names = ['fang.png','amulet.png','cloak.png','vigor.png','barrier.png','bell.png','vest.png']
           target_w, target_h = 139, 120
