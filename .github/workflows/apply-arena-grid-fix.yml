@@ -1,0 +1,19 @@
+name: Apply arena grid fix
+
+on:
+  push:
+    paths:
+      - .github/workflows/apply-arena-grid-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply arena grid fix
+        run: bash scripts/apply-arena-grid-fix.sh
