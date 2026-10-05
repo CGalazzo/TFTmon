@@ -1,4 +1,4 @@
-name: Normalize remaining item sprites
+name: Apply normalized item sprites
 
 on:
   push:
@@ -9,79 +9,64 @@ permissions:
   contents: write
 
 jobs:
-  normalize:
+  apply:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Install image tools
-        run: python3 -m pip install --quiet pillow cairosvg
+      - name: Install Pillow for validation
+        run: python3 -m pip install --quiet pillow
 
-      - name: Rebuild fang and normalize only the 7 new sprites
+      - name: Decode exact corrected sprite files
         shell: bash
         run: |
+          set -euo pipefail
+          tr -d '\n\r ' < .sprite-staging/fang.b64 | base64 -d > assets/items/fang.png
+          tr -d '\n\r ' < .sprite-staging/amulet.b64 | base64 -d > assets/items/amulet.png
+          tr -d '\n\r ' < .sprite-staging/cloak.b64 | base64 -d > assets/items/cloak.png
+          tr -d '\n\r ' < .sprite-staging/vigor.b64 | base64 -d > assets/items/vigor.png
+          cat .sprite-staging/barrier.*.b64 | tr -d '\n\r ' | base64 -d > assets/items/barrier.png
+          tr -d '\n\r ' < .sprite-staging/bell.b64 | base64 -d > assets/items/bell.png
+          tr -d '\n\r ' < .sprite-staging/vest.b64 | base64 -d > assets/items/vest.png
+
           python3 - <<'PY'
           from pathlib import Path
           from PIL import Image
-          import cairosvg
+          import hashlib
 
-          # Rebuild Presa Vital cleanly so the previously corrupted PNG is not reused.
-          svg = r'''<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
-          <defs>
-            <radialGradient id="red" cx="50%" cy="50%" r="55%"><stop offset="0" stop-color="#ff6b57"/><stop offset="0.55" stop-color="#e92a37"/><stop offset="1" stop-color="#8e0f22"/></radialGradient>
-            <linearGradient id="ivory" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffbea"/><stop offset="0.55" stop-color="#f1e7c7"/><stop offset="1" stop-color="#c7af83"/></linearGradient>
-            <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd46c"/><stop offset="1" stop-color="#b96b18"/></linearGradient>
-            <filter id="shadow"><feGaussianBlur stdDeviation="3"/></filter>
-          </defs>
-          <circle cx="128" cy="128" r="92" fill="url(#red)" opacity="0.28"/>
-          <path d="M55 160 C33 129 40 88 67 61 C53 90 63 104 81 111 C66 83 83 54 111 37 C95 68 104 86 124 94 C126 61 149 39 181 32 C158 56 159 79 177 96 C192 69 219 64 232 68 C205 81 199 103 206 120 C224 111 241 116 248 123 C220 127 208 144 205 162 C226 162 239 174 243 183 C214 174 194 184 184 202 C201 211 208 226 207 236 C181 216 155 216 135 226 C111 238 79 225 67 205 C89 214 105 206 112 192 C89 197 67 185 55 160Z" fill="url(#red)"/>
-          <path d="M111 58 C88 82 81 108 87 134 C93 161 111 184 135 199 C157 187 174 165 179 141 C184 115 176 89 155 66 C149 101 136 132 115 161 C119 127 116 92 111 58Z" fill="#241818" opacity="0.92"/>
-          <path d="M126 72 C112 96 109 123 114 150 C118 171 127 190 139 207 C158 181 170 155 174 129 C177 108 169 88 154 72 C153 112 143 147 124 178 C132 142 132 107 126 72Z" fill="url(#ivory)" stroke="#49352d" stroke-width="6" stroke-linejoin="round"/>
-          <path d="M103 79 L126 57 L155 69 L165 95 L143 108 L119 98 Z" fill="#2c2a32" stroke="#cc8b2d" stroke-width="6"/>
-          <path d="M126 68 L143 76 L136 93 L118 87 Z" fill="#e53935" stroke="url(#gold)" stroke-width="4"/>
-          <ellipse cx="128" cy="222" rx="62" ry="10" fill="#000" opacity="0.18" filter="url(#shadow)"/>
-          </svg>'''
-          cairosvg.svg2png(bytestring=svg.encode('utf-8'), write_to='assets/items/fang.png', output_width=256, output_height=256)
-
-          names = ['fang.png','amulet.png','cloak.png','vigor.png','barrier.png','bell.png','vest.png']
-          target_w, target_h = 139, 120
-          max_w, max_h = 125, 112
-
-          for name in names:
+          expected = {
+              'fang.png': ('f653d13e98a0ca3e00d3c188f32a90b43220fcd7593c71fe6279c83b0224a448', 8601),
+              'amulet.png': ('e7ac351855e977c4df75466bba6671fbcdcc232241a4311d95ab497500842505', 9356),
+              'cloak.png': ('ddb9f5b1d59df31cbd4b133c8e83091d89fc99bc8d5cf264a00fd515ac93fd91', 9091),
+              'vigor.png': ('f88fa0c594b50ea03e52a1b7c02237ed464ad5b65fd5421951311035e2ff4daa', 9264),
+              'barrier.png': ('19c1f61921aea473d02cfd329f684b0cb7152ae0ad195a027fa8aa86079a7014', 9928),
+              'bell.png': ('c6f947d9c91f89a4b73ca94f67e123933dbbe03129e976cfe295af60b71193f0', 8591),
+              'vest.png': ('2e730aa23e5622540a48970177bf0cad64a28c58a7ace9efe782fe16f320614a', 10294),
+          }
+          for name, (sha, size) in expected.items():
               p = Path('assets/items') / name
-              im = Image.open(p).convert('RGBA')
-              bbox = im.getchannel('A').getbbox()
-              if not bbox:
-                  raise RuntimeError(f'{name}: sprite sem pixels visiveis')
-              crop = im.crop(bbox)
-              cw, ch = crop.size
-              scale = min(max_w / cw, max_h / ch)
-              nw, nh = max(1, round(cw * scale)), max(1, round(ch * scale))
-              crop = crop.resize((nw, nh), Image.Resampling.LANCZOS)
-              canvas = Image.new('RGBA', (target_w, target_h), (0, 0, 0, 0))
-              canvas.alpha_composite(crop, ((target_w - nw)//2, (target_h - nh)//2))
-              try:
-                  out = canvas.quantize(colors=256, method=Image.Quantize.LIBIMAGEQUANT, dither=Image.Dither.FLOYDSTEINBERG)
-              except Exception:
-                  out = canvas.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.FLOYDSTEINBERG)
-              out.save(p, 'PNG', optimize=True)
-              check = Image.open(p)
-              if check.size != (139, 120):
-                  raise RuntimeError(f'{name}: tamanho final incorreto {check.size}')
-
-          print('Sprites normalizadas:', ', '.join(names))
+              raw = p.read_bytes()
+              if len(raw) != size:
+                  raise SystemExit(f'{name}: tamanho de arquivo incorreto {len(raw)} != {size}')
+              got = hashlib.sha256(raw).hexdigest()
+              if got != sha:
+                  raise SystemExit(f'{name}: checksum incorreto')
+              im = Image.open(p)
+              im.load()
+              if im.size != (139, 120):
+                  raise SystemExit(f'{name}: dimensoes incorretas {im.size}')
+              print(name, im.size, im.mode, len(raw), got)
           PY
 
           git diff --check
-          git diff --stat -- assets/items/fang.png assets/items/amulet.png assets/items/cloak.png assets/items/vigor.png assets/items/barrier.png assets/items/bell.png assets/items/vest.png
 
-      - name: Commit only the corrected sprite files
+      - name: Commit only the seven corrected PNGs
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add assets/items/fang.png assets/items/amulet.png assets/items/cloak.png assets/items/vigor.png assets/items/barrier.png assets/items/bell.png assets/items/vest.png
-          git commit -m 'Normalize remaining item sprite sizes and fix fang' || exit 0
+          git commit -m 'Normalize remaining combined item sprites' || exit 0
           git push origin HEAD:main
