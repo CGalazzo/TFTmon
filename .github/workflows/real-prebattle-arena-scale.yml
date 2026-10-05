@@ -1,0 +1,72 @@
+name: Real pre-battle arena scaling
+
+on:
+  push:
+    paths:
+      - .github/workflows/real-prebattle-arena-scale.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Give the arena real desktop space and preserve battle sprite size
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          marker = '/* ===== TFTMON EXACT APPROVED FLOATING ARENA — 2026-10-05 ===== */'
+          if text.count(marker) != 1:
+              raise SystemExit(f'Expected arena marker once, found {text.count(marker)}')
+
+          layout_css = '''/* Real desktop space for the 20% larger preparation arena. */
+@media (min-width:1051px){
+  #gameApp{padding-left:8px!important;padding-right:8px!important}
+  #gameApp .layout{grid-template-columns:180px minmax(0,1fr) 190px!important;gap:10px!important}
+}
+'''
+          if layout_css not in text:
+              text = text.replace(marker, layout_css + '\n' + marker, 1)
+
+          old_fighter = '#gameApp .fighter{width:9.5%!important;height:28%!important;'
+          new_fighter = '#gameApp .fighter{width:7.9167%!important;height:23.3333%!important;'
+          if text.count(old_fighter) != 1:
+              raise SystemExit(f'Expected battle fighter rule once, found {text.count(old_fighter)}')
+          text = text.replace(old_fighter, new_fighter, 1)
+
+          required = [
+              '#gameApp .layout{grid-template-columns:180px minmax(0,1fr) 190px!important;gap:10px!important}',
+              "width:min(100%,1320px)!important;max-width:1320px!important;aspect-ratio:1100/401!important;",
+              '#gameApp .board .cell .token img{width:86.4%!important;height:86.4%!important;',
+              '#gameApp .fighter{width:7.9167%!important;height:23.3333%!important;',
+              '#gameApp .cell:nth-child(1){left:25.2542%!important;top:15.9841%!important;',
+              '#gameApp .cell:nth-child(42){left:71.6602%!important;top:63.0119%!important;',
+          ]
+          for item in required:
+              if item not in text:
+                  raise SystemExit(f'Missing required result: {item}')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+          git diff --check
+          git diff -- index.html
+
+      - name: Commit real preparation scaling
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Give preparation arena real space and preserve battle sprite size'
+          git push origin HEAD:main
