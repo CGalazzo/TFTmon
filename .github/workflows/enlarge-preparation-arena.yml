@@ -1,0 +1,64 @@
+name: Enlarge preparation arena and Pokemon
+
+on:
+  push:
+    paths:
+      - .github/workflows/enlarge-preparation-arena.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Enlarge preparation view only
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          old_img = '#gameApp .board .cell .token img{width:86.4%!important;height:86.4%!important;max-width:none!important;max-height:none!important;object-fit:contain!important}'
+          new_img = '#gameApp .board .cell .token img{width:118%!important;height:118%!important;max-width:none!important;max-height:none!important;object-fit:contain!important;transform:translateY(-4%)!important;transform-origin:center bottom!important}'
+          if text.count(old_img) != 1:
+              raise SystemExit(f'Expected preparation sprite rule once, found {text.count(old_img)}')
+          text = text.replace(old_img, new_img, 1)
+
+          base = "#gameApp .board,#gameApp .battle-preview[data-boss] + .board{position:relative!important;isolation:isolate!important;display:block!important;width:min(100%,1320px)!important;max-width:1320px!important;aspect-ratio:1100/401!important;height:auto!important;margin:4px auto 26px!important;padding:0!important;overflow:visible!important;border:0!important;border-radius:0!important;background-color:transparent!important;background-image:url('assets/tftmon-arena-game.webp')!important;background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important;box-shadow:none!important}"
+          prep = "#gameApp .board:not(.in-battle):not(:has(.fighter)),#gameApp .battle-preview[data-boss] + .board:not(.in-battle):not(:has(.fighter)){width:min(100%,1420px)!important;max-width:1420px!important}"
+          if text.count(base) != 1:
+              raise SystemExit(f'Expected arena base rule once, found {text.count(base)}')
+          if prep not in text:
+              text = text.replace(base, base + '\n' + prep, 1)
+
+          required = [
+              'width:min(100%,1420px)!important;max-width:1420px!important',
+              '#gameApp .board .cell .token img{width:118%!important;height:118%!important;',
+              '#gameApp .fighter{width:7.9167%!important;height:23.3333%!important;',
+              '#gameApp .cell:nth-child(1){left:25.2542%!important;top:15.9841%!important;',
+              '#gameApp .cell:nth-child(42){left:71.6602%!important;top:63.0119%!important;',
+          ]
+          for item in required:
+              if item not in text:
+                  raise SystemExit(f'Missing required result: {item}')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+          git diff --check
+          git diff -- index.html
+
+      - name: Commit preparation sizing
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Enlarge preparation arena and Pokemon sprites'
+          git push origin HEAD:main
