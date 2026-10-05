@@ -3708,6 +3708,67 @@
     #gameApp .board:not(.in-battle) .cell.player-zone .token img{
       scale:var(--prep-row-depth,1)!important;
     }
+
+    /* ===== TFTMON COMPACT PREPARATION SYNERGY CARDS ===== */
+    /* Only the narrow desktop preparation sidebar: keep all synergy text readable without changing arena/layout widths. */
+    @media (min-width:1051px){
+      #gameApp .layout:not(:has(.board.in-battle)) .side-left{
+        padding-left:8px!important;
+        padding-right:8px!important;
+      }
+      #gameApp .layout:not(:has(.board.in-battle)) .side-left .synergy{
+        grid-template-columns:36px minmax(0,1fr)!important;
+        gap:6px!important;
+        min-height:56px!important;
+        padding:6px 7px!important;
+      }
+      #gameApp .layout:not(:has(.board.in-battle)) .side-left .synergy-iconbox{
+        width:36px!important;
+        height:36px!important;
+        padding:2px!important;
+      }
+      #gameApp .layout:not(:has(.board.in-battle)) .side-left .synergy-icon{
+        width:100%!important;
+        height:100%!important;
+      }
+      #gameApp .layout:not(:has(.board.in-battle)) .side-left .synergy-copy{
+        min-width:0!important;
+        width:100%!important;
+        overflow:visible!important;
+      }
+      #gameApp .layout:not(:has(.board.in-battle)) .side-left .synergy-copy b{
+        font-size:12px!important;
+        line-height:1.05!important;
+        white-space:nowrap!important;
+      }
+      #gameApp .layout:not(:has(.board.in-battle)) .side-left .synergy-copy small{
+        font-size:8px!important;
+        line-height:1.05!important;
+        letter-spacing:-.12px!important;
+        white-space:nowrap!important;
+      }
+      #gameApp .layout:not(:has(.board.in-battle)) .side-left .synergy-next{
+        font-size:11px!important;
+        line-height:1!important;
+        white-space:nowrap!important;
+      }
+      #gameApp .layout:not(:has(.board.in-battle)) .side-left .synergy-count{
+        position:absolute!important;
+        top:4px!important;
+        right:5px!important;
+        width:auto!important;
+        min-width:14px!important;
+        height:14px!important;
+        display:grid!important;
+        place-items:center!important;
+        padding:0 3px!important;
+        border-radius:7px!important;
+        font-size:9px!important;
+        line-height:14px!important;
+        opacity:.82!important;
+        pointer-events:none!important;
+      }
+    }
 </style>
 </head>
 <body>
