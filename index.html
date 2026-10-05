@@ -3564,7 +3564,39 @@
       transform:translateY(-9px) scale(var(--sprite-scale,1.18)) scale(1.35)!important;
       filter:drop-shadow(0 8px 5px #000b)!important;
     }
-  </style>
+  
+    /* ===== TFTMON MAJOR PREPARATION POKEMON BOOST ===== */
+    /* Preparation only; combat fighters are untouched. */
+    #gameApp .board:not(.in-battle) .cell .token img{
+      width:132%!important;
+      height:124%!important;
+      max-width:none!important;
+      max-height:none!important;
+      object-fit:contain!important;
+      object-position:center bottom!important;
+      transform-origin:50% 88%!important;
+      transform:translateY(-12px) scale(var(--sprite-scale,1.18)) scale(1.75)!important;
+      filter:drop-shadow(0 9px 6px #000b)!important;
+    }
+    #gameApp .board:not(.in-battle) .enemy-preview-token{
+      overflow:visible!important;
+      z-index:8!important;
+    }
+    #gameApp .board:not(.in-battle) .enemy-preview-token img{
+      width:148%!important;
+      height:138%!important;
+      max-width:none!important;
+      max-height:none!important;
+      object-fit:contain!important;
+      object-position:center bottom!important;
+      transform-origin:50% 88%!important;
+      transform:translateY(-9px) scaleX(-1) scale(var(--sprite-scale,1.18)) scale(2.15)!important;
+      filter:drop-shadow(0 10px 7px #000c)!important;
+    }
+    #gameApp .board:not(.in-battle) .enemy-preview-token.boss-preview img{
+      transform:translateY(-9px) scaleX(-1) scale(var(--sprite-scale,1.18)) scale(1.85)!important;
+    }
+</style>
 </head>
 <body>
 <section id="startScreen" class="start-screen">
