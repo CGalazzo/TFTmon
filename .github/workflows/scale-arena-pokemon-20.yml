@@ -1,0 +1,68 @@
+name: Scale arena and Pokemon 20 percent
+
+on:
+  push:
+    paths:
+      - .github/workflows/scale-arena-pokemon-20.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scale arena and Pokemon
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          changes = [
+              ('.app{max-width:1500px;margin:auto;padding:16px}',
+               '.app{max-width:1920px;margin:auto;padding:16px}'),
+              ("width:min(100%,1100px)!important;max-width:1100px!important;aspect-ratio:1100/401!important;",
+               "width:min(100%,1320px)!important;max-width:1320px!important;aspect-ratio:1100/401!important;"),
+              ('#gameApp .fighter{width:9.5%!important;height:28%!important;',
+               '#gameApp .fighter{width:11.4%!important;height:33.6%!important;'),
+              ('.token img{width:72%;height:72%;object-fit:contain;',
+               '.token img{width:86.4%;height:86.4%;object-fit:contain;'),
+          ]
+
+          for old, new in changes:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'Expected exactly one occurrence of {old!r}, found {count}')
+              text = text.replace(old, new, 1)
+
+          # Functional 7x6 hitbox coordinates must remain untouched.
+          required = [
+              '#gameApp .cell:nth-child(1){left:25.2542%!important;top:15.9841%!important;',
+              '#gameApp .cell:nth-child(42){left:71.6602%!important;top:63.0119%!important;',
+              "background-image:url('assets/tftmon-arena-game.webp')!important;",
+          ]
+          for marker in required:
+              if marker not in text:
+                  raise SystemExit(f'Grid/arena marker missing after scaling: {marker}')
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+          git diff --check
+          git diff -- index.html
+
+      - name: Commit scaling
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Increase arena and Pokemon size by 20 percent'
+          git push origin HEAD:main
