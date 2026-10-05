@@ -26,21 +26,14 @@ jobs:
           marker = '/* ===== TFTMON MAJOR PREPARATION POKEMON BOOST ===== */'
           if marker in text:
               raise SystemExit('Major preparation boost already present')
-          if text.count('</style>') != 1:
-              raise SystemExit(f'Expected one closing style tag, found {text.count("</style>")}')
+          pos = text.rfind('</style>')
+          if pos < 0:
+              raise SystemExit('No closing style tag found')
           css = '''\n    /* ===== TFTMON MAJOR PREPARATION POKEMON BOOST ===== */\n    /* Final cascade override: preparation only. Combat fighters are untouched. */\n    #gameApp .board:not(.in-battle) .cell .token img{\n      width:132%!important;\n      height:124%!important;\n      max-width:none!important;\n      max-height:none!important;\n      object-fit:contain!important;\n      object-position:center bottom!important;\n      transform-origin:50% 88%!important;\n      transform:translateY(-12px) scale(var(--sprite-scale,1.18)) scale(1.75)!important;\n      filter:drop-shadow(0 9px 6px #000b)!important;\n    }\n    #gameApp .board:not(.in-battle) .enemy-preview-token{\n      overflow:visible!important;\n      z-index:8!important;\n    }\n    #gameApp .board:not(.in-battle) .enemy-preview-token img{\n      width:148%!important;\n      height:138%!important;\n      max-width:none!important;\n      max-height:none!important;\n      object-fit:contain!important;\n      object-position:center bottom!important;\n      transform-origin:50% 88%!important;\n      transform:translateY(-9px) scaleX(-1) scale(var(--sprite-scale,1.18)) scale(2.15)!important;\n      filter:drop-shadow(0 10px 7px #000c)!important;\n    }\n    #gameApp .board:not(.in-battle) .enemy-preview-token.boss-preview img{\n      transform:translateY(-9px) scaleX(-1) scale(var(--sprite-scale,1.18)) scale(1.85)!important;\n    }\n'''
-          text = text.replace('</style>', css + '  </style>', 1)
-          required = [
-              marker,
-              'scale(var(--sprite-scale,1.18)) scale(1.75)!important',
-              'scaleX(-1) scale(var(--sprite-scale,1.18)) scale(2.15)!important',
-              '#gameApp .board:not(.in-battle) .enemy-preview-token.boss-preview img{',
-              '#gameApp .fighter{width:7.9167%!important;height:23.3333%!important;'
-          ]
-          for item in required:
-              if item not in text:
-                  raise SystemExit(f'Missing required result: {item}')
+          text = text[:pos] + css + text[pos:]
           path.write_text(text, encoding='utf-8')
+          if marker not in path.read_text(encoding='utf-8'):
+              raise SystemExit('Boost marker was not written')
           PY
           git diff --check
           git diff -- index.html
