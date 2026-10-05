@@ -1,0 +1,168 @@
+name: Apply no third-stage random appearances
+
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-no-third-stage-shop.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch stage odds and enemy balance
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          old = """  function difficultyProfile(round){
+    if(round<=1)return {count:1,scale:.70,stage1:0,stage2:0,synergy:0};
+    if(round===2)return {count:1,scale:.76,stage1:0,stage2:0,synergy:0};
+    if(round===3)return {count:2,scale:.80,stage1:0,stage2:0,synergy:0};
+    if(round<=5)return {count:round===4?2:3,scale:round===4?.86:.92,stage1:.05,stage2:0,synergy:0};
+    if(round<=8)return {count:3,scale:.96,stage1:.15,stage2:0,synergy:3};
+    if(round<=11)return {count:4,scale:1.00,stage1:.25,stage2:.03,synergy:3};
+    if(round<=14)return {count:5,scale:1.06,stage1:.38,stage2:.06,synergy:3};
+    if(round<=17)return {count:5,scale:1.11,stage1:.50,stage2:.12,synergy:5};
+    if(round<=21)return {count:6,scale:1.16,stage1:.58,stage2:.18,synergy:5};
+    return {count:7,scale:1.23,stage1:.64,stage2:.24,synergy:5};
+  }"""
+          new = """  function difficultyProfile(round){
+    if(round<=1)return {count:1,scale:.70,stage1:0,stage2:0,synergy:0};
+    if(round===2)return {count:1,scale:.76,stage1:0,stage2:0,synergy:0};
+    if(round===3)return {count:2,scale:.80,stage1:0,stage2:0,synergy:0};
+    if(round<=5)return {count:round===4?2:3,scale:round===4?.86:.92,stage1:0,stage2:0,synergy:0};
+    if(round<=8)return {count:3,scale:.96,stage1:.15,stage2:0,synergy:3};
+    if(round<=11)return {count:4,scale:1.00,stage1:.28,stage2:0,synergy:3};
+    if(round<=14)return {count:5,scale:1.06,stage1:.44,stage2:0,synergy:3};
+    if(round<=17)return {count:5,scale:1.11,stage1:.62,stage2:0,synergy:5};
+    if(round<=21)return {count:6,scale:1.16,stage1:.76,stage2:0,synergy:5};
+    return {count:7,scale:1.23,stage1:.88,stage2:0,synergy:5};
+  }"""
+          if old not in text:
+              raise SystemExit('difficultyProfile signature changed; refusing unsafe patch')
+          text = text.replace(old, new, 1)
+
+          old = """  function stageOdds(level=state.level,special=false){
+    if(special){
+      if(level<=6)return [94,5,1];
+      if(level===7)return [82,15,3];
+      if(level===8)return [72,21,7];
+      return [62,26,12];
+    }
+    if(level<=2)return [100,0,0];
+    if(level===3)return [98,2,0];
+    if(level===4)return [92,8,0];
+    if(level===5)return [82,16,2];
+    if(level===6)return [70,25,5];
+    if(level===7)return [58,32,10];
+    if(level===8)return [48,35,17];
+    return [40,37,23];
+  }"""
+          new = """  function stageOdds(level=state.level,special=false){
+    if(special){
+      if(level<=6)return [94,6,0];
+      if(level===7)return [82,18,0];
+      if(level===8)return [72,28,0];
+      return [62,38,0];
+    }
+    if(level<=2)return [100,0,0];
+    if(level===3)return [98,2,0];
+    if(level===4)return [92,8,0];
+    if(level===5)return [82,18,0];
+    if(level===6)return [70,30,0];
+    if(level===7)return [58,42,0];
+    if(level===8)return [48,52,0];
+    return [40,60,0];
+  }"""
+          if old not in text:
+              raise SystemExit('stageOdds signature changed; refusing unsafe patch')
+          text = text.replace(old, new, 1)
+
+          old = """  function rollStage(line){
+    const l=LINES[line];if(l.stages.length===1)return 0;
+    const o=stageOdds(state.level,!!l.special),r=Math.random()*100;
+    let desired=r<o[0]?0:r<o[0]+o[1]?1:2;
+    if(l.stages.length===2&&desired>0)return 1;
+    return Math.min(desired,l.stages.length-1);
+  }"""
+          new = """  function rollStage(line){
+    const l=LINES[line];if(l.stages.length===1)return 0;
+    const o=stageOdds(state.level,!!l.special),r=Math.random()*100;
+    const desired=r<o[0]?0:1;
+    return Math.min(desired,l.stages.length-1,1);
+  }"""
+          if old not in text:
+              raise SystemExit('rollStage signature changed; refusing unsafe patch')
+          text = text.replace(old, new, 1)
+
+          old = """  function renderShopInfo(){
+    const rows=[];for(let l=2;l<=9;l++){const o=shopOdds(l),n=stageOdds(l,false),sp=stageOdds(l,true);rows.push('<tr><td>Nv '+l+'</td><td>'+o[0]+'%</td><td>'+o[1]+'%</td><td>'+o[2]+'%</td><td>'+o[3]+'%</td><td>'+n.join(' / ')+'%</td><td>'+(l<6?'Bloqueado':sp.join(' / ')+'%')+'</td></tr>')}
+    $('#shopInfoContent').innerHTML='<table class=\"shop-table\"><thead><tr><th>Nível</th><th>1$</th><th>2$</th><th>3$</th><th>4★</th><th>Normal B/2ª/F</th><th>4★ B/2ª/F</th></tr></thead><tbody>'+rows.join('')+'</tbody></table><p class=\"item-note\">Formas evoluídas normais custam o valor equivalente ao estágio. Especiais 4★ custam 4 / 9 / 16 ouro.</p>';
+  }"""
+          new = """  function renderShopInfo(){
+    const rows=[];for(let l=2;l<=9;l++){const o=shopOdds(l),n=stageOdds(l,false),sp=stageOdds(l,true);rows.push('<tr><td>Nv '+l+'</td><td>'+o[0]+'%</td><td>'+o[1]+'%</td><td>'+o[2]+'%</td><td>'+o[3]+'%</td><td>'+n.join(' / ')+'%</td><td>'+(l<6?'Bloqueado':sp.join(' / ')+'%')+'</td></tr>')}
+    $('#shopInfoContent').innerHTML='<table class=\"shop-table\"><thead><tr><th>Nível</th><th>1$</th><th>2$</th><th>3$</th><th>4★</th><th>Normal B/2ª/3ª</th><th>4★ B/2ª/3ª</th></tr></thead><tbody>'+rows.join('')+'</tbody></table><p class=\"item-note\"><b>3º estágio não aparece na loja.</b> Ele só pode ser obtido evoluindo 3 cópias do 2º estágio. As chances removidas do 3º estágio foram transferidas para o 2º estágio.</p>';
+  }"""
+          if old not in text:
+              raise SystemExit('renderShopInfo signature changed; refusing unsafe patch')
+          text = text.replace(old, new, 1)
+
+          old = "$('#typeModalCount').textContent=list.length+' formas dessa tipagem podem aparecer na loja conforme seu nível e as chances de evolução.';"
+          new = "$('#typeModalCount').textContent=list.length+' formas dessa tipagem existem. Na loja aparecem apenas a forma base e o 2º estágio; a forma final é exclusiva de evolução.';"
+          if old not in text:
+              raise SystemExit('type modal text signature changed; refusing unsafe patch')
+          text = text.replace(old, new, 1)
+
+          old = """  function chooseEnemyStage(line,profile){
+    const max=LINES[line].stages.length-1,r=Math.random();
+    if(max>=2&&r<profile.stage2)return 2;
+    if(max>=1&&r<profile.stage2+profile.stage1)return 1;
+    return 0;
+  }
+  function traitStageForLine(line,type){
+    const stages=LINES[line].types;for(let i=0;i<stages.length;i++)if(stages[i].includes(type))return i;return 0;
+  }"""
+          new = """  function chooseEnemyStage(line,profile){
+    const max=LINES[line].stages.length-1,r=Math.random();
+    if(max>=1&&r<profile.stage1)return 1;
+    return 0;
+  }
+  function traitStageForLine(line,type){
+    const stages=LINES[line].types;for(let i=0;i<Math.min(2,stages.length);i++)if(stages[i].includes(type))return i;return 0;
+  }"""
+          if old not in text:
+              raise SystemExit('enemy stage selector signature changed; refusing unsafe patch')
+          text = text.replace(old, new, 1)
+
+          old = "const pool=ENEMY_TRAIT_POOLS[traitType],baseReady=pool.filter(k=>LINES[k].types[0].includes(traitType)),later=pool.filter(k=>!LINES[k].types[0].includes(traitType));"
+          new = "const pool=ENEMY_TRAIT_POOLS[traitType],baseReady=pool.filter(k=>LINES[k].types[0].includes(traitType)),later=pool.filter(k=>!LINES[k].types[0].includes(traitType)&&(LINES[k].types[1]||[]).includes(traitType));"
+          if old not in text:
+              raise SystemExit('enemy trait pool signature changed; refusing unsafe patch')
+          text = text.replace(old, new, 1)
+
+          path.write_text(text, encoding='utf-8')
+          PY
+
+          git diff --check
+
+      - name: Commit stage balance changes
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Remove random third-stage Pokemon and rebalance odds' || exit 0
+          git push origin HEAD:main
