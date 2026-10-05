@@ -3682,6 +3682,32 @@
         height:3px!important;
       }
     }
+
+    /* ===== TFTMON PREPARATION HITBOX ISOLATION ===== */
+    /* Large preparation sprites may overflow visually, but only their own cell is interactive. */
+    #gameApp .board:not(.in-battle) .cell.player-zone{
+      pointer-events:auto!important;
+    }
+    #gameApp .board:not(.in-battle) .cell .token{
+      pointer-events:auto!important;
+      scale:1!important;
+    }
+    #gameApp .board:not(.in-battle) .cell .token img,
+    #gameApp .board:not(.in-battle) .cell .token .mini{
+      pointer-events:none!important;
+    }
+    #gameApp .board:not(.in-battle) .enemy-preview-token,
+    #gameApp .board:not(.in-battle) .enemy-preview-token *{
+      pointer-events:none!important;
+    }
+
+    /* Preserve the perspective scale visually on the sprite instead of enlarging the draggable hitbox. */
+    #gameApp .cell:nth-child(n+22):nth-child(-n+28){--prep-row-depth:.94}
+    #gameApp .cell:nth-child(n+29):nth-child(-n+35){--prep-row-depth:1}
+    #gameApp .cell:nth-child(n+36):nth-child(-n+42){--prep-row-depth:1.06}
+    #gameApp .board:not(.in-battle) .cell.player-zone .token img{
+      scale:var(--prep-row-depth,1)!important;
+    }
 </style>
 </head>
 <body>
