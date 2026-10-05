@@ -23,11 +23,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tr -d '\n\r ' < .sprite-staging/fang.b64 | base64 -d > assets/items/fang.png
+          cat .sprite-staging/fang.[1-4].b64 | tr -d '\n\r ' | base64 -d > assets/items/fang.png
           tr -d '\n\r ' < .sprite-staging/amulet.b64 | base64 -d > assets/items/amulet.png
           tr -d '\n\r ' < .sprite-staging/cloak.b64 | base64 -d > assets/items/cloak.png
           tr -d '\n\r ' < .sprite-staging/vigor.b64 | base64 -d > assets/items/vigor.png
-          cat .sprite-staging/barrier.*.b64 | tr -d '\n\r ' | base64 -d > assets/items/barrier.png
+          cat .sprite-staging/barrier.[1-4].b64 | tr -d '\n\r ' | base64 -d > assets/items/barrier.png
           tr -d '\n\r ' < .sprite-staging/bell.b64 | base64 -d > assets/items/bell.png
           tr -d '\n\r ' < .sprite-staging/vest.b64 | base64 -d > assets/items/vest.png
 
