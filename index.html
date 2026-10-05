@@ -3642,7 +3642,7 @@
     vest:{name:'Colete Protetor',icon:'🦺',recipe:['shell','seed'],stats:{def:.25,hp:.25},desc:'+25% de defesa e +25% de vida'}
   };
   const COMPONENTS=Object.keys(ITEM_DEFS).filter(k=>ITEM_DEFS[k].component);
-  const ITEM_SPRITES={claw:'assets/items/claw.png',feather:'assets/items/feather.png',crystal:'assets/items/crystal.png',shell:'assets/items/shell.png',seed:'assets/items/seed.png',muscle:'assets/items/muscle.png',scarf:'assets/items/scarf.png',glasses:'assets/items/glasses.png',metal:'assets/items/metal.png',leftovers:'assets/items/leftovers.png',quickClaw:'assets/items/quick-claw.png',orb:'assets/items/orb.png',combatBand:'assets/items/combat-band.png'};
+  const ITEM_SPRITES={claw:'assets/items/claw.png',feather:'assets/items/feather.png',crystal:'assets/items/crystal.png',shell:'assets/items/shell.png',seed:'assets/items/seed.png',muscle:'assets/items/muscle.png',scarf:'assets/items/scarf.png',glasses:'assets/items/glasses.png',metal:'assets/items/metal.png',leftovers:'assets/items/leftovers.png',quickClaw:'assets/items/quick-claw.png',orb:'assets/items/orb.png',combatBand:'assets/items/combat-band.png',fang:'assets/items/fang.png',amulet:'assets/items/amulet.png',cloak:'assets/items/cloak.png',vigor:'assets/items/vigor.png',barrier:'assets/items/barrier.png',bell:'assets/items/bell.png',vest:'assets/items/vest.png'};
   function itemSpriteHTML(key,cls=''){
     const src=ITEM_SPRITES[key];return src?'<img class="item-sprite '+cls+'" src="'+src+'" alt="" aria-hidden="true">':'';
   }
