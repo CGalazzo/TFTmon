@@ -1,0 +1,78 @@
+name: Fix board drop hitboxes
+
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-board-drop-hitboxes.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate player hitboxes and isolate visual overflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+
+          # Confirm all 21 player cells are wired as drop zones.
+          required_drop = "if(i>=21){cell.onclick=()=>placeSelected(i);setDropZone(cell,'board',i)}"
+          if required_drop not in text:
+              raise SystemExit('Player drop-zone wiring not found')
+
+          # Confirm the 21 player hitboxes (22..42) exist and do not overlap.
+          rx = re.compile(r"#gameApp \.cell:nth-child\((\d+)\)\{left:([0-9.]+)%!important;top:([0-9.]+)%!important;width:([0-9.]+)%!important;height:([0-9.]+)%!important\}")
+          boxes = {}
+          for m in rx.finditer(text):
+              i = int(m.group(1))
+              if 22 <= i <= 42:
+                  boxes[i] = tuple(map(float, m.groups()[1:]))
+          if sorted(boxes) != list(range(22,43)):
+              raise SystemExit(f'Expected 21 player hitboxes, found {len(boxes)}')
+
+          for i in range(22,43):
+              l1,t1,w1,h1 = boxes[i]
+              r1,b1 = l1+w1,t1+h1
+              for j in range(i+1,43):
+                  l2,t2,w2,h2 = boxes[j]
+                  r2,b2 = l2+w2,t2+h2
+                  overlap_x = min(r1,r2) - max(l1,l2)
+                  overlap_y = min(b1,b2) - max(t1,t2)
+                  if overlap_x > 0.001 and overlap_y > 0.001:
+                      raise SystemExit(f'Hitboxes {i} and {j} overlap')
+
+          marker = '/* ===== TFTMON PREPARATION HITBOX ISOLATION ===== */'
+          if marker not in text:
+              pos = text.rfind('</style>')
+              if pos < 0:
+                  raise SystemExit('No closing style tag found')
+              css = '''\n    /* ===== TFTMON PREPARATION HITBOX ISOLATION ===== */\n    /* Large preparation sprites may overflow visually, but only their own cell is interactive. */\n    #gameApp .board:not(.in-battle) .cell.player-zone{\n      pointer-events:auto!important;\n    }\n    #gameApp .board:not(.in-battle) .cell .token{\n      pointer-events:auto!important;\n      scale:1!important;\n    }\n    #gameApp .board:not(.in-battle) .cell .token img,\n    #gameApp .board:not(.in-battle) .cell .token .mini{\n      pointer-events:none!important;\n    }\n    #gameApp .board:not(.in-battle) .enemy-preview-token,\n    #gameApp .board:not(.in-battle) .enemy-preview-token *{\n      pointer-events:none!important;\n    }\n\n    /* Preserve the perspective scale visually on the sprite instead of enlarging the draggable hitbox. */\n    #gameApp .cell:nth-child(n+22):nth-child(-n+28){--prep-row-depth:.94}\n    #gameApp .cell:nth-child(n+29):nth-child(-n+35){--prep-row-depth:1}\n    #gameApp .cell:nth-child(n+36):nth-child(-n+42){--prep-row-depth:1.06}\n    #gameApp .board:not(.in-battle) .cell.player-zone .token img{\n      scale:var(--prep-row-depth,1)!important;\n    }\n'''
+              text = text[:pos] + css + text[pos:]
+              path.write_text(text, encoding='utf-8')
+
+          print('Validated 21 player hitboxes: indices 22-42, no overlap')
+          print('Visual overflow no longer captures pointer/drop events')
+          PY
+          git diff --check
+
+      - name: Commit hitbox fix
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet && exit 0
+          git commit -m 'Fix adjacent preparation cell drops'
+          git push origin HEAD:main
