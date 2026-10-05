@@ -1,0 +1,87 @@
+name: Normalize remaining item sprites
+
+on:
+  push:
+    paths:
+      - '.github/workflows/normalize-item-sprites.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Pillow
+        run: python3 -m pip install --quiet pillow
+
+      - name: Restore clean fang and normalize only the 7 new sprites
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, urllib.request
+          from pathlib import Path
+          from PIL import Image
+
+          repo = os.environ['GITHUB_REPOSITORY']
+          token = os.environ['GH_TOKEN']
+          clean_fang_blob = '011c5838430ed9934a47ca5b622f829e966c087f'
+          req = urllib.request.Request(
+              f'https://api.github.com/repos/{repo}/git/blobs/{clean_fang_blob}',
+              headers={
+                  'Authorization': f'Bearer {token}',
+                  'Accept': 'application/vnd.github+json',
+                  'X-GitHub-Api-Version': '2022-11-28',
+              },
+          )
+          with urllib.request.urlopen(req) as r:
+              data = json.load(r)
+          Path('assets/items/fang.png').write_bytes(base64.b64decode(data['content']))
+
+          names = ['fang.png','amulet.png','cloak.png','vigor.png','barrier.png','bell.png','vest.png']
+          target_w, target_h = 139, 120
+          max_w, max_h = 125, 112
+
+          for name in names:
+              p = Path('assets/items') / name
+              im = Image.open(p).convert('RGBA')
+              bbox = im.getchannel('A').getbbox()
+              if not bbox:
+                  raise RuntimeError(f'{name}: sprite sem pixels visiveis')
+              crop = im.crop(bbox)
+              cw, ch = crop.size
+              scale = min(max_w / cw, max_h / ch)
+              nw, nh = max(1, round(cw * scale)), max(1, round(ch * scale))
+              crop = crop.resize((nw, nh), Image.Resampling.LANCZOS)
+              canvas = Image.new('RGBA', (target_w, target_h), (0, 0, 0, 0))
+              canvas.alpha_composite(crop, ((target_w - nw)//2, (target_h - nh)//2))
+              # Mesma ideia de PNG indexado usada pelos sprites antigos: leve e com transparência.
+              try:
+                  out = canvas.quantize(colors=256, method=Image.Quantize.LIBIMAGEQUANT, dither=Image.Dither.FLOYDSTEINBERG)
+              except Exception:
+                  out = canvas.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.FLOYDSTEINBERG)
+              out.save(p, 'PNG', optimize=True)
+              check = Image.open(p)
+              if check.size != (139, 120):
+                  raise RuntimeError(f'{name}: tamanho final incorreto {check.size}')
+
+          print('Sprites normalizadas:', ', '.join(names))
+          PY
+
+          git diff --check
+          git diff --stat -- assets/items/fang.png assets/items/amulet.png assets/items/cloak.png assets/items/vigor.png assets/items/barrier.png assets/items/bell.png assets/items/vest.png
+
+      - name: Commit only the corrected sprite files
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/items/fang.png assets/items/amulet.png assets/items/cloak.png assets/items/vigor.png assets/items/barrier.png assets/items/bell.png assets/items/vest.png
+          git commit -m 'Normalize remaining item sprite sizes and fix fang' || exit 0
+          git push origin HEAD:main
