@@ -3483,12 +3483,12 @@
     #gameApp .battle-preview[data-boss] + .board{
       position:relative!important;
       isolation:isolate!important;
-      width:min(100%,950px)!important;
-      max-width:950px!important;
-      aspect-ratio:950/590!important;
+      width:min(100%,1160px)!important;
+      max-width:1160px!important;
+      aspect-ratio:1160/390!important;
       height:auto!important;
       margin:4px auto 26px!important;
-      padding:9.7% 10.5% 23.6%!important;
+      padding:8% 17% 21% 19.5%!important;
       grid-template-columns:repeat(7,minmax(0,1fr))!important;
       grid-template-rows:repeat(6,minmax(0,1fr))!important;
       gap:0!important;
@@ -3496,7 +3496,7 @@
       border:0!important;
       border-radius:0!important;
       background-color:transparent!important;
-      background-image:url('assets/tftmon-arena-live.webp')!important;
+      background-image:url('assets/tftmon-arena-approved.webp')!important;
       background-size:100% 100%!important;
       background-position:center!important;
       background-repeat:no-repeat!important;
@@ -3570,8 +3570,8 @@
     #gameApp .battle-layer{z-index:40!important}
     #gameApp .fx-layer{z-index:25!important}
     #gameApp .fighter{
-      width:11.2%!important;
-      height:14.2%!important;
+      width:8.5%!important;
+      height:24%!important;
       transform-origin:center bottom!important;
       scale:var(--arena-depth,1);
       overflow:visible!important;
@@ -3591,11 +3591,11 @@
       #gameApp .battle-preview[data-boss] + .board{
         width:min(calc(100vw - 6px),950px)!important;
         max-width:calc(100vw - 6px)!important;
-        aspect-ratio:950/590!important;
+        aspect-ratio:1160/390!important;
         margin:2px auto 22px!important;
-        padding:9.7% 10.5% 23.6%!important;
+        padding:8% 17% 21% 19.5%!important;
       }
-      #gameApp .fighter{width:11.8%!important;height:14.8%!important}
+      #gameApp .fighter{width:9%!important;height:25%!important}
       #gameApp .cell::before{inset:1px!important;border-radius:5px!important}
     }
 
@@ -4755,12 +4755,12 @@
       if(d.dataset.fxX!==undefined&&(Number(d.dataset.fxX)!==c.x||Number(d.dataset.fxY)!==c.y)){d.classList.add('moving');setTimeout(()=>d.classList.remove('moving'),250)}
       d.dataset.fxX=String(c.x);d.dataset.fxY=String(c.y);
       const arenaTy=(c.y+.5)/6;
-      const arenaLeftPct=24.2+(11.8-24.2)*arenaTy,arenaRightPct=75.8+(88.2-75.8)*arenaTy;
+      const arenaLeftPct=23.8+(19.5-23.8)*arenaTy,arenaRightPct=79.2+(83.0-79.2)*arenaTy;
       const arenaXPct=arenaLeftPct+(arenaRightPct-arenaLeftPct)*((c.x+.5)/7);
-      const arenaYPct=17.1+(76.4-17.1)*arenaTy;
-      d.style.left=(layer.clientWidth*arenaXPct/100-layer.clientWidth*.056)+'px';
-      d.style.top=(layer.clientHeight*arenaYPct/100-layer.clientHeight*.071)+'px';
-      d.style.setProperty('--arena-depth',(0.80+arenaTy*.27).toFixed(3));
+      const arenaYPct=c.y<3?(12.7+c.y*10.0):(45.5+(c.y-3)*12.7);
+      d.style.left=(layer.clientWidth*arenaXPct/100-layer.clientWidth*.0425)+'px';
+      d.style.top=(layer.clientHeight*arenaYPct/100-layer.clientHeight*.12)+'px';
+      d.style.setProperty('--arena-depth',(0.82+arenaTy*.26).toFixed(3));
       const hp=Math.max(0,Math.round(c.hp/c.maxHp*100));d.querySelector('.hp i').style.width=hp+'%';d.querySelector('.mana i').style.width=Math.min(100,c.mana)+'%';
       const img=d.querySelector('img');img.src=SPRITE(c.dex);
       d.querySelector('.label').textContent=c.name+(c.summoned?' ⚡':'');
