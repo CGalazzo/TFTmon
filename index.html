@@ -4871,7 +4871,8 @@
     const preview=ensureEnemyPreview(),bossKey=preview.bossKey,enemy=preview.units,pb=synergyBonuses(player),eb=synergyBonuses(enemy);
     for(const c of player)applyBonus(c,pb);for(const c of enemy)applyBonus(c,eb);
     const battleStart=Date.now();
-    state.combat={units:[...player,...enemy],ticks:0,elapsedMs:0,timer:null,timeoutId:null,startedAt:battleStart,deadline:battleStart+COMBAT_LIMIT_MS,bossKey,bossInitialHp:enemy.filter(c=>c.boss).reduce((s,c)=>s+c.maxHp,0),enemyInitialHp:enemy.reduce((s,c)=>s+c.maxHp,0)};
+    state.combat={units:[...player,...enemy],ticks:0,elapsedMs:0,timer:null,timeoutId:null,assassinJumpTimer:null,startedAt:battleStart,deadline:battleStart+COMBAT_LIMIT_MS,bossKey,bossInitialHp:enemy.filter(c=>c.boss).reduce((s,c)=>s+c.maxHp,0),enemyInitialHp:enemy.reduce((s,c)=>s+c.maxHp,0)};
+    state.combat.units.forEach(c=>{if(roleHas(c,'Assassino'))c.assassinJumpPending=true});
     state.enemyPreview=null;
     if(pb.Electric===2)summonElectivire('player');
     if(!bossKey&&eb.Electric===2)summonElectivire('enemy');
@@ -4881,6 +4882,11 @@
     const label=bossKey?'BOSS • '+BOSS_DEFS[bossKey].name:'RODADA '+state.round;
     banner(label);log(bossKey?'👑 Boss da etapa '+state.round+': '+BOSS_DEFS[bossKey].name+'.':'⚔️ Rodada '+state.round+' começou.');render();
     const combat=state.combat;
+    combat.assassinJumpTimer=setTimeout(()=>{
+      if(!state.battle||state.combat!==combat)return;
+      combat.elapsedMs=Math.min(COMBAT_LIMIT_MS,Date.now()-combat.startedAt);
+      performAssassinShadowJumps();
+    },400);
     combat.timer=setInterval(combatTick,COMBAT_TICK_MS);
     combat.timeoutId=setTimeout(()=>{
       if(!state.battle||state.combat!==combat)return;
@@ -5011,6 +5017,51 @@
       .sort((a,b)=>dist(a,target)-dist(b,target)||dist(a,anchor)-dist(b,anchor));
     const next=steps[0];if(next&&dist(next,target)<dist(c,target)){c.x=next.x;c.y=next.y}
   }
+  // ===== TFTMON ASSASSIN SHADOW JUMP =====
+  // One safe opening jump for Assassins. It never overlaps another living unit.
+  function assassinShadowDestination(c,t){
+    if(!c||!t||!state.combat)return null;
+    const behind=t.side==='enemy'?-1:1;
+    const preferred=[
+      {x:t.x,y:t.y+behind},
+      {x:t.x-1,y:t.y+behind},{x:t.x+1,y:t.y+behind},
+      {x:t.x-1,y:t.y},{x:t.x+1,y:t.y},
+      {x:t.x,y:t.y-behind}
+    ];
+    const seen=new Set();
+    const valid=p=>p.x>=0&&p.x<7&&p.y>=0&&p.y<6&&!(p.x===c.x&&p.y===c.y)&&!occupied(p.x,p.y,c);
+    for(const p of preferred){
+      const key=p.x+','+p.y;if(seen.has(key))continue;seen.add(key);
+      if(valid(p))return {x:p.x,y:p.y};
+    }
+    const radius=[];
+    for(let y=0;y<6;y++)for(let x=0;x<7;x++){
+      const p={x,y};if(dist(p,t)>2||!valid(p))continue;
+      radius.push(p);
+    }
+    radius.sort((a,b)=>dist(a,t)-dist(b,t)||(t.side==='enemy'?a.y-b.y:b.y-a.y)||dist(a,c)-dist(b,c)||a.x-b.x);
+    return radius[0]||null;
+  }
+  function performAssassinShadowJumps(){
+    const combat=state.combat;if(!combat)return;
+    const assassins=combat.units.filter(c=>!c.dead&&c.assassinJumpPending&&roleHas(c,'Assassino'));
+    for(const c of assassins){
+      c.assassinJumpPending=false;
+      const foes=combat.units.filter(x=>x.side!==c.side&&!x.dead);if(!foes.length)continue;
+      const t=targetForRole(c,foes);if(!t)continue;
+      const dest=assassinShadowDestination(c,t);
+      // Revalidate immediately before moving so multiple Assassins can never share a tile.
+      if(!dest||occupied(dest.x,dest.y,c))continue;
+      fxRing(c,'ghost');
+      c.x=dest.x;c.y=dest.y;c.shadowJumped=true;
+      const now=combat.elapsedMs||0;
+      c.speedBoost=Math.max(c.speedBoost||0,.25);
+      c.speedBoostUntil=Math.max(c.speedBoostUntil||0,now+2000);
+      setTimeout(()=>{if(state.combat===combat&&!c.dead){fxRing(c,'ghost');flash(c.cid,'cast')}},35);
+    }
+    renderCombat();
+  }
+
   function fxTypeFor(c,kind=''){
     if(kind==='heal')return 'heal';if(kind==='shield')return 'shield';if(kind==='blizzard')return 'ice';if(kind==='meteorMash')return 'steel';
     if(kind==='quake')return 'ground';if(kind==='shadowBall')return 'psychic';if(kind==='dragonRush')return 'dragon';
@@ -5193,6 +5244,7 @@
       if(c.dead)continue;
       processEffects(c,state.combat.elapsedMs);if(c.dead)continue;
       if(c.stun>0){c.stun--;continue}
+      if(c.assassinJumpPending)continue;
       let actionSpeed=c.speed*(1-(c.sandSlow||0));if(c.chillUntil>state.combat.elapsedMs)actionSpeed*=1-(c.chill||0);if(c.speedBoostUntil>state.combat.elapsedMs)actionSpeed*=1+(c.speedBoost||0);
       c.meter+=actionSpeed/3.2;if(c.meter<100)continue;c.meter-=100;
       const foes=c.side==='player'?aliveE:aliveP,allies=c.side==='player'?aliveP:aliveE;if(!foes.length)continue;
@@ -5261,7 +5313,7 @@
   function closeFinalSummary(){$('#finalModal').classList.remove('open')}
   function finishBattle(win,reason=''){
     if(!state.combat)return;
-    clearInterval(state.combat.timer);clearTimeout(state.combat.timeoutId);
+    clearInterval(state.combat.timer);clearTimeout(state.combat.timeoutId);clearTimeout(state.combat.assassinJumpTimer);
     const combat=state.combat,bossKey=combat.bossKey||null,bossUnits=combat.units.filter(c=>c.boss),bossInitial=combat.bossInitialHp||0;
     const bossRemaining=bossUnits.reduce((s,c)=>s+Math.max(0,c.hp),0),bossDamageRatio=bossKey&&bossInitial?Math.max(0,Math.min(1,1-bossRemaining/bossInitial)):0;
     const enemyRemaining=combat.units.filter(c=>c.side==='enemy'&&!c.summoned).reduce((s,c)=>s+Math.max(0,c.hp),0);
