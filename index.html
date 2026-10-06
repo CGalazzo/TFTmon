@@ -4008,6 +4008,28 @@
       box-shadow:inset 0 0 14px rgba(245,197,66,.16),0 0 12px rgba(245,197,66,.22)!important;
     }
 
+
+
+    /* ===== TFTMON ENEMY INSPECTION ===== */
+    /* Click area stays inside the logical enemy cell; oversized sprites remain visual only. */
+    #gameApp .board:not(.in-battle) .enemy-preview-token{
+      pointer-events:auto!important;
+      cursor:pointer!important;
+    }
+    #gameApp .board:not(.in-battle) .enemy-preview-token *{
+      pointer-events:none!important;
+    }
+    #gameApp .battle-layer .fighter.enemy{
+      pointer-events:auto!important;
+      cursor:pointer!important;
+    }
+    #gameApp .battle-layer .fighter.player{
+      pointer-events:none!important;
+    }
+    #gameApp .battle-layer .fighter.enemy:hover .fighter-sprite{
+      filter:brightness(1.10);
+    }
+
 </style>
 </head>
 <body>
@@ -4293,7 +4315,7 @@
 
   const state = {
     round:1,maxRounds:50,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,
-    bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,enemyPreview:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss(),shopLocked:false,lastBattleSummary:null,runStats:{wins:0,losses:0,specialSeen:[],specialBought:[]}
+    bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,enemySelected:null,uid:1,combat:null,enemyPreview:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss(),shopLocked:false,lastBattleSummary:null,runStats:{wins:0,losses:0,specialSeen:[],specialBought:[]}
   };
 
   const $ = s => document.querySelector(s);
@@ -4520,11 +4542,11 @@
     d.draggable=!state.battle&&!state.gameOver;
     d.ondragstart=e=>{
       if(state.battle||state.gameOver){e.preventDefault();return}
-      draggingUnitId=u.id;state.selected={id:u.id,location,index};d.classList.add('dragging');els.board.classList.add('dragging-active');
+      draggingUnitId=u.id;state.enemySelected=null;state.selected={id:u.id,location,index};d.classList.add('dragging');els.board.classList.add('dragging-active');
       if(e.dataTransfer){e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain',String(u.id))}
     };
     d.ondragend=()=>{draggingUnitId=null;d.classList.remove('dragging');els.board.classList.remove('dragging-active')};
-    d.onclick=e=>{e.stopPropagation();if(state.battle)return;state.selected={id:u.id,location,index};render()};
+    d.onclick=e=>{e.stopPropagation();if(state.battle)return;state.enemySelected=null;state.selected={id:u.id,location,index};render()};
     return d;
   }
   function createEnemyPreviewToken(c){
@@ -4534,7 +4556,8 @@
     d.dataset.idleMotion=idleMotionKind(c);
     d.style.setProperty('--idle-delay',idleMotionDelay(c.cid||c.name+'-'+c.x+'-'+c.y));
     d.innerHTML='<img src="'+SPRITE(c.dex)+'" alt="'+c.name+'"><div class="enemy-preview-name">'+c.name+'</div>';
-    d.title=c.name;return d;
+    d.title=c.name+' • Clique para ver atributos';d.tabIndex=0;d.setAttribute('role','button');
+    d.onclick=e=>{e.stopPropagation();inspectEnemy(c)};d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inspectEnemy(c)}};return d;
   }
   function renderBoard(){
     els.board.classList.toggle('in-battle',!!state.battle);els.board.innerHTML='';
@@ -4667,7 +4690,7 @@
       toast('Seu nível permite apenas '+state.level+' Pokémon no campo.');return false;
     }
     sourceArray[source.index]=target;destArray[index]=source.u;
-    state.selected={id:source.u.id,location:destination,index};render();return true;
+    state.enemySelected=null;state.selected={id:source.u.id,location:destination,index};render();return true;
   }
   function setDropZone(el,destination,index){
     el.dataset.dropLocation=destination;el.dataset.dropIndex=String(index);
@@ -4742,8 +4765,81 @@
     if(x.kind==='metalBody')return 'Corpo Metálico: reduz o primeiro controle recebido em '+Math.round((x.guard||0)*100)+'%.';
     return x.kind;
   }
+  // ===== TFTMON ENEMY INSPECTION =====
+  function selectedEnemyCombatant(){
+    const ref=state.enemySelected;if(!ref)return null;
+    const pools=[];
+    if(state.combat?.units)pools.push(state.combat.units);
+    if(state.enemyPreview?.units)pools.push(state.enemyPreview.units);
+    for(const pool of pools){const c=pool.find(x=>x&&x.side==='enemy'&&x.cid===ref.cid);if(c)return c}
+    state.enemySelected=null;return null;
+  }
+  function inspectEnemy(c){
+    if(!c||c.side!=='enemy')return;
+    state.enemySelected={cid:c.cid};state.selected=null;selectedBox();
+  }
+  function enemyInspectionStats(c){
+    if(state.battle&&state.combat?.units?.includes(c))return c;
+    const copy={...c,itemBonus:{...(c.itemBonus||{})},effects:{...(c.effects||{})},bonus:c.bonus?{...c.bonus}:undefined};
+    const preview=state.enemyPreview||ensureEnemyPreview();
+    applyBonus(copy,synergyBonuses(preview?.units||[c]));
+    if(copy.passive?.kind==='sandstorm')copy.def=Math.round(copy.def*(1+(copy.passive.defBoost||0)));
+    return copy;
+  }
+  function enemyCategoryLabel(c){
+    if(c.boss)return 'Boss';if(c.summoned)return 'Invocação';
+    const l=LINES[c.line];if(!l)return 'Especial';
+    return l.special?'★★★★ Especial':l.cost===1?'1$ • Comum':l.cost===2?'2$ • Incomum':'3$ • Raro';
+  }
+  function enemyStageLabel(c){
+    if(c.boss)return 'Boss';if(c.summoned)return 'Invocação';
+    const l=LINES[c.line],stage=Math.max(0,c.stage||0);if(!l)return 'Especial';
+    if(stage===0)return 'Forma base';return stage>=l.stages.length-1?'Forma final':'Evolução '+(stage+1);
+  }
+  function enemyDamageSummary(c){
+    const a=c.ability||{},power=c.bonus?.power||1,atk=Math.max(0,c.atk||0),hp=Math.max(0,c.maxHp||0),raw=n=>Math.max(0,Math.round(n));
+    const low=raw(atk*.90),high=raw(atk*1.10),main=raw(atk*(a.power||0)*power);
+    let skill='Efeito especial.';
+    if(a.kind==='blast')skill='Habilidade: '+main+' de dano principal; dano em área reduzido.';
+    else if(a.kind==='multi')skill='Habilidade: '+main+' no primeiro alvo e cerca de '+raw(main*.68)+' nos demais.';
+    else if(a.kind==='stun')skill='Habilidade: '+main+' de dano + atordoamento.';
+    else if(a.kind==='heal')skill='Habilidade: cura cerca de '+raw(hp*(a.power||0)*power)+' e causa cerca de '+raw(atk*.7*power)+' de dano.';
+    else if(a.kind==='shield')skill='Habilidade: gera cerca de '+raw(hp*(a.power||0)*power)+' de escudo e causa cerca de '+raw(atk*.8*power)+' de dano.';
+    else if(a.kind==='dragonRush')skill='Habilidade: '+main+' no alvo e cerca de '+raw(main*.40)+' nos inimigos próximos.';
+    else if(a.kind==='quake')skill='Habilidade: '+main+' de dano em área + controle.';
+    else if(a.kind==='shadowBall')skill='Habilidade: '+main+' de dano; recupera mana ao finalizar.';
+    else if(a.kind==='blizzard')skill='Habilidade: cerca de '+main+' em até 4 alvos + redução de velocidade.';
+    else if(a.kind==='meteorMash')skill='Habilidade: cerca de '+main+' por alvo atingido + geração de escudo.';
+    else if(a.power)skill='Habilidade: cerca de '+main+' de dano.';
+    return 'Ataque básico: '+low+'–'+high+' antes da DEF. '+skill+' Valores são antes da DEF e de escudos do alvo.';
+  }
+  function renderEnemySelectedBox(c){
+    const s=enemyInspectionStats(c),items=(c.items||[]),hpNow=state.battle?Math.max(0,Math.ceil(c.hp||0)):s.maxHp;
+    const equipSlots=Array.from({length:3},(_,i)=>{
+      const item=items[i],def=item&&ITEM_DEFS[item.key];
+      if(!item||!def)return '<span class="selected-equip-slot empty" aria-label="Espaço de equipamento vazio">+</span>';
+      return '<span class="selected-equip-slot filled" title="'+def.name+'"><span class="equipment-chip">'+itemSpriteHTML(item.key,'compact')+'<span>'+def.name+'</span></span></span>';
+    }).join('');
+    els.selected.innerHTML=
+      '<div class="selected-card-head"><span class="selected-card-name">'+(s.special?'★★★★ ':'')+s.name+'</span><small class="selected-card-meta">OPONENTE • '+(s.types||[]).join(' / ')+' • '+s.role+'</small></div>'+
+      '<div class="selected-hero"><div class="selected-sprite-wrap"><img class="selected-sprite" src="'+SPRITE(s.dex)+'" alt="'+s.name+'"></div><div class="selected-stats">'+
+        '<div class="selected-stat"><span>HP</span><b>'+s.maxHp+'</b></div><div class="selected-stat"><span>ATK</span><b>'+Math.round(s.atk)+'</b></div><div class="selected-stat"><span>DEF</span><b>'+Math.round(s.def)+'</b></div></div></div>'+
+      '<div class="selected-info-grid">'+
+        '<div class="selected-info-card"><small>Categoria</small><b>'+enemyCategoryLabel(c)+'</b></div>'+
+        '<div class="selected-info-card"><small>Estágio</small><b>'+enemyStageLabel(c)+'</b></div>'+
+        '<div class="selected-info-card"><small>Alcance</small><b>'+combatRange(s)+' casa'+(combatRange(s)===1?'':'s')+'</b></div>'+
+        '<div class="selected-info-card"><small>Velocidade</small><b>'+Math.round(s.speed)+'</b></div>'+
+        '<div class="selected-info-card"><small>HP atual</small><b>'+hpNow+' / '+s.maxHp+'</b></div>'+
+        '<div class="selected-info-card"><small>Estado</small><b>'+(c.dead?'Derrotado':'Ativo')+'</b></div></div>'+
+      '<div class="selected-ability"><b class="selected-section-title">Habilidade • '+(s.ability?.name||'Nenhuma')+'</b><span class="selected-section-copy">'+abilityDescription(s)+'</span></div>'+
+      '<div class="selected-passive"><b class="selected-section-title">Dano estimado</b><span class="selected-section-copy">'+enemyDamageSummary(s)+'</span></div>'+
+      (s.passive?'<div class="selected-passive"><b class="selected-section-title">Passiva especial</b><span class="selected-section-copy">'+passiveDescription(s)+'</span></div>':'')+
+      '<div class="selected-equipment"><div class="selected-equipment-head"><b>Equipamentos ('+items.length+'/3)</b></div><div class="selected-equipment-slots">'+equipSlots+'</div></div>';
+  }
+
   function selectedBox(){
-    const f=state.selected?findUnit(state.selected.id):null;$('#sellBtn').disabled=!f||state.battle;
+    const f=state.selected?findUnit(state.selected.id):null,enemy=!f?selectedEnemyCombatant():null;$('#sellBtn').disabled=!f||state.battle;
+    if(enemy){renderEnemySelectedBox(enemy);return}
     if(!f){els.selected.innerHTML='<small>Nenhum Pokémon selecionado.</small>';return}
     const p=stageData(f.u),val=unitPrice(f.u.line,f.u.stage),ib=itemBonuses(f.u),items=(f.u.items||[]);
     p.hp=Math.round(p.hp*(1+ib.hp));p.atk=Math.round(p.atk*(1+ib.atk));p.def=Math.round(p.def*(1+ib.def));
@@ -4809,7 +4905,7 @@
   function makeCombatant(u,side,x,y){
     const p=stageData(u);return {cid:side+'-'+u.id+'-'+Math.random(),side,line:u.line,stage:u.stage,name:p.name,dex:p.dex,types:p.types,role:p.role,
       maxHp:p.hp,hp:p.hp,atk:p.atk,def:p.def,range:p.range,speed:p.speed,ability:p.ability,passive:p.passive,special:p.special,mana:0,shield:0,x,y,meter:Math.random()*35,stun:0,
-      effects:{},rootUntil:0,hasCast:false,nextRegenAt:3000,summoned:false,dead:false,itemBonus:itemBonuses(u),intangibleUntil:0,controlGuardUsed:false,sandSlow:0,chill:0,chillUntil:0,speedBoost:0,speedBoostUntil:0};
+      effects:{},rootUntil:0,hasCast:false,nextRegenAt:3000,summoned:false,dead:false,items:(u.items||[]).map(i=>({id:i.id,key:i.key})),itemBonus:itemBonuses(u),intangibleUntil:0,controlGuardUsed:false,sandSlow:0,chill:0,chillUntil:0,speedBoost:0,speedBoostUntil:0};
   }
   function scaleEnemy(c,scale){
     c.maxHp=Math.max(1,Math.round(c.maxHp*scale));c.hp=c.maxHp;c.atk=Math.max(1,Math.round(c.atk*scale));c.def=Math.max(0,Math.round(c.def*scale));
@@ -5270,6 +5366,7 @@
         layer.appendChild(d)
       }
       d.classList.toggle('player',c.side==='player');d.classList.toggle('enemy',c.side==='enemy');
+      if(c.side==='enemy'){d.tabIndex=0;d.setAttribute('role','button');d.onclick=e=>{e.stopPropagation();inspectEnemy(c)};d.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();inspectEnemy(c)}}}else{d.removeAttribute('tabindex');d.removeAttribute('role');d.onclick=null;d.onkeydown=null}
       d.style.setProperty('--sprite-scale',String(spriteScaleForCombat(c)));
       d.style.setProperty('--mobile-sprite-boost',String(c.boss?mobileSpriteBoostForStage(2):mobileSpriteBoostForStage(c.stage||0)));
       d.dataset.idleMotion=idleMotionKind(c);
@@ -5295,6 +5392,7 @@
       d.querySelector('.label').textContent=c.name+(c.summoned?' ⚡':'');
     });
     layer.querySelectorAll('.fighter').forEach(d=>{if(!known.has(d.dataset.cid))d.remove()});
+    if(state.enemySelected)selectedBox();
   }
   function updateStreak(win){
     const result=win?'win':'loss';
@@ -5319,7 +5417,7 @@
     const enemyRemaining=combat.units.filter(c=>c.side==='enemy'&&!c.summoned).reduce((s,c)=>s+Math.max(0,c.hp),0);
     const damageDealt=Math.max(0,Math.round((combat.enemyInitialHp||0)-enemyRemaining));
     const survivors=combat.units.filter(c=>c.side==='enemy'&&!c.dead&&!c.summoned).length;
-    state.battle=false;state.combat=null;const interest=Math.min(5,Math.floor(state.gold/10)),streakBonus=updateStreak(win);
+    state.enemySelected=null;state.battle=false;state.combat=null;const interest=Math.min(5,Math.floor(state.gold/10)),streakBonus=updateStreak(win);
     const incomeDetails=interest+' de juros + '+streakBonus+' de sequência • '+state.streak+' '+(win?'vitória(s)':'derrota(s)')+' consecutiva(s)';
     let gain=0,hpLost=0,bossReward=0;
     if(win){gain=6+interest+streakBonus;state.gold+=gain;state.runStats.wins++;log('✅ Vitória! +'+gain+' ouro ('+incomeDetails+').','win');banner(bossKey?'BOSS DERROTADO':'VITÓRIA');}
@@ -5341,7 +5439,7 @@
     $('#startScreen').style.display='none';$('#gameApp').classList.remove('game-hidden');render();
   }
   function reset(){
-    clearInterval(state.combat?.timer);clearTimeout(state.combat?.timeoutId);closeFinalSummary();Object.assign(state,{round:1,maxRounds:50,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,uid:1,combat:null,enemyPreview:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss(),shopLocked:false,lastBattleSummary:null,runStats:{wins:0,losses:0,specialSeen:[],specialBought:[]}});
+    clearInterval(state.combat?.timer);clearTimeout(state.combat?.timeoutId);closeFinalSummary();Object.assign(state,{round:1,maxRounds:50,hp:100,gold:10,level:2,xp:0,battle:false,gameOver:false,streak:0,streakResult:null,bench:Array(9).fill(null),board:Array(42).fill(null),shop:[],selected:null,enemySelected:null,uid:1,combat:null,enemyPreview:null,inventory:[],itemUid:1,selectedItem:null,pendingCombine:null,rewardChoices:null,rewardRounds:[],bossRewards:[],legendaryBoss:randomLegendaryBoss(),shopLocked:false,lastBattleSummary:null,runStats:{wins:0,losses:0,specialSeen:[],specialBought:[]}});
     els.log.innerHTML='';prepareItemRewards();rollShop(true);log('Bem-vindo ao TFTmon. Nível máximo 9 e Pokémon especiais 4★ liberados a partir do nível 6.');render();
   }
   $('#rerollBtn').onclick=()=>rollShop(false);$('#xpBtn').onclick=buyXP;$('#sellBtn').onclick=sellSelected;$('#battleBtn').onclick=()=>{if(state.gameOver)reset();else startBattle()};$('#lockShopBtn').onclick=toggleShopLock;$('#shopInfoBtn').onclick=openShopInfo;$('#rulesBtn').onclick=openRules;$('#backpackBtn').onclick=openBackpack;$('#historyBtn').onclick=openHistory;$('#startGameBtn').onclick=startGame;$('#startRulesBtn').onclick=openRules;
