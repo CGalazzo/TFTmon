@@ -1,0 +1,29 @@
+name: Apply melee pathfinding fix
+on:
+  push:
+    branches:
+      - tmp-melee-pathfinding-fix-2
+    paths:
+      - '.github/workflows/apply-melee-pathfinding-fix.yml'
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply isolated melee pathfinding patch
+        run: python .github/scripts/fix_melee_pathfinding.py
+      - name: Validate isolated change
+        run: |
+          grep -q 'Melee pathfinding on the 7x6 logical board' index.html
+          grep -q 'if(range>1)' index.html
+          grep -q 'if(cur.first&&dist(cur,t)<=1)' index.html
+          git diff --exit-code -- . ':!index.html'
+      - name: Commit melee pathfinding fix
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Fix melee pathfinding around occupied cells' || exit 0
+          git push
