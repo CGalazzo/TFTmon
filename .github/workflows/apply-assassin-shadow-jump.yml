@@ -1,0 +1,28 @@
+name: Apply Assassin shadow jump
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-assassin-shadow-jump.yml'
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply Assassin shadow jump
+        run: python .github/scripts/apply_assassin_shadow_jump.py
+      - name: Validate isolated combat mechanic change
+        run: |
+          grep -q 'TFTMON ASSASSIN SHADOW JUMP' index.html
+          grep -q 'assassinJumpPending' index.html
+          grep -q 'assassinJumpTimer' index.html
+          grep -q "speedBoost=Math.max(c.speedBoost||0,.25)" index.html
+          git diff --exit-code -- . ':!index.html'
+      - name: Commit Assassin mechanic
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Add safe opening shadow jump for Assassins' || exit 0
+          git push
