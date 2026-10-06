@@ -4386,10 +4386,10 @@
   function buy(i){
     if(state.battle||state.gameOver)return;const offer=normalizeOffer(state.shop[i]);if(!offer)return;
     const cost=unitPrice(offer.line,offer.stage);if(state.gold<cost)return;
-    const open=state.bench.findIndex(x=>!x);if(open<0){toast('Banco cheio. Libere um espaço para comprar.');return}
-    state.gold-=cost;const u=unit(offer.line,offer.stage);state.bench[open]=u;
+    const open=state.bench.findIndex(x=>!x),canMergeWithoutBench=open<0&&offer.stage<LINES[offer.line].stages.length-1&&countCopies(offer.line,offer.stage)>=2;if(open<0&&!canMergeWithoutBench){toast('Banco cheio. Libere um espaço para comprar.');return}
+    state.gold-=cost;const u=unit(offer.line,offer.stage);if(open>=0)state.bench[open]=u;
     if(LINES[offer.line].special&&!state.runStats.specialBought.includes(offer.line))state.runStats.specialBought.push(offer.line);
-    state.shop[i]=null;normalizeShop();tryMerge(offer.line,offer.stage);render();
+    state.shop[i]=null;normalizeShop();tryMerge(offer.line,offer.stage,open>=0?null:u);render();
   }
   function normalizeShop(){state.shop=state.shop.map(x=>x)}
   function findUnit(id){
@@ -4425,11 +4425,11 @@
     let i=state.bench.findIndex(u=>u&&u.id===id);if(i>=0){const u=state.bench[i];state.bench[i]=null;return {u,location:'bench',index:i}}
     i=state.board.findIndex(u=>u&&u.id===id);if(i>=0){const u=state.board[i];state.board[i]=null;return {u,location:'board',index:i}}return null;
   }
-  function tryMerge(line,stage){
+  function tryMerge(line,stage,extraUnit=null){
     const l=LINES[line];if(stage>=l.stages.length-1)return;
-    const copies=allPlayerUnits().filter(u=>u.line===line&&u.stage===stage);
+    const copies=allPlayerUnits().filter(u=>u.line===line&&u.stage===stage);if(extraUnit)copies.push(extraUnit);
     if(copies.length<3)return;
-    const picked=copies.slice(0,3).map(u=>removeById(u.id));
+    const picked=copies.slice(0,3).map(u=>u===extraUnit?{u,location:'purchase',index:-1}:removeById(u.id));
     const boardDest=picked.find(x=>x&&x.location==='board');
     const evolved=unit(line,stage+1);inheritItems(evolved,picked,boardDest);
     if(boardDest)state.board[boardDest.index]=evolved;
