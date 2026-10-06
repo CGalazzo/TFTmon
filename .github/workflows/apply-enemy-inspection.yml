@@ -1,0 +1,28 @@
+name: Apply enemy inspection
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-enemy-inspection.yml'
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply enemy inspection
+        run: python .github/scripts/apply_enemy_inspection.py
+      - name: Validate isolated enemy inspection change
+        run: |
+          grep -q 'TFTMON ENEMY INSPECTION' index.html
+          grep -q 'enemySelected' index.html
+          grep -q 'inspectEnemy' index.html
+          grep -q 'Dano estimado' index.html
+          git diff --exit-code -- . ':!index.html'
+      - name: Commit enemy inspection
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Allow inspecting enemy Pokemon attributes' || exit 0
+          git push
