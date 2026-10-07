@@ -1,0 +1,25 @@
+name: Apply Suicune balance
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-suicune-balance.yml'
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply Suicune balance
+        run: python .github/scripts/balance_suicune_heal.py
+      - name: Validate isolated change
+        run: |
+          grep -q "suicune:{name:'Suicune'.*power:.18" index.html
+          git diff --exit-code -- . ':!index.html'
+      - name: Commit Suicune balance
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Reduce Suicune Aurora healing' || exit 0
+          git push
