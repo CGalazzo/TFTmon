@@ -1,0 +1,31 @@
+name: Apply Shiny system
+on:
+  push:
+    paths:
+      - '.github/workflows/apply-shiny-system.yml'
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply Shiny system
+        run: python .github/scripts/apply_shiny_system.py
+      - name: Validate Shiny system
+        run: |
+          grep -q 'TFTMON SHINY SYSTEM' index.html
+          grep -q 'SHINY_CHANCE=.01' index.html
+          grep -q 'SHINY_SPECIAL_CHANCE=.005' index.html
+          grep -q "shiny:Math.random()<shinyChanceForLine" index.html
+          grep -q "Passiva Shiny" index.html
+          grep -q "shinyTankShieldUsed" index.html
+          grep -q "shinyAssassinBoostUntil" index.html
+          git diff --exit-code -- . ':!index.html'
+      - name: Commit Shiny system
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Add rare Shiny Pokemon system' || exit 0
+          git push
