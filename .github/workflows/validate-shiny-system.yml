@@ -1,0 +1,33 @@
+name: Validate Shiny system
+on:
+  push:
+    paths:
+      - '.github/workflows/validate-shiny-system.yml'
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract browser JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          html=Path('index.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script[^>]*>([\s\S]*?)</script>',html,re.I)
+          if not scripts:
+              raise SystemExit('No script blocks found')
+          Path('/tmp/tftmon.js').write_text('\n'.join(scripts),encoding='utf-8')
+          PY
+      - name: Check JavaScript syntax
+        run: node --check /tmp/tftmon.js
+      - name: Check Shiny invariants
+        run: |
+          grep -q "SHINY_CHANCE=.01,SHINY_SPECIAL_CHANCE=.005" index.html
+          grep -q "unit(line,stage=0,shiny=false)" index.html
+          grep -q "picked.some(x=>x?.u?.shiny)" index.html
+          grep -q "Shiny e normal contam como a mesma linha" index.html
+          grep -q "SPRITE(c.dex,c.shiny)" index.html
+          grep -q "shinySupportBoost" index.html
+          grep -q "shinyTankShieldUsed" index.html
+          grep -q "shinyAssassinBoostUntil" index.html
