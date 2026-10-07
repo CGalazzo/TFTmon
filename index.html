@@ -4030,6 +4030,33 @@
       filter:brightness(1.10);
     }
 
+
+
+    /* ===== TFTMON SHINY SYSTEM ===== */
+    #gameApp .card.shiny-card{
+      border-color:rgba(255,226,105,.92)!important;
+      box-shadow:0 0 0 1px rgba(255,246,181,.34),0 0 18px rgba(255,215,72,.34),0 10px 24px rgba(0,0,0,.38)!important;
+      background-image:radial-gradient(circle at 72% 18%,rgba(255,241,155,.12),transparent 34%)!important;
+    }
+    #gameApp .card.shiny-card .rarity-label,#gameApp .card.shiny-card .name,#gameApp .shiny-name{
+      color:#fff0a6!important;text-shadow:0 0 8px rgba(255,220,72,.7);
+    }
+    #gameApp .card.shiny-card>img,
+    #gameApp .token.shiny-token>img,
+    #gameApp .fighter.shiny-fighter .fighter-sprite img,
+    #gameApp .selected-sprite.shiny-selected-sprite{
+      filter:drop-shadow(0 7px 5px rgba(0,0,0,.62)) drop-shadow(0 0 9px rgba(255,230,95,.88))!important;
+    }
+    #gameApp .token.shiny-token .mini,#gameApp .fighter.shiny-fighter .label{
+      color:#fff0a6!important;text-shadow:0 0 7px rgba(255,220,72,.72),0 1px 3px #000!important;
+    }
+    #gameApp .shiny-passive-box{
+      border-color:rgba(255,220,86,.55)!important;
+      background:linear-gradient(180deg,rgba(60,45,8,.28),rgba(6,23,36,.96))!important;
+      box-shadow:inset 0 1px rgba(255,246,180,.08),0 0 10px rgba(255,215,70,.08)!important;
+    }
+    #gameApp .shiny-passive-box .selected-section-title{color:#fff0a6!important}
+
 </style>
 </head>
 <body>
@@ -4126,6 +4153,7 @@
   <div class="modal-section"><h3>✨ Evolução e campo</h3><p>3 cópias iguais do mesmo estágio evoluem automaticamente. Formas finais não fundem. O limite de Pokémon no campo é igual ao nível do treinador, que vai até 9. Para posicionar, você pode clicar no Pokémon e depois no destino ou simplesmente clicar, arrastar e soltar entre o banco e o seu lado do tabuleiro.</p></div>
   <div class="modal-section"><h3>🧩 Sinergias</h3><p>A maioria das tipagens ativa bônus com 3 ou 5 linhas evolutivas diferentes. Dragon é especial: ativa com 1 e alcança Ascensão Dracônica com 4. Repetidos da mesma linha contam uma vez. Toque em qualquer tipagem durante a partida para ver os Pokémon válidos e seus efeitos.</p></div>
   <div class="modal-section"><h3>★★★★ Pokémon especiais</h3><p>Dratini, Larvitar, Gastly, Gible e Beldum são 4★. Eles começam a aparecer no nível 6, podem vir evoluídos e possuem habilidades/passivas exclusivas.</p></div>
+  <div class="modal-section"><h3>✨ Pokémon Shiny</h3><p>Cada oferta normal da loja tem 1% de chance de ser Shiny; Pokémon 4★ têm 0,5%. Shiny custa o mesmo, usa sua coloração especial e recebe uma Passiva Shiny de acordo com a função. Se uma das 3 cópias usadas na evolução for Shiny, a evolução continua Shiny. Shiny e normal contam como a mesma linha para sinergias.</p></div>
   <div class="modal-section"><h3>🎒 Itens</h3><p>Você começa com 2 componentes. Combine 2 componentes para formar equipamentos. Cada Pokémon pode carregar até 3 itens. Bosses podem conceder novos componentes.</p></div>
   <div class="modal-section"><h3>👑 Bosses</h3><p>Etapa 6: Onix • 12: 3 Tauros • 18: Raikou, Entei ou Suicune • 25: Mewtwo • 32: Tyranitar • 38: Dragonite • 44: Articuno + Zapdos + Moltres • 50: Rayquaza. Vitória rende 2 componentes; ao perder removendo pelo menos 50% do HP total do boss, você recebe 1.</p></div>
   <div class="modal-section"><h3>🏆 Objetivo</h3><p>Sobreviva às 50 etapas e derrote Rayquaza na etapa final. Não existem fraquezas, resistências ou imunidades elementais de dano: as tipagens servem para formar sinergias.</p></div>
@@ -4145,7 +4173,7 @@
 
 <script>
 (() => {
-  const SPRITE = d => 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + d + '.png';
+  const SPRITE = (d,shiny=false) => 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/' + (shiny?'shiny/':'') + d + '.png';
   const COMBAT_TICK_MS = 260;
   const COMBAT_LIMIT_MS = 30000;
   const COMBAT_FX_ENABLED = true; // visual-only layer; set false to disable movement/VFX without changing combat logic
@@ -4328,7 +4356,7 @@
       passive={kind:l.passive.kind};
       for(const [k,v] of Object.entries(l.passive))if(k!=='kind')passive[k]=Array.isArray(v)?v[Math.min(st,v.length-1)]:v;
     }
-    return {name,dex,cost:l.cost,role:l.role,types:l.types[st]||l.types[l.types.length-1],special:!!l.special,passive,
+    return {name,dex,cost:l.cost,role:l.role,types:l.types[st]||l.types[l.types.length-1],special:!!l.special,shiny:!!u.shiny,passive,
       hp:Math.round(l.base[0]*mult),atk:Math.round(l.base[1]*(1+st*.56)),def:Math.round(l.base[2]*(1+st*.52)),
       range:l.base[3],speed:Math.round(l.base[4]*(1+st*.08)),ability,final:st===l.stages.length-1};
   }
@@ -4336,7 +4364,34 @@
     const l=LINES[line],st=Math.min(stage,l.stages.length-1);
     return l.special?[4,9,16][st]||16:l.cost*Math.pow(3,st);
   }
-  function unit(line,stage=0){return {id:state.uid++,line,stage,items:[]};}
+  function unit(line,stage=0,shiny=false){return {id:state.uid++,line,stage,shiny:!!shiny,items:[]};}
+  const SHINY_CHANCE=.01,SHINY_SPECIAL_CHANCE=.005;
+  function shinyChanceForLine(line){return LINES[line]?.special?SHINY_SPECIAL_CHANCE:SHINY_CHANCE}
+  function shinyRoleKind(subject){
+    const role=String(subject?.role||LINES[subject?.line]?.role||''),roles=role.split('/').map(x=>x.trim());
+    if(roles.includes('Assassino'))return 'assassin';
+    if(roles.includes('Tanque'))return 'tank';
+    if(roles.includes('Suporte'))return 'support';
+    if(roles.includes('Bruiser')||roles.includes('Lutador'))return 'bruiser';
+    if(roles.includes('Mago'))return 'mage';
+    if(roles.includes('Atacante')||roles.includes('Carry'))return 'attacker';
+    return 'attacker';
+  }
+  function shinyPassiveDescription(subject){
+    const kind=shinyRoleKind(subject);
+    if(kind==='assassin')return 'Após o Salto Sombrio, recebe +15% de velocidade de ação adicional por 3s.';
+    if(kind==='tank')return 'Ao cair abaixo de 50% do HP pela primeira vez, recebe um escudo de 15% do HP máximo.';
+    if(kind==='support')return 'Curas e escudos gerados por este Pokémon são 15% mais fortes.';
+    if(kind==='bruiser')return 'Recebe +8% de HP máximo e +8% de ATK.';
+    if(kind==='mage')return 'Começa cada batalha com +20 de mana.';
+    return 'Recebe +10% de ATK.';
+  }
+  function applyShinyPreviewStats(p,u){
+    if(!u?.shiny)return p;const kind=shinyRoleKind(p);
+    if(kind==='attacker')p.atk=Math.round(p.atk*1.10);
+    else if(kind==='bruiser'){p.hp=Math.round(p.hp*1.08);p.atk=Math.round(p.atk*1.08)}
+    return p;
+  }
   function newItem(key){return {id:state.itemUid++,key}}
   function canManageItems(){return !state.battle&&!state.gameOver}
   function itemBonuses(u){
@@ -4533,12 +4588,12 @@
     return '-'+((hash%9)*0.11).toFixed(2)+'s';
   }
   function createToken(u,location,index){
-    const p=stageData(u),d=document.createElement('div');d.className='token'+(p.special?' special-token':'')+(state.selected&&state.selected.id===u.id?' selected':'');
+    const p=stageData(u),d=document.createElement('div');d.className='token'+(p.special?' special-token':'')+(u.shiny?' shiny-token':'')+(state.selected&&state.selected.id===u.id?' selected':'');
     d.style.setProperty('--sprite-scale',String(spriteScaleForStage(u.stage)));
     d.style.setProperty('--mobile-sprite-boost',String(mobileSpriteBoostForStage(u.stage)));
     d.dataset.idleMotion=idleMotionKind(p);
     d.style.setProperty('--idle-delay',idleMotionDelay(u.id));
-    d.innerHTML='<img src="'+SPRITE(p.dex)+'" alt="'+p.name+'"><div class="mini">'+(p.special?'<span class="special-stars">★★★★</span> ':'')+p.name+(u.stage?' • E'+(u.stage+1):'')+'</div>';
+    d.innerHTML='<img src="'+SPRITE(p.dex,u.shiny)+'" alt="'+(u.shiny?'Shiny ':'')+p.name+'"><div class="mini">'+(p.special?'<span class="special-stars">★★★★</span> ':'')+(u.shiny?'<span class="shiny-name">✨ Shiny</span> ':'')+p.name+(u.stage?' • E'+(u.stage+1):'')+'</div>';
     d.draggable=!state.battle&&!state.gameOver;
     d.ondragstart=e=>{
       if(state.battle||state.gameOver){e.preventDefault();return}
@@ -4628,7 +4683,7 @@
   function normalizeOffer(entry){return typeof entry==='string'?{line:entry,stage:0}:entry}
   function renderShopInfo(){
     const rows=[];for(let l=2;l<=9;l++){const o=shopOdds(l),n=stageOdds(l,false),sp=stageOdds(l,true);rows.push('<tr><td>Nv '+l+'</td><td>'+o[0]+'%</td><td>'+o[1]+'%</td><td>'+o[2]+'%</td><td>'+o[3]+'%</td><td>'+n.join(' / ')+'%</td><td>'+(l<6?'Bloqueado':sp.join(' / ')+'%')+'</td></tr>')}
-    $('#shopInfoContent').innerHTML='<table class="shop-table"><thead><tr><th>Nível</th><th>1$</th><th>2$</th><th>3$</th><th>4★</th><th>Normal B/2ª/3ª</th><th>4★ B/2ª/3ª</th></tr></thead><tbody>'+rows.join('')+'</tbody></table><p class="item-note"><b>3º estágio não aparece na loja.</b> Ele só pode ser obtido evoluindo 3 cópias do 2º estágio. As chances removidas do 3º estágio foram transferidas para o 2º estágio.</p>';
+    $('#shopInfoContent').innerHTML='<table class="shop-table"><thead><tr><th>Nível</th><th>1$</th><th>2$</th><th>3$</th><th>4★</th><th>Normal B/2ª/3ª</th><th>4★ B/2ª/3ª</th></tr></thead><tbody>'+rows.join('')+'</tbody></table><p class="item-note"><b>3º estágio não aparece na loja.</b> Ele só pode ser obtido evoluindo 3 cópias do 2º estágio. As chances removidas do 3º estágio foram transferidas para o 2º estágio.</p><p class="item-note"><b>✨ Shiny:</b> Pokémon normais têm 1% de chance de aparecer Shiny em cada oferta; Pokémon 4★ têm 0,5%. O preço é o mesmo da versão normal.</p>';
   }
   function openShopInfo(){renderShopInfo();$('#shopInfoModal').classList.add('open')}
   function closeShopInfo(){$('#shopInfoModal').classList.remove('open')}
@@ -4641,9 +4696,12 @@
       const cost=weightedCost(),pool=KEYS.filter(k=>LINES[k].cost===cost);
       if(!pool.length)return null;
       const line=pool[Math.floor(Math.random()*pool.length)];
-      return {line,stage:rollStage(line)};
+      return {line,stage:rollStage(line),shiny:Math.random()<shinyChanceForLine(line)};
     });
-    for(const offer of state.shop){if(offer&&LINES[offer.line].special&&!state.runStats.specialSeen.includes(offer.line))state.runStats.specialSeen.push(offer.line)}
+    for(const offer of state.shop){
+      if(offer&&LINES[offer.line].special&&!state.runStats.specialSeen.includes(offer.line))state.runStats.specialSeen.push(offer.line);
+      if(offer?.shiny){const p=stageData({line:offer.line,stage:offer.stage,shiny:true});log('✨ SHINY! Um Shiny '+p.name+' apareceu na loja!','win')}
+    }
     render();
   }
   function renderShop(){
@@ -4655,11 +4713,12 @@
 
     state.shop.forEach((entry,i)=>{
       if(!entry){const empty=document.createElement('div');empty.className='card';empty.style.opacity='.4';empty.innerHTML='<div style="margin-top:62px;color:#9fb3c8">Comprado</div>';els.shop.appendChild(empty);return}
-      const offer=normalizeOffer(entry),l=LINES[offer.line],u={line:offer.line,stage:offer.stage},p=stageData(u),price=unitPrice(offer.line,offer.stage),d=document.createElement('div');
-      d.className='card rarity-'+l.cost;
-      const rarity=l.special?'★★★★ Especial':l.cost+'$ • '+(['Comum','Incomum','Raro'][l.cost-1]||'Especial');
+      const offer=normalizeOffer(entry),l=LINES[offer.line],u={line:offer.line,stage:offer.stage,shiny:!!offer.shiny},p=stageData(u),price=unitPrice(offer.line,offer.stage),d=document.createElement('div');
+      d.className='card rarity-'+l.cost+(offer.shiny?' shiny-card':'');
+      const rarity=(offer.shiny?'✨ SHINY • ':'')+(l.special?'★★★★ Especial':l.cost+'$ • '+(['Comum','Incomum','Raro'][l.cost-1]||'Especial'));
       const evo=p.final&&offer.stage>0?'Forma final':offer.stage>0?'Forma '+(offer.stage+1):'Forma base';
-      d.innerHTML='<div class="cost">'+price+'</div><div class="rarity-label">'+rarity+'</div><img src="'+SPRITE(p.dex)+'"><div class="name">'+p.name+'</div><div class="meta">'+p.types.join(' / ')+' • '+p.role+'<br>'+evo+' • '+p.ability.name+'</div><button class="btn buy">Comprar</button>';
+      d.innerHTML='<div class="cost">'+price+'</div><div class="rarity-label">'+rarity+'</div><img src="'+SPRITE(p.dex,offer.shiny)+'"><div class="name">'+(offer.shiny?'✨ Shiny ':'')+p.name+'</div><div class="meta">'+p.types.join(' / ')+' • '+p.role+'<br>'+evo+' • '+p.ability.name+'</div><button class="btn buy">Comprar</button>';
+      if(offer.shiny)d.title='Passiva Shiny: '+shinyPassiveDescription(u);
       d.querySelector('button').onclick=()=>buy(i);d.querySelector('button').disabled=state.battle||state.gold<price;els.shop.appendChild(d);
     });
   }
@@ -4669,7 +4728,7 @@
     if(state.battle||state.gameOver)return;const offer=normalizeOffer(state.shop[i]);if(!offer)return;
     const cost=unitPrice(offer.line,offer.stage);if(state.gold<cost)return;
     const open=state.bench.findIndex(x=>!x),canMergeWithoutBench=open<0&&offer.stage<LINES[offer.line].stages.length-1&&countCopies(offer.line,offer.stage)>=2;if(open<0&&!canMergeWithoutBench){toast('Banco cheio. Libere um espaço para comprar.');return}
-    state.gold-=cost;const u=unit(offer.line,offer.stage);if(open>=0)state.bench[open]=u;
+    state.gold-=cost;const u=unit(offer.line,offer.stage,!!offer.shiny);if(open>=0)state.bench[open]=u;if(u.shiny)log('✨ Você comprou Shiny '+stageData(u).name+'!','win');
     if(LINES[offer.line].special&&!state.runStats.specialBought.includes(offer.line))state.runStats.specialBought.push(offer.line);
     state.shop[i]=null;normalizeShop();tryMerge(offer.line,offer.stage,open>=0?null:u);render();
   }
@@ -4711,13 +4770,14 @@
     const l=LINES[line];if(stage>=l.stages.length-1)return;
     const copies=allPlayerUnits().filter(u=>u.line===line&&u.stage===stage);if(extraUnit)copies.push(extraUnit);
     if(copies.length<3)return;
-    const picked=copies.slice(0,3).map(u=>u===extraUnit?{u,location:'purchase',index:-1}:removeById(u.id));
+    const mergeCopies=copies.slice(0,3),shinyCopy=copies.find(u=>u.shiny);if(shinyCopy&&!mergeCopies.includes(shinyCopy))mergeCopies[2]=shinyCopy;
+    const picked=mergeCopies.map(u=>u===extraUnit?{u,location:'purchase',index:-1}:removeById(u.id));
     const boardDest=picked.find(x=>x&&x.location==='board');
-    const evolved=unit(line,stage+1);inheritItems(evolved,picked,boardDest);
+    const evolved=unit(line,stage+1,picked.some(x=>x?.u?.shiny));inheritItems(evolved,picked,boardDest);
     if(boardDest)state.board[boardDest.index]=evolved;
     else{const open=state.bench.findIndex(x=>!x);if(open>=0)state.bench[open]=evolved;else state.bench[0]=evolved}
-    const p=stageData(evolved);toast('<span class="evo">EVOLUÇÃO!</span> '+p.name+' entrou no time.');log('✨ Evolução: '+p.name,'win');
-    if(state.selected&&copies.some(x=>x.id===state.selected.id))state.selected={id:evolved.id,location:boardDest?'board':'bench',index:boardDest?boardDest.index:state.bench.findIndex(x=>x&&x.id===evolved.id)};
+    const p=stageData(evolved);toast('<span class="evo">EVOLUÇÃO!</span> '+(evolved.shiny?'✨ Shiny ':'')+p.name+' entrou no time.');log('✨ Evolução: '+(evolved.shiny?'Shiny ':'')+p.name,'win');
+    if(state.selected&&mergeCopies.some(x=>x.id===state.selected.id))state.selected={id:evolved.id,location:boardDest?'board':'bench',index:boardDest?boardDest.index:state.bench.findIndex(x=>x&&x.id===evolved.id)};
     tryMerge(line,stage+1);
   }
   function placeSelected(i){
@@ -4739,7 +4799,7 @@
     while(state.level<9&&state.xp>=xpNeed()){state.xp-=xpNeed();state.level++;toast('Nível '+state.level+'! Agora você pode usar '+state.level+' Pokémon.');log('⬆️ Treinador chegou ao nível '+state.level,'win')}
   }
   function rarityName(u){
-    const l=LINES[u.line];return l.special?'★★★★ Especial':l.cost===1?'1$ • Comum':l.cost===2?'2$ • Incomum':'3$ • Raro';
+    const l=LINES[u.line],base=l.special?'★★★★ Especial':l.cost===1?'1$ • Comum':l.cost===2?'2$ • Incomum':'3$ • Raro';return (u.shiny?'✨ Shiny • ':'')+base;
   }
   function abilityDescription(p){
     const a=p.ability,pc=n=>Math.round((n||0)*100)+'%';
@@ -4842,7 +4902,7 @@
     if(enemy){renderEnemySelectedBox(enemy);return}
     if(!f){els.selected.innerHTML='<small>Nenhum Pokémon selecionado.</small>';return}
     const p=stageData(f.u),val=unitPrice(f.u.line,f.u.stage),ib=itemBonuses(f.u),items=(f.u.items||[]);
-    p.hp=Math.round(p.hp*(1+ib.hp));p.atk=Math.round(p.atk*(1+ib.atk));p.def=Math.round(p.def*(1+ib.def));
+    p.hp=Math.round(p.hp*(1+ib.hp));p.atk=Math.round(p.atk*(1+ib.atk));p.def=Math.round(p.def*(1+ib.def));applyShinyPreviewStats(p,f.u);
     const stageLabel=f.u.stage===0?'Forma base':p.final?'Forma final':'Evolução '+(f.u.stage+1);
     const equipSlots=Array.from({length:3},(_,i)=>{
       const item=items[i];
@@ -4850,8 +4910,8 @@
       return '<span class="selected-equip-slot filled" title="'+ITEM_DEFS[item.key].name+'"><span class="equipment-chip">'+itemSpriteHTML(item.key,'compact')+'<span>'+ITEM_DEFS[item.key].name+'</span></span></span>';
     }).join('');
     els.selected.innerHTML=
-      '<div class="selected-card-head"><span class="selected-card-name">'+(p.special?'★★★★ ':'')+p.name+'</span><small class="selected-card-meta">'+p.types.join(' / ')+' • '+p.role+'</small></div>'+
-      '<div class="selected-hero"><div class="selected-sprite-wrap"><img class="selected-sprite" src="'+SPRITE(p.dex)+'" alt="'+p.name+'"></div><div class="selected-stats">'+
+      '<div class="selected-card-head"><span class="selected-card-name">'+(p.special?'★★★★ ':'')+(f.u.shiny?'✨ Shiny ':'')+p.name+'</span><small class="selected-card-meta">'+p.types.join(' / ')+' • '+p.role+'</small></div>'+
+      '<div class="selected-hero"><div class="selected-sprite-wrap"><img class="selected-sprite'+(f.u.shiny?' shiny-selected-sprite':'')+'" src="'+SPRITE(p.dex,f.u.shiny)+'" alt="'+(f.u.shiny?'Shiny ':'')+p.name+'"></div><div class="selected-stats">'+
         '<div class="selected-stat"><span>HP</span><b>'+p.hp+'</b></div><div class="selected-stat"><span>ATK</span><b>'+p.atk+'</b></div><div class="selected-stat"><span>DEF</span><b>'+p.def+'</b></div></div></div>'+
       '<div class="selected-info-grid">'+
         '<div class="selected-info-card"><small>Raridade</small><b>'+rarityName(f.u)+'</b></div>'+
@@ -4860,6 +4920,7 @@
         '<div class="selected-info-card"><small>Venda</small><b>'+val+' ouro</b></div></div>'+
       '<div class="selected-ability"><b class="selected-section-title">O que a habilidade faz</b><span class="selected-section-copy">'+abilityDescription(p)+'</span></div>'+
       (p.passive?'<div class="selected-passive"><b class="selected-section-title">Passiva especial</b><span class="selected-section-copy">'+passiveDescription(p)+'</span></div>':'')+
+      (f.u.shiny?'<div class="selected-passive shiny-passive-box"><b class="selected-section-title">✨ Passiva Shiny</b><span class="selected-section-copy">'+shinyPassiveDescription(f.u)+'</span></div>':'')+
       '<div class="selected-equipment"><div class="selected-equipment-head"><b>Equipamentos ('+items.length+'/3)</b></div><div class="selected-equipment-slots">'+equipSlots+'</div></div>';
   }
   function renderStats(){
@@ -4904,7 +4965,7 @@
   }
   function makeCombatant(u,side,x,y){
     const p=stageData(u);return {cid:side+'-'+u.id+'-'+Math.random(),side,line:u.line,stage:u.stage,name:p.name,dex:p.dex,types:p.types,role:p.role,
-      maxHp:p.hp,hp:p.hp,atk:p.atk,def:p.def,range:p.range,speed:p.speed,ability:p.ability,passive:p.passive,special:p.special,mana:0,shield:0,x,y,meter:Math.random()*35,stun:0,
+      maxHp:p.hp,hp:p.hp,atk:p.atk,def:p.def,range:p.range,speed:p.speed,ability:p.ability,passive:p.passive,special:p.special,shiny:!!u.shiny,shinyKind:u.shiny?shinyRoleKind(p):null,mana:0,shield:0,x,y,meter:Math.random()*35,stun:0,
       effects:{},rootUntil:0,hasCast:false,nextRegenAt:3000,summoned:false,dead:false,items:(u.items||[]).map(i=>({id:i.id,key:i.key})),itemBonus:itemBonuses(u),intangibleUntil:0,controlGuardUsed:false,sandSlow:0,chill:0,chillUntil:0,speedBoost:0,speedBoostUntil:0};
   }
   function scaleEnemy(c,scale){
@@ -4999,8 +5060,11 @@
       regen:(tier('Water')===2?.02:0)+[0,.02,.04][tier('Grass')],root:tier('Grass')===2,
       poison:[0,.01,.02][tier('Poison')],antiHeal:tier('Poison')===2?.30:0,burn:tier('Fire')===2?.02:0,
       shield:tier('Ground')===2?.15:0,dragonReduction:dragon===2?.25:0,dragonAscension:dragon===2};
-    c.maxHp=Math.round(c.maxHp*(1+ib.hp)*b.hp);c.hp=c.maxHp;c.atk=Math.round(c.atk*(1+ib.atk)*b.atk);c.def=Math.round(c.def*(1+ib.def)*b.def);
-    c.speed=c.speed*(1+ib.speed)*b.speed;c.mana=b.mana;c.shield=Math.round(c.maxHp*(b.shield+ib.shield));
+    c.maxHp=Math.round(c.maxHp*(1+ib.hp)*b.hp);c.atk=Math.round(c.atk*(1+ib.atk)*b.atk);c.def=Math.round(c.def*(1+ib.def)*b.def);
+    if(c.shinyKind==='attacker')c.atk=Math.round(c.atk*1.10);
+    else if(c.shinyKind==='bruiser'){c.maxHp=Math.round(c.maxHp*1.08);c.atk=Math.round(c.atk*1.08)}
+    c.hp=c.maxHp;c.speed=c.speed*(1+ib.speed)*b.speed;c.mana=b.mana+(c.shinyKind==='mage'?20:0);c.shield=Math.round(c.maxHp*(b.shield+ib.shield));
+    c.shinySupportBoost=c.shinyKind==='support'?.15:0;c.shinyTankShieldUsed=false;c.shinyAssassinBoostUntil=0;
     c.dragonDamageReduction=b.dragonReduction;c.dragonAscension=b.dragonAscension;c.dragonResurgenceUsed=false;c.dragonResurgenceUntil=0;
     b.power*=1+ib.power;b.regen+=ib.regen;b.basicLeech=ib.basicLeech;b.abilityLeech=ib.abilityLeech;b.manaOnAttack=ib.manaOnAttack;c.bonus=b;
   }
@@ -5153,6 +5217,7 @@
       const now=combat.elapsedMs||0;
       c.speedBoost=Math.max(c.speedBoost||0,.25);
       c.speedBoostUntil=Math.max(c.speedBoostUntil||0,now+2000);
+      if(c.shiny&&c.shinyKind==='assassin')c.shinyAssassinBoostUntil=Math.max(c.shinyAssassinBoostUntil||0,now+3000);
       setTimeout(()=>{if(state.combat===combat&&!c.dead){fxRing(c,'ghost');flash(c.cid,'cast')}},35);
     }
     renderCombat();
@@ -5236,8 +5301,13 @@
     if(t.shield>0){const absorbed=Math.min(t.shield,raw);t.shield-=absorbed;raw-=absorbed}
     t.hp=Math.max(0,t.hp-raw);const dealt=before-t.hp;
     if(t.hp===0)t.dead=true;
-    else if(t.dragonAscension&&!t.dragonResurgenceUsed&&t.maxHp&&t.hp/t.maxHp<.40){
-      t.dragonResurgenceUsed=true;heal(t,t.maxHp*.25);t.speedBoost=Math.max(t.speedBoost||0,.30);t.speedBoostUntil=Math.max(t.speedBoostUntil||0,now+4000);t.dragonResurgenceUntil=now+4000;
+    else{
+      if(t.shiny&&t.shinyKind==='tank'&&!t.shinyTankShieldUsed&&t.maxHp&&t.hp/t.maxHp<.50){
+        t.shinyTankShieldUsed=true;const shinyShield=Math.round(t.maxHp*.15);t.shield+=shinyShield;fxFloat(t,'+'+shinyShield+' ESCUDO','shield');fxRing(t,'shield');
+      }
+      if(t.dragonAscension&&!t.dragonResurgenceUsed&&t.maxHp&&t.hp/t.maxHp<.40){
+        t.dragonResurgenceUsed=true;heal(t,t.maxHp*.25);t.speedBoost=Math.max(t.speedBoost||0,.30);t.speedBoostUntil=Math.max(t.speedBoostUntil||0,now+4000);t.dragonResurgenceUntil=now+4000;
+      }
     }
     return dealt;
   }
@@ -5304,10 +5374,10 @@
     else if(a.kind==='stun'){fxAbility(c,t,a.kind,a.name);damage(c,t,c.atk*a.power*power);applyStun(t,2);fxRing(t,'electric',90)}
     else if(a.kind==='heal'){
       const a1=allies.filter(x=>!x.dead).sort((x,y)=>(x.hp/x.maxHp)-(y.hp/y.maxHp))[0];fxAbility(c,a1?[a1]:[],a.kind,a.name);fxProjectile(c,t,fxTypeFor(c),85);
-      if(a1)heal(a1,c.maxHp*a.power*power);damage(c,t,c.atk*.7*power)
+      if(a1)heal(a1,c.maxHp*a.power*power*(1+(c.shinySupportBoost||0)));damage(c,t,c.atk*.7*power)
     }
     else if(a.kind==='shield'){
-      const gain=Math.round(c.maxHp*a.power*power);fxAbility(c,t,a.kind,a.name);c.shield+=gain;fxFloat(c,'+'+gain+' ESCUDO','shield');damage(c,t,c.atk*.8*power)
+      const gain=Math.round(c.maxHp*a.power*power*(1+(c.shinySupportBoost||0)));fxAbility(c,t,a.kind,a.name);c.shield+=gain;fxFloat(c,'+'+gain+' ESCUDO','shield');damage(c,t,c.atk*.8*power)
     }
     else if(a.kind==='dragonRush'){
       const splash=foes.filter(x=>!x.dead&&x!==t&&dist(x,t)<=1).slice(0,2);fxAbility(c,[t,...splash],a.kind,a.name);
@@ -5341,7 +5411,7 @@
       processEffects(c,state.combat.elapsedMs);if(c.dead)continue;
       if(c.stun>0){c.stun--;continue}
       if(c.assassinJumpPending)continue;
-      let actionSpeed=c.speed*(1-(c.sandSlow||0));if(c.chillUntil>state.combat.elapsedMs)actionSpeed*=1-(c.chill||0);if(c.speedBoostUntil>state.combat.elapsedMs)actionSpeed*=1+(c.speedBoost||0);
+      let actionSpeed=c.speed*(1-(c.sandSlow||0));if(c.chillUntil>state.combat.elapsedMs)actionSpeed*=1-(c.chill||0);if(c.speedBoostUntil>state.combat.elapsedMs)actionSpeed*=1+(c.speedBoost||0);if(c.shinyAssassinBoostUntil>state.combat.elapsedMs)actionSpeed*=1.15;
       c.meter+=actionSpeed/3.2;if(c.meter<100)continue;c.meter-=100;
       const foes=c.side==='player'?aliveE:aliveP,allies=c.side==='player'?aliveP:aliveE;if(!foes.length)continue;
       const t=targetForRole(c,foes);if(!t)continue;
@@ -5372,7 +5442,7 @@
       d.dataset.idleMotion=idleMotionKind(c);
       d.style.setProperty('--idle-delay',idleMotionDelay(c.cid));
       d.style.zIndex=String(c.boss?12:3+Math.max(0,Math.min(2,c.stage||0)));
-      d.classList.toggle('boss-fighter',!!c.boss);
+      d.classList.toggle('boss-fighter',!!c.boss);d.classList.toggle('shiny-fighter',!!c.shiny);
       d.classList.toggle('dragon-ascended',!!c.dragonAscension);d.classList.toggle('dragon-resurgence',c.dragonResurgenceUntil>state.combat.elapsedMs);
       d.classList.toggle('has-shield',(c.shield||0)>0);d.classList.toggle('status-burn',!!c.effects.burn);d.classList.toggle('status-poison',!!c.effects.poison);
       d.classList.toggle('status-root',c.rootUntil>state.combat.elapsedMs);d.classList.toggle('status-chill',c.chillUntil>state.combat.elapsedMs);d.classList.toggle('status-stun',(c.stun||0)>0);
@@ -5388,8 +5458,8 @@
         d.style.setProperty('--arena-depth',(0.84+(c.y/5)*.22).toFixed(3));
       }
       const hp=Math.max(0,Math.round(c.hp/c.maxHp*100));d.querySelector('.hp i').style.width=hp+'%';d.querySelector('.mana i').style.width=Math.min(100,c.mana)+'%';
-      const img=d.querySelector('img');img.src=SPRITE(c.dex);
-      d.querySelector('.label').textContent=c.name+(c.summoned?' ⚡':'');
+      const img=d.querySelector('img');img.src=SPRITE(c.dex,c.shiny);
+      d.querySelector('.label').textContent=(c.shiny?'✨ ':'')+c.name+(c.summoned?' ⚡':'');
     });
     layer.querySelectorAll('.fighter').forEach(d=>{if(!known.has(d.dataset.cid))d.remove()});
     if(state.enemySelected)selectedBox();
@@ -5402,7 +5472,7 @@
   }
   function showFinalSummary(){
     const team=allPlayerUnits(),bossWins=state.bossRewards.filter(r=>r.count===2).length;
-    const mons=team.length?team.map(u=>{const p=stageData(u);return '<div class="final-mon"><img src="'+SPRITE(p.dex)+'"><div>'+(p.special?'★★★★ ':'')+p.name+'</div><small>'+p.types.join(' / ')+'</small></div>'}).join(''):'<span class="subtitle">Nenhum Pokémon restante.</span>';
+    const mons=team.length?team.map(u=>{const p=stageData(u);return '<div class="final-mon"><img src="'+SPRITE(p.dex,u.shiny)+'"><div>'+(p.special?'★★★★ ':'')+(u.shiny?'✨ Shiny ':'')+p.name+'</div><small>'+p.types.join(' / ')+'</small></div>'}).join(''):'<span class="subtitle">Nenhum Pokémon restante.</span>';
     const seen=state.runStats.specialSeen.map(k=>LINES[k].stages[0][0]).join(', ')||'Nenhum';
     const bought=state.runStats.specialBought.map(k=>LINES[k].stages[0][0]).join(', ')||'Nenhum';
     $('#finalContent').innerHTML='<div class="final-stats"><div class="final-stat"><b>Etapa alcançada</b><br>'+state.round+'/'+state.maxRounds+'</div><div class="final-stat"><b>Vitórias / Derrotas</b><br>'+state.runStats.wins+' / '+state.runStats.losses+'</div><div class="final-stat"><b>Bosses derrotados</b><br>'+bossWins+'/'+BOSS_ROUNDS.length+'</div><div class="final-stat"><b>4★ vistos / comprados</b><br>'+state.runStats.specialSeen.length+' / '+state.runStats.specialBought.length+'</div></div><h3>Time final</h3><div class="final-team">'+mons+'</div><p class="item-note"><b>4★ encontrados:</b> '+seen+'<br><b>4★ comprados:</b> '+bought+'</p>';
