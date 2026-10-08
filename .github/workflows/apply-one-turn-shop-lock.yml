@@ -1,0 +1,23 @@
+name: Apply one-turn shop lock
+on:
+  push:
+    branches: [tmp-one-turn-shop-lock-2026-10-08]
+    paths:
+      - '.github/workflows/apply-one-turn-shop-lock.yml'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: python .github/scripts/apply_one_turn_shop_lock.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Make shop lock last exactly one round" || exit 0
+          git push
