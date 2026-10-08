@@ -1,0 +1,36 @@
+name: Swap Cyndaquil and Litwick roles
+on:
+  push:
+    paths:
+      - '.github/workflows/swap-cyndaquil-litwick-roles.yml'
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply role swap
+        run: python .github/scripts/swap_cyndaquil_litwick_roles.py
+      - name: Validate role swap
+        run: |
+          grep -q "litwick:{cost:2,role:'Mago'" index.html
+          grep -q "cyndaquil:{cost:2,role:'Atacante'" index.html
+          ! grep -q "litwick:{cost:2,role:'Atacante'" index.html
+          ! grep -q "cyndaquil:{cost:2,role:'Mago'" index.html
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          html=Path('index.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script[^>]*>([\s\S]*?)</script>',html,re.I)
+          Path('/tmp/tftmon.js').write_text('\n'.join(scripts),encoding='utf-8')
+          PY
+          node --check /tmp/tftmon.js
+          git diff --exit-code -- . ':!index.html'
+      - name: Commit role swap
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Swap Litwick and Cyndaquil combat roles'
+          git push
