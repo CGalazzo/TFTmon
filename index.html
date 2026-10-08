@@ -4690,7 +4690,7 @@
   function toggleShopLock(){if(state.battle||state.gameOver)return;state.shopLocked=!state.shopLocked;render()}
   function rollShop(free=false){
     if(state.battle||state.gameOver)return;
-    if(free&&state.shopLocked&&state.shop.length){render();return}
+    if(free&&state.shopLocked){state.shopLocked=false;if(state.shop.length){render();return}}
     if(!free){if(state.gold<2){toast('Ouro insuficiente.');return}state.gold-=2}
     state.shop=Array.from({length:5},()=>{
       const cost=weightedCost(),pool=KEYS.filter(k=>LINES[k].cost===cost);
