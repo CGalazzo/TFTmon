@@ -1,0 +1,31 @@
+name: Balance Shiny rarity
+on:
+  push:
+    branches:
+      - tmp-shiny-rarity-balance-2026-10-08
+    paths:
+      - '.github/workflows/balance-shiny-rarity.yml'
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply Shiny rarity balance
+        run: python .github/scripts/balance_shiny_rarity.py
+      - name: Validate targeted change
+        run: |
+          grep -q 'const SHINY_CHANCE=.002,SHINY_SPECIAL_CHANCE=.0005;' index.html
+          grep -q '0,2% de chance de ser Shiny; Pokémon 4★ têm 0,05%' index.html
+          grep -q 'Pokémon normais têm 0,2% de chance de aparecer Shiny em cada oferta; Pokémon 4★ têm 0,05%' index.html
+          grep -q 'if(win){gain=6+interest+streakBonus' index.html
+          grep -q 'gain=5+interest+streakBonus' index.html
+          git diff --check
+      - name: Commit balance
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git commit -m 'Make Shiny Pokemon significantly rarer'
+          git push
