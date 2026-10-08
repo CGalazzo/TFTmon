@@ -4153,7 +4153,7 @@
   <div class="modal-section"><h3>✨ Evolução e campo</h3><p>3 cópias iguais do mesmo estágio evoluem automaticamente. Formas finais não fundem. O limite de Pokémon no campo é igual ao nível do treinador, que vai até 9. Para posicionar, você pode clicar no Pokémon e depois no destino ou simplesmente clicar, arrastar e soltar entre o banco e o seu lado do tabuleiro.</p></div>
   <div class="modal-section"><h3>🧩 Sinergias</h3><p>A maioria das tipagens ativa bônus com 3 ou 5 linhas evolutivas diferentes. Dragon é especial: ativa com 1 e alcança Ascensão Dracônica com 4. Repetidos da mesma linha contam uma vez. Toque em qualquer tipagem durante a partida para ver os Pokémon válidos e seus efeitos.</p></div>
   <div class="modal-section"><h3>★★★★ Pokémon especiais</h3><p>Dratini, Larvitar, Gastly, Gible e Beldum são 4★. Eles começam a aparecer no nível 6, podem vir evoluídos e possuem habilidades/passivas exclusivas.</p></div>
-  <div class="modal-section"><h3>✨ Pokémon Shiny</h3><p>Cada oferta normal da loja tem 1% de chance de ser Shiny; Pokémon 4★ têm 0,5%. Shiny custa o mesmo, usa sua coloração especial e recebe uma Passiva Shiny de acordo com a função. Se uma das 3 cópias usadas na evolução for Shiny, a evolução continua Shiny. Shiny e normal contam como a mesma linha para sinergias.</p></div>
+  <div class="modal-section"><h3>✨ Pokémon Shiny</h3><p>Cada oferta normal da loja tem 0,2% de chance de ser Shiny; Pokémon 4★ têm 0,05%. Shiny custa o mesmo, usa sua coloração especial e recebe uma Passiva Shiny de acordo com a função. Se uma das 3 cópias usadas na evolução for Shiny, a evolução continua Shiny. Shiny e normal contam como a mesma linha para sinergias.</p></div>
   <div class="modal-section"><h3>🎒 Itens</h3><p>Você começa com 2 componentes. Combine 2 componentes para formar equipamentos. Cada Pokémon pode carregar até 3 itens. Bosses podem conceder novos componentes.</p></div>
   <div class="modal-section"><h3>👑 Bosses</h3><p>Etapa 6: Onix • 12: 3 Tauros • 18: Raikou, Entei ou Suicune • 25: Mewtwo • 32: Tyranitar • 38: Dragonite • 44: Articuno + Zapdos + Moltres • 50: Rayquaza. Vitória rende 2 componentes; ao perder removendo pelo menos 50% do HP total do boss, você recebe 1.</p></div>
   <div class="modal-section"><h3>🏆 Objetivo</h3><p>Sobreviva às 50 etapas e derrote Rayquaza na etapa final. Não existem fraquezas, resistências ou imunidades elementais de dano: as tipagens servem para formar sinergias.</p></div>
@@ -4365,7 +4365,7 @@
     return l.special?[4,9,16][st]||16:l.cost*Math.pow(3,st);
   }
   function unit(line,stage=0,shiny=false){return {id:state.uid++,line,stage,shiny:!!shiny,items:[]};}
-  const SHINY_CHANCE=.01,SHINY_SPECIAL_CHANCE=.005;
+  const SHINY_CHANCE=.002,SHINY_SPECIAL_CHANCE=.0005;
   function shinyChanceForLine(line){return LINES[line]?.special?SHINY_SPECIAL_CHANCE:SHINY_CHANCE}
   function shinyRoleKind(subject){
     const role=String(subject?.role||LINES[subject?.line]?.role||''),roles=role.split('/').map(x=>x.trim());
@@ -4683,7 +4683,7 @@
   function normalizeOffer(entry){return typeof entry==='string'?{line:entry,stage:0}:entry}
   function renderShopInfo(){
     const rows=[];for(let l=2;l<=9;l++){const o=shopOdds(l),n=stageOdds(l,false),sp=stageOdds(l,true);rows.push('<tr><td>Nv '+l+'</td><td>'+o[0]+'%</td><td>'+o[1]+'%</td><td>'+o[2]+'%</td><td>'+o[3]+'%</td><td>'+n.join(' / ')+'%</td><td>'+(l<6?'Bloqueado':sp.join(' / ')+'%')+'</td></tr>')}
-    $('#shopInfoContent').innerHTML='<table class="shop-table"><thead><tr><th>Nível</th><th>1$</th><th>2$</th><th>3$</th><th>4★</th><th>Normal B/2ª/3ª</th><th>4★ B/2ª/3ª</th></tr></thead><tbody>'+rows.join('')+'</tbody></table><p class="item-note"><b>3º estágio não aparece na loja.</b> Ele só pode ser obtido evoluindo 3 cópias do 2º estágio. As chances removidas do 3º estágio foram transferidas para o 2º estágio.</p><p class="item-note"><b>✨ Shiny:</b> Pokémon normais têm 1% de chance de aparecer Shiny em cada oferta; Pokémon 4★ têm 0,5%. O preço é o mesmo da versão normal.</p>';
+    $('#shopInfoContent').innerHTML='<table class="shop-table"><thead><tr><th>Nível</th><th>1$</th><th>2$</th><th>3$</th><th>4★</th><th>Normal B/2ª/3ª</th><th>4★ B/2ª/3ª</th></tr></thead><tbody>'+rows.join('')+'</tbody></table><p class="item-note"><b>3º estágio não aparece na loja.</b> Ele só pode ser obtido evoluindo 3 cópias do 2º estágio. As chances removidas do 3º estágio foram transferidas para o 2º estágio.</p><p class="item-note"><b>✨ Shiny:</b> Pokémon normais têm 0,2% de chance de aparecer Shiny em cada oferta; Pokémon 4★ têm 0,05%. O preço é o mesmo da versão normal.</p>';
   }
   function openShopInfo(){renderShopInfo();$('#shopInfoModal').classList.add('open')}
   function closeShopInfo(){$('#shopInfoModal').classList.remove('open')}
